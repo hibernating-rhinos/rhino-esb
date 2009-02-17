@@ -229,8 +229,15 @@ namespace Rhino.ServiceBus.Msmq
                 }
                 finally
                 {
-                    if (messageCompleted != null)
-                        messageCompleted(currentMessageInformation, ex);
+                    try
+                    {
+                        if (messageCompleted != null)
+                            messageCompleted(currentMessageInformation, ex);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+                    }
                 }
             }
             catch (Exception e)
