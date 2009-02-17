@@ -61,7 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\rhino-pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj">
+    <ProjectReference Include="..\..\pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj">
       <Project>{F30B2D63-CED5-4C8A-908F-0B5503D984A9}</Project>
       <Name>Rhino.PersistentHashTable</Name>
     </ProjectReference>
