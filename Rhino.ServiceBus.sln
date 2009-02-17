@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus", "Rhino.ServiceBus\Rhino.ServiceBus.csproj", "{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Tests", "Rhino.ServiceBus.Tests\Rhino.ServiceBus.Tests.csproj", "{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Starbucks", "Starbucks", "{64DC50EF-F634-4E75-8375-ACC6D42E2DB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starbucks", "Samples\Starbucks\Starbucks.csproj", "{0FC43226-8030-46FC-A2AB-D064207FF364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Host", "Rhino.ServiceBus.Host\Rhino.ServiceBus.Host.csproj", "{8FBBDD2A-A832-4827-9325-C670B6DC06FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starbucks.Tests", "Samples\Starbucks.Tests\Starbucks.Tests.csproj", "{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.DistributedHashTable", "Rhino.DistributedHashTable\Rhino.DistributedHashTable.csproj", "{63530BA6-3424-49D9-B32C-A35A603817CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.PersistentHashTable", "..\rhino-pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj", "{F30B2D63-CED5-4C8A-908F-0B5503D984A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.PersistentHashTable.Tests", "..\rhino-pht\Rhino.PersistentHashTable.Tests\Rhino.PersistentHashTable.Tests.csproj", "{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.DistributedHashTable.Tests", "Rhino.DistributedHashTable.Tests\Rhino.DistributedHashTable.Tests.csproj", "{A9B450CA-22D0-4234-BA46-62A39FC554F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.DistributedHashTableIntegration", "Rhino.ServiceBus.DistributedHashTableIntegration\Rhino.ServiceBus.DistributedHashTableIntegration.csproj", "{CBBB042F-D5E4-4BCD-AE95-D6D886DA8222}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC43226-8030-46FC-A2AB-D064207FF364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC43226-8030-46FC-A2AB-D064207FF364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC43226-8030-46FC-A2AB-D064207FF364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC43226-8030-46FC-A2AB-D064207FF364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FBBDD2A-A832-4827-9325-C670B6DC06FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FBBDD2A-A832-4827-9325-C670B6DC06FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FBBDD2A-A832-4827-9325-C670B6DC06FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FBBDD2A-A832-4827-9325-C670B6DC06FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63530BA6-3424-49D9-B32C-A35A603817CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63530BA6-3424-49D9-B32C-A35A603817CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63530BA6-3424-49D9-B32C-A35A603817CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63530BA6-3424-49D9-B32C-A35A603817CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F30B2D63-CED5-4C8A-908F-0B5503D984A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F30B2D63-CED5-4C8A-908F-0B5503D984A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F30B2D63-CED5-4C8A-908F-0B5503D984A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F30B2D63-CED5-4C8A-908F-0B5503D984A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9B450CA-22D0-4234-BA46-62A39FC554F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9B450CA-22D0-4234-BA46-62A39FC554F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9B450CA-22D0-4234-BA46-62A39FC554F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9B450CA-22D0-4234-BA46-62A39FC554F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBBB042F-D5E4-4BCD-AE95-D6D886DA8222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBBB042F-D5E4-4BCD-AE95-D6D886DA8222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBBB042F-D5E4-4BCD-AE95-D6D886DA8222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBBB042F-D5E4-4BCD-AE95-D6D886DA8222}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0FC43226-8030-46FC-A2AB-D064207FF364} = {64DC50EF-F634-4E75-8375-ACC6D42E2DB4}
+		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA} = {64DC50EF-F634-4E75-8375-ACC6D42E2DB4}
+	EndGlobalSection
+EndGlobal

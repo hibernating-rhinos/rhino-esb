@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rhino.ServiceBus</RootNamespace>
+    <AssemblyName>Rhino.ServiceBus</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\Castle\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\Castle\Castle.MicroKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\Castle\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\NHibernate\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Config\IBusConfigurationAware.cs" />
+    <Compile Include="Config\LoggingConfiguration.cs" />
+    <Compile Include="Config\SecurityConfiguration.cs" />
+    <Compile Include="ConsumerOf.cs" />
+    <Compile Include="Convertors\ThrowingWireEcryptedStringConvertor.cs" />
+    <Compile Include="Convertors\WireEcryptedStringConvertor.cs" />
+    <Compile Include="DataStructures\OrderedList.cs" />
+    <Compile Include="DataStructures\Queue.cs" />
+    <Compile Include="DataStructures\Set.cs" />
+    <Compile Include="DataStructures\WireEcryptedString.cs" />
+    <Compile Include="DataStructures\MultiValueIndexHashtable.cs" />
+    <Compile Include="DataStructures\LeastRecentlyUsedSet.cs" />
+    <Compile Include="DataStructures\Hashtable.cs" />
+    <Compile Include="Exceptions\InvalidUsageException.cs" />
+    <Compile Include="Exceptions\OptimisticConcurrencyException.cs" />
+    <Compile Include="Exceptions\UnboundedResultSetException.cs" />
+    <Compile Include="Hosting\AbstractBootStrapper.cs" />
+    <Compile Include="Hosting\DefaultHost.cs" />
+    <Compile Include="Hosting\RemoteAppDomainHost.cs" />
+    <Compile Include="Hosting\RemoteAppDomainLoadBalancerHost.cs" />
+    <Compile Include="Impl\EndpointRouter.cs" />
+    <Compile Include="Endpoint.cs" />
+    <Compile Include="Internal\IEndpointRouter.cs" />
+    <Compile Include="IServiceBusAware.cs" />
+    <Compile Include="Impl\DefaultServiceBus.cs" />
+    <Compile Include="Impl\DisposableAction.cs" />
+    <Compile Include="Impl\InstanceSubscriptionInformation.cs" />
+    <Compile Include="Impl\MessageOwner.cs" />
+    <Compile Include="Impl\CurrentMessageInformation.cs" />
+    <Compile Include="Exceptions\MessagePublicationException.cs" />
+    <Compile Include="Exceptions\SubscriptionException.cs" />
+    <Compile Include="Exceptions\TransportException.cs" />
+    <Compile Include="LoadBalancer\LoadBalancerHost.cs" />
+    <Compile Include="LoadBalancer\MsmqLoadBalancer.cs" />
+    <Compile Include="MessageModules\LoadBalancerMessageModule.cs" />
+    <Compile Include="Messages\AcceptingWork.cs" />
+    <Compile Include="Messages\LoadBalancerMessage.cs" />
+    <Compile Include="Messages\MergeSagaState.cs" />
+    <Compile Include="Messages\ReadyToWork.cs" />
+    <Compile Include="Msmq\AbstractMsmqListener.cs" />
+    <Compile Include="Msmq\QueueCreationModule.cs" />
+    <Compile Include="Msmq\SubQueue.cs" />
+    <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
+    <Compile Include="Msmq\TransportState.cs" />
+    <Compile Include="Sagas\Persisters\InMemorySagaPersister.cs" />
+    <Compile Include="Impl\RhinoServiceBusFacility.cs" />
+    <Compile Include="Internal\IMessageConsumer.cs" />
+    <Compile Include="Impl\DefaultReflection.cs" />
+    <Compile Include="Internal\IMsmqTransport.cs" />
+    <Compile Include="Internal\IReflection.cs" />
+    <Compile Include="Internal\ISagaPersister.cs" />
+    <Compile Include="Internal\ISubscriptionStorage.cs" />
+    <Compile Include="Internal\IValueConvertor.cs" />
+    <Compile Include="MessageModules\IMessageModule.cs" />
+    <Compile Include="MessageModules\MessageLoggingModule.cs" />
+    <Compile Include="Messages\AddInstanceSubscription.cs" />
+    <Compile Include="Messages\AddSubscription.cs" />
+    <Compile Include="Messages\AdministrativeMessage.cs" />
+    <Compile Include="Messages\MessageArrivedMessage.cs" />
+    <Compile Include="Messages\MessageProcessingFailedMessage.cs" />
+    <Compile Include="Messages\MessageProcessingCompletedMessage.cs" />
+    <Compile Include="Messages\MessageSentMessage.cs" />
+    <Compile Include="Messages\RemoveInstanceSubscription.cs" />
+    <Compile Include="Messages\RemoveSubscription.cs" />
+    <Compile Include="Messages\SerializationErrorMessage.cs" />
+    <Compile Include="Msmq\FlatQueueStrategy.cs" />
+    <Compile Include="Msmq\IQueueStrategy.cs" />
+    <Compile Include="Msmq\MessageType.cs" />
+    <Compile Include="Msmq\MsmqCurrentMessageInformation.cs" />
+    <Compile Include="Msmq\MsmqExtensions.cs" />
+    <Compile Include="Msmq\NativeMethods.cs" />
+    <Compile Include="Msmq\SubQueueStrategy.cs" />
+    <Compile Include="Msmq\TimeoutInfo.cs" />
+    <Compile Include="Msmq\TransportActions\AdministrativeAction.cs" />
+    <Compile Include="Msmq\TransportActions\ErrorAction.cs" />
+    <Compile Include="Msmq\TransportActions\AbstractTransportAction.cs" />
+    <Compile Include="Msmq\TransportActions\ITransportAction.cs" />
+    <Compile Include="Msmq\TransportActions\TimeoutAction.cs" />
+    <Compile Include="Msmq\TypeAndUriKey.cs" />
+    <Compile Include="OccasionalConsumerOf.cs" />
+    <Compile Include="Internal\IAccessibleSaga.cs" />
+    <Compile Include="Sagas\InitiatedBy.cs" />
+    <Compile Include="IServiceBus.cs" />
+    <Compile Include="Internal\ITransport.cs" />
+    <Compile Include="IStartableServiceBus.cs" />
+    <Compile Include="Internal\IMessageSerializer.cs" />
+    <Compile Include="Msmq\MsmqSubscriptionStorage.cs" />
+    <Compile Include="Msmq\MsmqUtil.cs" />
+    <Compile Include="Msmq\MsmqTransport.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sagas\ISaga.cs" />
+    <Compile Include="Sagas\ISagaMessage.cs" />
+    <Compile Include="Sagas\Orchestrates.cs" />
+    <Compile Include="Sagas\SupportsOptimisticConcurrency.cs" />
+    <Compile Include="Serializers\XmlMessageSerializer.cs" />
+    <Compile Include="Util\GuidCombGenerator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Config\LoadBalancerConfiguration.cs" />
+    <Compile Include="DataStructures\Timeout.cs" />
+    <Compile Include="Exceptions\LoadBalancerException.cs" />
+    <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
+    <Compile Include="Messages\Heartbeat.cs" />
+    <Compile Include="Messages\NewEndpointPersisted.cs" />
+    <Compile Include="Messages\NewWorkerPersisted.cs" />
+    <Compile Include="Messages\QueryForAllKnownWorkersAndEndpoints.cs" />
+    <Compile Include="Messages\Reroute.cs" />
+    <Compile Include="Msmq\OpenedQueue.cs" />
+    <Compile Include="Msmq\QueueInfo.cs" />
+    <None Include="PublicApi.cd" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

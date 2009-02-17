@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Rhino.ServiceBus.DataStructures.LeastRecentlyUsedSet&lt;T&gt;">
+    <Position X="11.5" Y="3.75" Width="2.5" />
+    <Members>
+      <Field Name="inOrder" Hidden="true" />
+      <Field Name="maxEntries" Hidden="true" />
+      <Field Name="readerWriterLock" Hidden="true" />
+      <Field Name="set" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Delegate Name="Rhino.ServiceBus.DataStructures.LeastRecentlyUsedSet&lt;T&gt;.WriteAction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DataStructures\LeastRecentlyUsedSet.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAhAAAAUADAAAAAAAAAAEAAAAAAEQAAA=</HashCode>
+      <FileName>DataStructures\LeastRecentlyUsedSet.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Rhino.ServiceBus.DataStructures.ThreadSafeDictionary&lt;TKey, TVal&gt;">
+    <Position X="8.75" Y="3.75" Width="2.5" />
+    <Members>
+      <Field Name="dictionary" Hidden="true" />
+      <Field Name="readerWriterLockSlim" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Delegate Name="Rhino.ServiceBus.DataStructures.ThreadSafeDictionary&lt;TKey, TVal&gt;.WriteAction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DataStructures\ThreadSafeDictionary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAEAAAAAAAEAAAJAAEAAAA=</HashCode>
+      <FileName>DataStructures\ThreadSafeDictionary.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Rhino.ServiceBus.IStartableServiceBus">
+    <Position X="3.5" Y="3.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IStartableServiceBus.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.ServiceBus.IServiceBus">
+    <Position X="0.75" Y="3.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQABAEAAAAAAAAACAABAQAAAAAAAAAA=</HashCode>
+      <FileName>IServiceBus.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.ServiceBus.ConsumerOf&lt;TMsg&gt;">
+    <Position X="3.5" Y="0.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsumerOf.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.ServiceBus.Sagas.InitiatedBy&lt;TMsg&gt;" Collapsed="true">
+    <Position X="1" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Sagas\InitiatedBy.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.ServiceBus.Sagas.Orchestrates&lt;TMsg&gt;" Collapsed="true">
+    <Position X="6.25" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Sagas\Orchestrates.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.ServiceBus.OccasionalConsumerOf&lt;TMsg&gt;" Collapsed="true">
+    <Position X="3.25" Y="2.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OccasionalConsumerOf.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
