@@ -17,8 +17,8 @@
 		
 		<!-- <include name="Rhino.ServiceBus.NHibernate/default.build" /> -->
 		
-		<include name="Rhino.ServiceBus.Tests/default.build" if="${common.testrunner.enabled}"/>
-		<include name="Rhino.DistributedHashTable.Tests/default.build" if="${common.testrunner.enabled}" />
+		<include name="Rhino.ServiceBus.Tests/default.build"/>
+		<include name="Rhino.DistributedHashTable.Tests/default.build" />
 		
 	</fileset>
 

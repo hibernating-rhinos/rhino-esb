@@ -85,6 +85,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj">
+      <Project>{F30B2D63-CED5-4C8A-908F-0B5503D984A9}</Project>
+      <Name>Rhino.PersistentHashTable</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.DistributedHashTable\Rhino.DistributedHashTable.csproj">
       <Project>{63530BA6-3424-49D9-B32C-A35A603817CE}</Project>
       <Name>Rhino.DistributedHashTable</Name>
