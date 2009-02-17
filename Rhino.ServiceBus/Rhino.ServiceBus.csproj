@@ -164,6 +164,7 @@
   <ItemGroup>
     <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="DataStructures\Timeout.cs" />
+    <Compile Include="Exceptions\InvalidDeploymentException.cs" />
     <Compile Include="Exceptions\LoadBalancerException.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
     <Compile Include="Messages\Heartbeat.cs" />
