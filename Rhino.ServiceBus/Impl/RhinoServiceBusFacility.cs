@@ -7,6 +7,7 @@ using Castle.Core.Configuration;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
+using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
@@ -146,6 +147,10 @@ namespace Rhino.ServiceBus.Impl
                     .Parameters(Parameter.ForKey("modules")
                                     .Eq(CreateModuleConfigurationNode())
                     ),
+                Component.For<IDeploymentAction>()
+                    .ImplementedBy<CreateLogQueueAction>(),
+                Component.For<IDeploymentAction>()
+                    .ImplementedBy<CreateQueuesAction>(),
                 Component.For<IReflection>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy<DefaultReflection>(),

@@ -11,10 +11,13 @@ namespace Rhino.ServiceBus.Msmq
 	/// </summary>
 	public class SubQueueStrategy : IQueueStrategy
 	{
-		public void InitializeQueue(Endpoint queueEndpoint)
+		public MessageQueue[] InitializeQueue(Endpoint queueEndpoint)
 		{
 			var path = MsmqUtil.GetQueuePath(queueEndpoint);
-			path.Create();
+		    return new[]
+		    {
+		        path.Create()
+		    };
 		}
 
 		/// <summary>

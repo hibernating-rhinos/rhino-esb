@@ -162,10 +162,15 @@
     <Compile Include="Util\GuidCombGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\CreateLogQueueAction.cs" />
+    <Compile Include="Actions\CreateQueuesAction.cs" />
+    <Compile Include="Actions\IDeploymentAction.cs" />
+    <Compile Include="Actions\IEnvironmentValidationAction.cs" />
     <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="DataStructures\Timeout.cs" />
     <Compile Include="Exceptions\InvalidDeploymentException.cs" />
     <Compile Include="Exceptions\LoadBalancerException.cs" />
+    <Compile Include="Hosting\IApplicationHost.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
     <Compile Include="Messages\Heartbeat.cs" />
     <Compile Include="Messages\NewEndpointPersisted.cs" />

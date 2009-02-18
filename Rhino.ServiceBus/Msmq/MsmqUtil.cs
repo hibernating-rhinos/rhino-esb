@@ -56,27 +56,27 @@ namespace Rhino.ServiceBus.Msmq
                 match.Groups["queueName"]);
         }
 
-        public static MessageQueue CreateQueue(string queuePath, QueueAccessMode accessMode)
+        public static MessageQueue CreateQueue(string newQueuePath, QueueAccessMode accessMode)
         {
             try
             {
-                if (MessageQueue.Exists(queuePath) == false)
+                if (MessageQueue.Exists(newQueuePath) == false)
                 {
                     try
                     {
-                        MessageQueue.Create(queuePath, true);
+                        MessageQueue.Create(newQueuePath, true);
                     }
                     catch (Exception e)
                     {
-                        throw new TransportException("Queue " + queuePath + " doesn't exists and we failed to create it", e);
+                        throw new TransportException("Queue " + newQueuePath + " doesn't exists and we failed to create it", e);
                     }
                 }
 
-                return new MessageQueue(queuePath, accessMode);
+                return new MessageQueue(newQueuePath, accessMode);
             }
             catch (Exception e)
             {
-                throw new MessagePublicationException("Could not open queue (" + queuePath + ")", e);
+                throw new MessagePublicationException("Could not open queue (" + newQueuePath + ")", e);
             }
         }
     }

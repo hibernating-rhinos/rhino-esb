@@ -33,7 +33,7 @@ namespace Rhino.ServiceBus.Host.Actions
 
             var host = new RhinoServiceBusHost();
             host.SetArguments(options.Assembly, options.ConfigFile);
-            host.CreateQueues();
+            host.InitialDeployment(installer.Account);
         }
     }
 }

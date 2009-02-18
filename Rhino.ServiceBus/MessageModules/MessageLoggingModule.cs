@@ -14,6 +14,11 @@ namespace Rhino.ServiceBus.MessageModules
         private readonly Uri logQueue;
         private OpenedQueue queue;
 
+        public Uri LogQueue
+        {
+            get { return logQueue; }
+        }
+
         public MessageLoggingModule(IMessageSerializer messageSerializer, IEndpointRouter endpointRouter, Uri logQueue)
         {
             this.messageSerializer = messageSerializer;

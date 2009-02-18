@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Rhino.ServiceBus.Host
 {
 	using System.ServiceProcess;
@@ -38,10 +40,13 @@ namespace Rhino.ServiceBus.Host
 			OnStart(arguments);
 		}
 
-	    public void CreateQueues()
+	    public void InitialDeployment(ServiceAccount account)
 	    {
 	        var tmpHost = new RemoteAppDomainHost(asm, cfg);
-	        tmpHost.CreateQueues();
+	        var user = account.ToString();
+            if (account == ServiceAccount.User)
+                user = Environment.UserDomainName;
+	        tmpHost.InitialDeployment(user);
             tmpHost.Close();
 	        
 	    }

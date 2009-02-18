@@ -6,14 +6,14 @@ using log4net;
 
 namespace Rhino.ServiceBus.Hosting
 {
-	using System.Reflection;
-	using System.Text;
+    using System.Reflection;
+    using System.Text;
 
     public class RemoteAppDomainHost
     {
-	    private readonly Type boosterType;
+        private readonly Type boosterType;
         private readonly string assembly;
-        private string path;
+        private readonly string path;
         private HostedService current;
         private string configurationFile;
 
@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Hosting
         }
 
         public RemoteAppDomainHost(Type boosterType)
-            :this(boosterType.Assembly.Location, null)
+            : this(boosterType.Assembly.Location, null)
         {
             this.boosterType = boosterType;
         }
@@ -40,19 +40,19 @@ namespace Rhino.ServiceBus.Hosting
         {
             HostedService service = CreateNewAppDomain();
             current = service;
-        	try
-        	{
-        		service.Start();
-        	}
-			catch (ReflectionTypeLoadException e)
-			{
-				var sb = new StringBuilder();
-				foreach (var exception in e.LoaderExceptions)
-				{
-					sb.AppendLine(exception.ToString());
-				}
-				throw new TypeLoadException(sb.ToString(), e);
-			}
+            try
+            {
+                service.Start();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                var sb = new StringBuilder();
+                foreach (var exception in e.LoaderExceptions)
+                {
+                    sb.AppendLine(exception.ToString());
+                }
+                throw new TypeLoadException(sb.ToString(), e);
+            }
         }
 
         private HostedService CreateNewAppDomain()
@@ -69,27 +69,18 @@ namespace Rhino.ServiceBus.Hosting
         }
 
         protected virtual HostedService CreateRemoteHost(AppDomain appDomain)
-	    {
-	        object instance = appDomain.CreateInstanceAndUnwrap("Rhino.ServiceBus",
-	                                                            "Rhino.ServiceBus.Hosting.DefaultHost");
-	        var hoster = (DefaultHost) instance;
-            
-	        if (boosterType != null)
-	            hoster.SetBootStrapperTypeName(boosterType.FullName);
+        {
+            object instance = appDomain.CreateInstanceAndUnwrap("Rhino.ServiceBus",
+                                                                "Rhino.ServiceBus.Hosting.DefaultHost");
+            var hoster = (DefaultHost)instance;
 
-	        return new HostedService
-	        {
-                CreateQueues = ()=>hoster.CreateQueues(assembly),
-	            Stop = ()=>
-	            {
-	                hoster.Dispose();
-	                AppDomain.Unload(appDomain);
-	            },
-	            Start = () => hoster.Start(assembly)
-	        };
-	    }
+            if (boosterType != null)
+                hoster.SetBootStrapperTypeName(boosterType.FullName);
 
-	    private string ConfigurationFile
+            return new HostedService(hoster, assembly, appDomain);
+        }
+
+        private string ConfigurationFile
         {
             get
             {
@@ -110,19 +101,42 @@ namespace Rhino.ServiceBus.Hosting
 
         #region Nested type: HostedService
 
-	    protected class HostedService
+        protected class HostedService
         {
-            public Action Start;
-            public Action Stop;
-	        public Action CreateQueues;
+            private readonly IApplicationHost hoster;
+            private readonly string assembly;
+            private readonly AppDomain appDomain;
+
+            public HostedService(IApplicationHost hoster, string assembly, AppDomain appDomain)
+            {
+                this.hoster = hoster;
+                this.assembly = assembly;
+                this.appDomain = appDomain;
+            }
+
+            public void Stop()
+            {
+                hoster.Dispose();
+                AppDomain.Unload(appDomain);
+            }
+
+            public void Start()
+            {
+                hoster.Start(assembly);
+            }
+
+            public void InitialDeployment(string user)
+            {
+                hoster.InitialDeployment(assembly, user);
+            }
         }
 
         #endregion
 
-        public void CreateQueues()
+        public void InitialDeployment(string user)
         {
             HostedService service = CreateNewAppDomain();
-            service.CreateQueues();
+            service.InitialDeployment(user);
         }
     }
 }

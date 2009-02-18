@@ -1,6 +1,6 @@
 namespace Rhino.ServiceBus.Actions
 {
-    public interface IValidationAction
+    public interface IEnvironmentValidationAction
     {
         void Execute();
     }

@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
+using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 
@@ -30,6 +31,10 @@ namespace Rhino.ServiceBus.Hosting
         protected virtual void ConfigureContainer()
         {
             container.Register(
+                AllTypes.Of<IDeploymentAction>()
+                    .FromAssembly(Assembly),
+                AllTypes.Of<IEnvironmentValidationAction>()
+                    .FromAssembly(Assembly),
                 AllTypes
 					.FromAssembly(Assembly)
 					.Where(type => 

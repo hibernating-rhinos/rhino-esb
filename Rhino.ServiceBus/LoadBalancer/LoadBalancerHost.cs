@@ -1,11 +1,12 @@
 using System;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.LoadBalancer
 {
-    public class LoadBalancerHost : MarshalByRefObject, IDisposable
+    public class LoadBalancerHost : MarshalByRefObject, IApplicationHost
     {
         private MsmqLoadBalancer loadBalancer;
 
@@ -27,6 +28,16 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             if (loadBalancer != null)
                 loadBalancer.Dispose();
+        }
+
+        public void Start(string assembly)
+        {
+            Start();
+        }
+
+        public void InitialDeployment(string assembly, string user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

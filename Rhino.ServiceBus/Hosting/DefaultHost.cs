@@ -6,6 +6,7 @@ using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using log4net;
 using log4net.Config;
+using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
@@ -13,7 +14,7 @@ using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Hosting
 {
-    public class DefaultHost : MarshalByRefObject, IDisposable
+    public class DefaultHost : MarshalByRefObject, IApplicationHost
     {
         private readonly ILog logger = LogManager.GetLogger(typeof(DefaultHost));
         private string assebmlyName;
@@ -137,20 +138,19 @@ namespace Rhino.ServiceBus.Hosting
             return null; //singleton
         }
 
-        public void CreateQueues(string asmName)
+        public void InitialDeployment(string asmName, string user)
         {
             InitailizeBus(asmName);
 
-            var queueStrategy = container.Resolve<IQueueStrategy>();
-            // will create the queues if they are not already there
-            queueStrategy.InitializeQueue(serviceBus.Endpoint);
+            foreach (var action in container.ResolveAll<IDeploymentAction>())
+            {
+                action.Execute(user);
+            }
 
-            if(container.Kernel.HasComponent(typeof(MessageLoggingModule))==false)
-                return;
-            var transport = container.Resolve<ITransport>();
-            var loggingModule = container.Resolve<MessageLoggingModule>();
-            // will create the queues if they are not already there
-            loggingModule.Init(transport);
+            foreach (var action in container.ResolveAll<IEnvironmentValidationAction>())
+            {
+                action.Execute();
+            }
         }
     }
 }

@@ -2,6 +2,6 @@ namespace Rhino.ServiceBus.Actions
 {
     public interface IDeploymentAction
     {
-        void Execute();
+        void Execute(string user);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration.Install;
 using System.Linq;
+using System.ServiceProcess;
 
 
 namespace Rhino.ServiceBus.Host
@@ -18,6 +19,14 @@ namespace Rhino.ServiceBus.Host
 				return serviceInstaller1.ServiceName;
 			}
 		}
+
+	    public ServiceAccount Account
+	    {
+	        get
+	        {
+	            return serviceProcessInstaller1.Account;
+	        }
+	    }
 
 		public ProjectInstaller()
 		{

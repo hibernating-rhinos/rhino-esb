@@ -80,13 +80,13 @@ namespace Rhino.ServiceBus.Msmq
 				MessageQueue.Delete(QueuePath);
 		}
 
-		public void Create()
+		public MessageQueue Create()
 		{
 			if (IsLocal == false || Exists)
-				return;
+			    return new MessageQueue(queuePath);
 			try
 			{
-				MessageQueue.Create(QueuePath, true);
+				return MessageQueue.Create(QueuePath, true);
 			}
 			catch (Exception e)
 			{

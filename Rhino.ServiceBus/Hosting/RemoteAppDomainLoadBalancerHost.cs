@@ -19,16 +19,7 @@ namespace Rhino.ServiceBus.Hosting
             object instance = appDomain.CreateInstanceAndUnwrap("Rhino.ServiceBus",
                                                                 "Rhino.ServiceBus.LoadBalancer.LoadBalancerHost");
             var hoster = (LoadBalancerHost)instance;
-
-            return new HostedService
-            {
-                Stop = () =>
-                {
-                    hoster.Dispose();
-                    AppDomain.Unload(appDomain);
-                },
-                Start = hoster.Start
-            };
+            return new HostedService(hoster, "Rhino.ServiceBus", appDomain);
         }
     }
 }
