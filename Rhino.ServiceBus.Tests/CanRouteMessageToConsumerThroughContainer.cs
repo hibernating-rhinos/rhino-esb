@@ -33,7 +33,7 @@ namespace Rhino.ServiceBus.Tests
                 var transport = container.Resolve<ITransport>();
                 transport.Send(transport.Endpoint, msg);
 
-                TestConsumer.Wait.WaitOne(TimeSpan.FromSeconds(30));
+                TestConsumer.Wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.Equal(msg, TestConsumer.Ticks);
             }

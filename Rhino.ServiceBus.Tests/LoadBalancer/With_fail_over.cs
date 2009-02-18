@@ -94,7 +94,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                          });
 
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var messageSerializer = container.Resolve<IMessageSerializer>();
 
@@ -169,7 +169,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 }
 
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var messageSerializer = container.Resolve<IMessageSerializer>();
 

@@ -35,7 +35,7 @@ namespace Rhino.ServiceBus.Tests
               
                 bus.Start();
                 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var serializer = container.Resolve<IMessageSerializer>();
                 bool found = false;
@@ -65,7 +65,7 @@ namespace Rhino.ServiceBus.Tests
 
                 subscriptionStorage.SubscriptionChanged += () => wait.Set();
                 bus.Start();
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var serializer = container.Resolve<IMessageSerializer>();
                 subscriptions.Peek(TimeSpan.FromSeconds(30));

@@ -57,7 +57,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 transport.Send(loadBalancer.Endpoint, "test");
 
-                Assert.True(wait.WaitOne(TimeSpan.FromSeconds(30)));
+                Assert.True(wait.WaitOne(TimeSpan.FromSeconds(30), false));
             }
         }
 
@@ -84,17 +84,17 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 transport.Send(loadBalancer.Endpoint, "test");
 
-                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30)));
+                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30), false));
 
                 loadBalancer.Dispose();
 
-                Assert.True(waitForReroute.WaitOne(TimeSpan.FromSeconds(30)));
+                Assert.True(waitForReroute.WaitOne(TimeSpan.FromSeconds(30), false));
 
                 waitForMsg.Reset();
 
                 transport.Send(loadBalancer.Endpoint, "test2");
 
-                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30)));
+                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30), false));
                 Assert.True(secondaryLoadBalancer.TookOverWork);
             }
         }

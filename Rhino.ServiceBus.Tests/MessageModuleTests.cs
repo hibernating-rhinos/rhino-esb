@@ -92,7 +92,7 @@ namespace Rhino.ServiceBus.Tests
                 Module1.ErrorResetEvent = new ManualResetEvent(false);
 
                 serviceBus.Send(serviceBus.Endpoint,5);
-                Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
             }
             Assert.NotNull(Module1.Exception);
         }
@@ -109,8 +109,8 @@ namespace Rhino.ServiceBus.Tests
                 Module1.Completion = false;
 
                 serviceBus.Send(serviceBus.Endpoint, 3);
-                Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30));
-                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
             }
             Assert.True(Module1.Completion);
         }
@@ -125,7 +125,7 @@ namespace Rhino.ServiceBus.Tests
                 Module1.Completion = false;
 
                 serviceBus.Send(serviceBus.Endpoint, "hello");
-                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
             }
             Assert.True(Module1.Completion);
         }

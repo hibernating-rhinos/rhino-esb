@@ -25,7 +25,7 @@ namespace Rhino.ServiceBus.Tests
                 Name = "ayende",
                 SendAt = today
             });
-            waitHandle.WaitOne(TimeSpan.FromSeconds(30));
+            waitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.NotNull(receivedMsg);
             Assert.Equal(1, receivedMsg.Count);
@@ -61,7 +61,7 @@ namespace Rhino.ServiceBus.Tests
                 Name = "ayende",
                 SendAt = today
             });
-            waitHandle.WaitOne(TimeSpan.FromSeconds(30));
+            waitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.NotNull(receivedMsg);
             Assert.Equal(1, receivedMsg.Count);

@@ -207,7 +207,7 @@ namespace Rhino.ServiceBus.Tests
             queue.Send("test1", MessageQueueTransactionType.None);
             queue.Send("test2", MessageQueueTransactionType.None);
 
-            wait.WaitOne(TimeSpan.FromSeconds(30));
+            wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.Equal(1, count);
         }
@@ -233,7 +233,7 @@ namespace Rhino.ServiceBus.Tests
 
             queue.Send("test1");
             queue.Send("test2");
-            wait.WaitOne(TimeSpan.FromSeconds(30));
+            wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.Equal(2, count);
         }
@@ -253,7 +253,7 @@ namespace Rhino.ServiceBus.Tests
         {
             IAsyncResult asyncResult = queue.BeginPeek(
                 TimeSpan.FromMilliseconds(1), null, delegate { });
-            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.False(asyncResult.CompletedSynchronously);
 
@@ -268,7 +268,7 @@ namespace Rhino.ServiceBus.Tests
         {
             IAsyncResult asyncResult = queue.BeginPeek(
                 TimeSpan.FromMilliseconds(1), null, delegate { });
-            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.False(asyncResult.CompletedSynchronously);
 

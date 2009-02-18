@@ -44,11 +44,11 @@ namespace Rhino.ServiceBus.Tests
                 PongHandler.ResetEvent = new ManualResetEvent(false);
                 PongHandler.GotReply = false;
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 bus2.Publish(new Ping());
 
-                PongHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                PongHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.True(PongHandler.GotReply);
             }

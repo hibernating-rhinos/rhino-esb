@@ -31,7 +31,7 @@ namespace Rhino.ServiceBus.Tests
 
                 bus.Send(new TestMessage());
 
-                TestHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                TestHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.True(TestHandler.GotMessage);
             }

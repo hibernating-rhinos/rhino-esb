@@ -41,7 +41,7 @@ namespace Rhino.ServiceBus.Tests
 
                 transport.MessageProcessingCompleted += (i,e) => wait.Set();
                 bus.Send(bus.Endpoint, new AddLineItemMessage());
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.Null(OrderProcessor.LastState);
             }
@@ -57,12 +57,12 @@ namespace Rhino.ServiceBus.Tests
                 var guid = Guid.NewGuid();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage { CorrelationId = guid });
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 wait.Reset();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage { CorrelationId = guid });
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.Equal(2, OrderProcessor.LastState.Count);
             }
@@ -76,7 +76,7 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage());
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var persister = container.Resolve<ISagaPersister<OrderProcessor>>();
                 OrderProcessor processor = null;
@@ -98,7 +98,7 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage2());
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 var persister = container.Resolve<ISagaPersister<OrderProcessor>>();
                 OrderProcessor processor = null;
@@ -120,14 +120,14 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage());
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
                 wait.Reset();
 
                 Assert.Equal(1, OrderProcessor.LastState.Count);
 
                 bus.Send(bus.Endpoint, new AddLineItemMessage { CorrelationId = sagaId });
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.Equal(2, OrderProcessor.LastState.Count);
             }
@@ -141,7 +141,7 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
 
                 bus.Send(bus.Endpoint, new NewOrderMessage());
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
                 wait.Reset();
 
                 var persister = container.Resolve<ISagaPersister<OrderProcessor>>();
@@ -154,7 +154,7 @@ namespace Rhino.ServiceBus.Tests
 
                 bus.Send(bus.Endpoint, new SubmitOrderMessage { CorrelationId = sagaId });
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 while (processor != null)
                 {

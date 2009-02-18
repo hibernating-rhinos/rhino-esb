@@ -38,7 +38,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
                     Type = typeof(int).FullName
                 });
 
-                subscriptionChanged.WaitOne(TimeSpan.FromSeconds(30));
+                subscriptionChanged.WaitOne(TimeSpan.FromSeconds(30), false);
             }
 
             var container2 = CreateContainer();

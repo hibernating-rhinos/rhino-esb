@@ -33,7 +33,7 @@ namespace Starbucks.Customer
 
                 bus.Send(new NewOrder {CustomerName = Name, DrinkName = Drink, Size = Size});
 
-                if(wait.WaitOne(TimeSpan.FromSeconds(30))==false)
+                if(wait.WaitOne(TimeSpan.FromSeconds(30), false)==false)
                     throw new InvalidOperationException("didn't get my coffee in time");
             }
         }

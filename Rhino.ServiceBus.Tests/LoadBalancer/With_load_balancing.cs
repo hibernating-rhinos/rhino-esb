@@ -61,7 +61,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                              NewEndPoint = newEndPoint
                          });
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
                 routedEndpoint = endpointRouter.GetRoutedEndpoint(original);
                 Assert.Equal(newEndPoint, routedEndpoint.Uri);
             }
@@ -80,7 +80,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 bus.Send(loadBalancer.Endpoint, "abcdefg");
 
-                MyHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                MyHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
                 Assert.True(
                     MyHandler.Message.ResponseQueue.Path.Contains(@"private$\test_queue")
                     );
@@ -211,7 +211,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                     Type = "foobar"
                 });
 
-                wait.WaitOne(TimeSpan.FromSeconds(30));
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
             }
 
 			using (var q = MsmqUtil.GetQueuePath(TransactionalTestQueueUri).Open())
@@ -256,7 +256,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 loadBalancer.Start();
 
-                bool messagesWereProcess = wait.WaitOne(TimeSpan.FromMilliseconds(250));
+                bool messagesWereProcess = wait.WaitOne(TimeSpan.FromMilliseconds(250), false);
 
                 Assert.False(messagesWereProcess);
             }
@@ -276,7 +276,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 loadBalancer.Start();
 
-                MyHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                MyHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
                 Assert.True(
                     MyHandler.Message.ResponseQueue.Path.Contains(@"private$\test_queue")
                     );

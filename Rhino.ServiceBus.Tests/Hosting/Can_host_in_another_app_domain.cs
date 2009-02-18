@@ -50,7 +50,7 @@ namespace Rhino.ServiceBus.Tests.Hosting
                 {
                     bus.Send(new Uri("msmq://localhost/test_queue").ToEndpoint(), "hello");
 
-                    resetEvent.WaitOne(TimeSpan.FromSeconds(30));
+                    resetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
 
                     Assert.Equal("olleh", reply);
                 }

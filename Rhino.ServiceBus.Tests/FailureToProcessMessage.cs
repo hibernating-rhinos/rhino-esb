@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Tests
 
             Transport.Send(TestQueueUri, DateTime.Today);
 
-            gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30));
+            gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30), false);
 
             gotSecondMessage.Set();
         }
@@ -32,7 +32,7 @@ namespace Rhino.ServiceBus.Tests
 
             TransactionalTransport.Send(TransactionalTestQueueUri, DateTime.Today);
 
-            gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30));
+            gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30), false);
 
             Assert.NotNull(transactionalQueue.Peek());
 
@@ -126,7 +126,7 @@ namespace Rhino.ServiceBus.Tests
                         gotFirstMessage.Set();
                     }
                 }
-                gotSecondMessage.WaitOne(TimeSpan.FromSeconds(30));
+                gotSecondMessage.WaitOne(TimeSpan.FromSeconds(30), false);
                 return true;
             };
         }
@@ -148,7 +148,7 @@ namespace Rhino.ServiceBus.Tests
 
                 Transport.Send(testQueueEndPoint, DateTime.Today);
 
-                gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30));
+                gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 gotSecondMessage.Set();
             }
@@ -160,7 +160,7 @@ namespace Rhino.ServiceBus.Tests
 
                 TransactionalTransport.Send(transactionalTestQueueEndpoint, DateTime.Today);
 
-                gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30));
+                gotFirstMessage.WaitOne(TimeSpan.FromSeconds(30), false);
 
                 Assert.NotNull(transactionalQueue.Peek(TimeSpan.FromSeconds(30)));
 
@@ -254,7 +254,7 @@ namespace Rhino.ServiceBus.Tests
                             gotFirstMessage.Set();
                         }
                     }
-                    gotSecondMessage.WaitOne(TimeSpan.FromSeconds(30));
+                    gotSecondMessage.WaitOne(TimeSpan.FromSeconds(30), false);
                     return true;
                 };
             }
