@@ -1,5 +1,6 @@
 using System;
 using System.Messaging;
+using System.Net;
 using Rhino.ServiceBus.Exceptions;
 
 namespace Rhino.ServiceBus.Msmq
@@ -38,10 +39,20 @@ namespace Rhino.ServiceBus.Msmq
                 };
             }
 
+            IPAddress address;
+            if (IPAddress.TryParse(hostName, out address))
+            {
+                return new QueueInfo
+                {
+                    IsLocal = false,
+                    QueuePath = "FormatName:DIRECT=TCP:" + hostName + @"\private$\" + queuePathWithFlatSubQueue,
+                    QueueUri = uri
+                };
+            }
             return new QueueInfo
             {
                 IsLocal = false,
-                QueuePath = "FormatName:DIRECT=TCP:" + hostName + @"\private$\" + queuePathWithFlatSubQueue,
+                QueuePath = "FormatName:DIRECT=OS:" + hostName + @"\private$\" + queuePathWithFlatSubQueue,
                 QueueUri = uri
             };
         }
