@@ -14,7 +14,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
             get { return MessageType.AdministrativeMessageMarker; }
         }
 
-        public override void Init(IMsmqTransport parentTransport)
+        public override void Init(IMsmqTransport parentTransport, OpenedQueue queue)
         {
             transport = parentTransport;
         }
@@ -28,7 +28,8 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
                 return true;
             };
 
-            transport.ReceiveMessageInTransaction(message.Id,
+            transport.ReceiveMessageInTransaction(
+                queue, message.Id,
                 messageRecieved,
                 transport.RaiseAdministrativeMessageProcessingCompleted);
 

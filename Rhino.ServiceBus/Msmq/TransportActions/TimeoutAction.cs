@@ -21,12 +21,12 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
             this.queueStrategy = queueStrategy;
         }
 
-        public override void Init(IMsmqTransport transport)
+        public override void Init(IMsmqTransport transport, OpenedQueue queue)
         {
             parentTransport = transport;
             timeoutMessageIds.Write(writer =>
             {
-                foreach (var message in queueStrategy.GetTimeoutMessages(transport.Queue))
+                foreach (var message in queueStrategy.GetTimeoutMessages(queue))
                 {
                     writer.Add(message.Time, message.Id);
                 }
@@ -88,9 +88,10 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
                     try
                     {
+                        using(var queue = parentTransport.CreateQueue())
                         using (var tx = new TransactionScope())
                         {
-                            queueStrategy.MoveTimeoutToMainQueue(parentTransport.Queue, pair.Value);
+                            queueStrategy.MoveTimeoutToMainQueue(queue, pair.Value);
                             tx.Complete();
                         }
                     }

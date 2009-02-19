@@ -32,11 +32,11 @@ namespace Rhino.ServiceBus.Msmq
 
         #region ITransport Members
 
-        protected override void BeforeStart()
+        protected override void BeforeStart(OpenedQueue queue)
         {
             foreach (var messageAction in transportActions)
             {
-                messageAction.Init(this);
+                messageAction.Init(this, queue);
             }
         }
 
@@ -74,11 +74,6 @@ namespace Rhino.ServiceBus.Msmq
                 return copy(information);
 	        return false;
         }
-
-	    public OpenedQueue Queue
-	    {
-	        get { return queue; }
-	    }
 
 	    public void RaiseAdministrativeMessageProcessingCompleted(CurrentMessageInformation information, Exception ex)
 	    {
@@ -127,7 +122,7 @@ namespace Rhino.ServiceBus.Msmq
 
 		#endregion
 
-        public void ReceiveMessageInTransaction(string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted)
+        public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted)
 		{
 			using (var tx = new TransactionScope(TransactionScopeOption.Required, GetTransactionTimeout()))
 			{
@@ -140,7 +135,7 @@ namespace Rhino.ServiceBus.Msmq
 			}
 		}
 
-        public void RaiseMessageSerializationException(Message msg, string errorMessage)
+        public void RaiseMessageSerializationException(OpenedQueue queue, Message msg, string errorMessage)
         {
             var copy = MessageSerializationException;
             if (copy == null)
@@ -154,6 +149,11 @@ namespace Rhino.ServiceBus.Msmq
                 MessageId = Guid.Empty
             };
             copy(messageInformation, new SerializationException(errorMessage));
+        }
+
+        public OpenedQueue CreateQueue()
+        {
+            return InitalizeQueue(Endpoint);
         }
 
         private void HandleMessageCompletion(
@@ -207,7 +207,7 @@ namespace Rhino.ServiceBus.Msmq
             Action<CurrentMessageInformation, Exception> messageCompleted)
 		{
 		    Exception ex = null;
-		    currentMessageInformation = CreateMessageInformation(message, null, null);
+		    currentMessageInformation = CreateMessageInformation(messageQueue, message, null, null);
             try
             {
                 //deserialization errors do not count for module events
@@ -216,7 +216,7 @@ namespace Rhino.ServiceBus.Msmq
                 {
                     foreach (object msg in messages)
                     {
-                        currentMessageInformation = CreateMessageInformation(message, messages, msg);
+                        currentMessageInformation = CreateMessageInformation(messageQueue,message, messages, msg);
 
                         if(ProcessSingleMessage(messageRecieved)==false)
                             Discard(currentMessageInformation.Message);
@@ -266,7 +266,7 @@ namespace Rhino.ServiceBus.Msmq
 	        return false;
 	    }
 
-	    private MsmqCurrentMessageInformation CreateMessageInformation(Message message, object[] messages, object msg)
+	    private MsmqCurrentMessageInformation CreateMessageInformation(OpenedQueue queue,Message message, object[] messages, object msg)
 	    {
 	        return new MsmqCurrentMessageInformation
 	        {
@@ -301,7 +301,7 @@ namespace Rhino.ServiceBus.Msmq
 			}
 		}
 
-        protected override void HandlePeekedMessage(Message message)
+        protected override void HandlePeekedMessage(OpenedQueue queue,Message message)
         {
             foreach (var action in transportActions)
             {
@@ -320,7 +320,7 @@ namespace Rhino.ServiceBus.Msmq
                 }
             }
 
-            ReceiveMessageInTransaction(message.Id, MessageArrived, MessageProcessingCompleted);
+            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted);
         }
 	}
 }

@@ -7,16 +7,16 @@ namespace Rhino.ServiceBus.Internal
 {
     public interface IMsmqTransport : ITransport
     {
-        OpenedQueue Queue { get; }
-
         void RaiseAdministrativeMessageProcessingCompleted(CurrentMessageInformation information, Exception ex);
 
         bool RaiseAdministrativeMessageArrived(CurrentMessageInformation information);
 
-        void ReceiveMessageInTransaction(string messageId, 
+        void ReceiveMessageInTransaction(OpenedQueue queue, 
+            string messageId, 
             Func<CurrentMessageInformation, bool> messageArrived,
             Action<CurrentMessageInformation, Exception> messageProcessingCompleted);
 
-        void RaiseMessageSerializationException(Message msg, string errorMessage);
+        void RaiseMessageSerializationException(OpenedQueue queue, Message msg, string errorMessage);
+        OpenedQueue CreateQueue();
     }
 }

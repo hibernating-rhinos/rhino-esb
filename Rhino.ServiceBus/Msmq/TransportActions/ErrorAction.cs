@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
             this.queueStrategy = queueStrategy;
         }
 
-        public void Init(IMsmqTransport transport)
+        public void Init(IMsmqTransport transport, OpenedQueue queue)
         {
             transport.MessageSerializationException += Transport_OnMessageSerializationException;
             transport.MessageProcessingFailure += Transport_OnMessageProcessingFailure;
@@ -79,7 +79,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
             if(doesNotHaveMessageId)
             {
                 var errorMessage = "Message does not have Extension set to at least 16 bytes, which will be used as the message id. Probably not a bus message.";
-                transport.RaiseMessageSerializationException(message,errorMessage);
+                transport.RaiseMessageSerializationException(queue,message,errorMessage);
                 MoveToErrorQueue(queue, message, errorMessage);
                 return true;
             }

@@ -75,16 +75,16 @@ namespace Rhino.ServiceBus.LoadBalancer
             Raise(TookOverAsActiveLoadBalancer);
         }
 
-        protected override void BeforeStart()
+        protected override void BeforeStart(OpenedQueue queue)
         {
             timeout = new Timeout(TimeoutForHeartBeatFromPrimary);
 
-            base.BeforeStart();
+            base.BeforeStart(queue);
         }
 
-        protected override void AfterStart()
+        protected override void AfterStart(OpenedQueue queue)
         {
-            base.AfterStart();
+            base.AfterStart(queue);
             SendToQueue(primaryLoadBalancer, new QueryForAllKnownWorkersAndEndpoints());
             StartTrackingHeartbeats();
         }

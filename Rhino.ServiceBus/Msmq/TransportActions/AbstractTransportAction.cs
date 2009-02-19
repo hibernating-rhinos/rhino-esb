@@ -7,7 +7,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
     {
         public abstract MessageType HandledType { get; }
 
-        public virtual void Init(IMsmqTransport transport)
+        public virtual void Init(IMsmqTransport transport, OpenedQueue queue)
         {
             
         }

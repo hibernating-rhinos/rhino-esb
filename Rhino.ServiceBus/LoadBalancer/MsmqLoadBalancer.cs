@@ -64,7 +64,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             get { return readyForWork.TotalCount; }
         }
 
-        protected override void BeforeStart()
+        protected override void BeforeStart(OpenedQueue queue)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         private void RemoveAllReadyToWorkMessages()
         {
             using (var tx = new TransactionScope())
-            using (var readyForWorkQueue = MsmqUtil.GetQueuePath(Endpoint).Open(QueueAccessMode.Receive))
+            using (var readyForWorkQueue = MsmqUtil.GetQueuePath(Endpoint).Open(QueueAccessMode.SendAndReceive))
             using (var enumerator = readyForWorkQueue.GetMessageEnumerator2())
             {
                 try
@@ -113,7 +113,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                             enumerator.Current.Label == typeof(ReadyToWork).FullName)
                         {
                             var current = enumerator.RemoveCurrent(readyForWorkQueue.GetTransactionType());
-                            HandleLoadBalancerMessage(current);
+                            HandleLoadBalancerMessage(readyForWorkQueue,current);
                         }
                     }
                 }
@@ -127,7 +127,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             }
         }
 
-        protected override void AfterStart()
+        protected override void AfterStart(OpenedQueue queue)
         {
             if (SecondaryLoadBalancer != null)
             {
@@ -160,7 +160,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             heartBeatTimer.Dispose();
         }
 
-        protected override void HandlePeekedMessage(Message message)
+        protected override void HandlePeekedMessage(OpenedQueue queue, Message message)
         {
             try
             {
@@ -170,18 +170,18 @@ namespace Rhino.ServiceBus.LoadBalancer
                     if (message == null)
                         return;
 
-                    PersistEndpoint(message);
+                    PersistEndpoint(queue, message);
 
                     switch ((MessageType)message.AppSpecific)
                     {
                         case MessageType.LoadBalancerMessageMarker:
-                            HandleLoadBalancerMessage(message);
+                            HandleLoadBalancerMessage(queue,message);
                             break;
                         case MessageType.AdministrativeMessageMarker:
                             SendToAllWorkers(message);
                             break;
                         default:
-                            HandleStandardMessage(message);
+                            HandleStandardMessage(queue,message);
                             break;
                     }
                     tx.Complete();
@@ -193,7 +193,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             }
         }
 
-        private void PersistEndpoint(Message message)
+        private void PersistEndpoint(OpenedQueue queue, Message message)
         {
             var queueUri = MsmqUtil.GetQueueUri(message.ResponseQueue);
             if (queueUri == null)
@@ -234,7 +234,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             }
         }
 
-        private void HandleStandardMessage(Message message)
+        private void HandleStandardMessage(OpenedQueue queue, Message message)
         {
             var worker = readyForWork.Dequeue();
 
@@ -271,7 +271,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                 copy(message);
         }
 
-        private void HandleLoadBalancerMessage(Message message)
+        private void HandleLoadBalancerMessage(OpenedQueue queue, Message message)
         {
             foreach (var msg in DeserializeMessages(queue, message, null))
             {
@@ -288,7 +288,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                     var needToAddToQueue = KnownWorkers.Add(work.Endpoint);
 
                     if (needToAddToQueue)
-                        AddWorkerToQueue(work);
+                        AddWorkerToQueue(queue,work);
 
                     readyForWork.Enqueue(work.Endpoint);
                 }
@@ -342,7 +342,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
         }
 
-        private void AddWorkerToQueue(ReadyToWork work)
+        private void AddWorkerToQueue(OpenedQueue queue, ReadyToWork work)
         {
             var persistedWorker = new Message
             {

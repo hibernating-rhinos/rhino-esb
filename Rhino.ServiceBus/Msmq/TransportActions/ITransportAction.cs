@@ -5,7 +5,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 {
     public interface ITransportAction
     {
-        void Init(IMsmqTransport transport);
+        void Init(IMsmqTransport transport, OpenedQueue queue);
 
         bool CanHandlePeekedMessage(Message message);
         bool HandlePeekedMessage(IMsmqTransport transport, OpenedQueue queue, Message message);
