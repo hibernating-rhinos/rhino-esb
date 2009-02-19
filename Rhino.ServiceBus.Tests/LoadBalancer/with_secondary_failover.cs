@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Messaging;
 using System.Threading;
 using Castle.MicroKernel.Registration;
@@ -19,7 +20,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
         public with_secondary_failover()
         {
-			testQueue2.Purge();
+            testQueue2.Purge();
 
             var interpreter = new XmlInterpreter(@"LoadBalancer\BusWithLoadBalancer.config");
             container = new WindsorContainer(interpreter);
@@ -39,11 +40,11 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
         [Fact]
         public void When_secondary_starts_it_will_ask_primary_to_get_known_workers_and_endpoints()
         {
-            using(var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
+            using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
                 secondary.Start();
 
-                using(var loadBalancerMsmqQueue = new MessageQueue(loadBalancerQueuePath))
+                using (var loadBalancerMsmqQueue = new MessageQueue(loadBalancerQueuePath))
                 {
                     var message = loadBalancerMsmqQueue.Receive(TimeSpan.FromSeconds(30));
                     Assert.Equal(typeof(QueryForAllKnownWorkersAndEndpoints).FullName, message.Label);
@@ -67,7 +68,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
         }
 
 
-        [Fact(Skip = "Need additional review, could not get them to consistently run")]
+        [Fact]
         public void When_secondary_takes_over_it_will_let_endpoints_that_it_took_over()
         {
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
@@ -91,8 +92,8 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             }
         }
 
-		[Fact(Skip = "Need additional review, could not get them to consistently run")]
-		public void When_secondary_takes_over_it_will_let_workers_know_that_it_took_over()
+        [Fact]
+        public void When_secondary_takes_over_it_will_let_workers_know_that_it_took_over()
         {
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
@@ -106,19 +107,25 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 Assert.True(wait.WaitOne());
 
-                var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                int tries = 5;
                 var serializer = container.Resolve<IMessageSerializer>();
-				Reroute reroute = serializer.Deserialize(message.BodyStream)
-            			.OfType<Reroute>().First();
+                Reroute reroute = null;
+                while (reroute == null)
+                {
+                    var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                    reroute = serializer.Deserialize(message.BodyStream)
+                        .OfType<Reroute>().FirstOrDefault();
+                    Assert.True(tries > 0);
+                    tries -= 1;
+                }
 
                 Assert.Equal(secondary.PrimaryLoadBalancer, reroute.OriginalEndPoint);
-                Assert.Equal(secondary.Endpoint.Uri.ToString().ToLower(), 
-                    reroute.NewEndPoint.ToString().ToLower().Replace(Environment.MachineName.ToLower(),"localhost"));
+                Assert.Equal(secondary.Endpoint.Uri, reroute.NewEndPoint);
             }
         }
 
-		[Fact(Skip = "Need additional review, could not get them to consistently run")]
-		public void When_secondary_takes_over_it_will_let_workers_know_that_it_is_accepting_work()
+        [Fact]
+        public void When_secondary_takes_over_it_will_let_workers_know_that_it_is_accepting_work()
         {
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
@@ -131,12 +138,18 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 secondary.Start();
 
                 Assert.True(wait.WaitOne());
-
-                testQueue2.Receive(TimeSpan.FromSeconds(30));//reroute message
-                var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
                 var serializer = container.Resolve<IMessageSerializer>();
-                var deserialize = serializer.Deserialize(message.BodyStream);
-                var acceptingWork = deserialize.OfType<AcceptingWork>().First();
+
+                int tries = 5;
+                AcceptingWork acceptingWork = null;
+                while(acceptingWork==null)
+                {
+                    var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                    var deserialize = serializer.Deserialize(message.BodyStream);
+                    acceptingWork = deserialize.OfType<AcceptingWork>().FirstOrDefault();
+                    Assert.True(tries > 0);
+                    tries -= 1;
+                }
 
                 Assert.Equal(acceptingWork.Endpoint, secondary.Endpoint.Uri);
             }

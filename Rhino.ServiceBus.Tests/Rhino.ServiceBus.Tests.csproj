@@ -71,6 +71,7 @@
     <Compile Include="Bugs\When_error_occured_on_transactional_queue.cs" />
     <Compile Include="Bugs\When_handler_consumes_two_messages.cs" />
     <Compile Include="Bugs\When_running_on_MTA_thread.cs" />
+    <Compile Include="Bugs\Will_send_invalid_admin_message_to_error_queue.cs" />
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
