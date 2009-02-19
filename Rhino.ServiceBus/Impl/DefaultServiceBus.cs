@@ -211,9 +211,10 @@ namespace Rhino.ServiceBus.Impl
                     continue;
 
                 logger.InfoFormat("Subscribing {0} on {1}", type.FullName, owner.Endpoint);
+                
                 Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new AddSubscription
                 {
-                    Endpoint = Endpoint.Uri.ToString(),
+                    Endpoint = Endpoint,
                     Type = type.FullName
                 });
             }
@@ -238,7 +239,7 @@ namespace Rhino.ServiceBus.Impl
 
                 Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new RemoveSubscription
                 {
-                    Endpoint = Endpoint.Uri.ToString(),
+                    Endpoint = Endpoint,
                     Type = type.FullName
                 });
             }

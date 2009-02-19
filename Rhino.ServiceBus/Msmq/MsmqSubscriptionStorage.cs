@@ -265,13 +265,13 @@ namespace Rhino.ServiceBus.Msmq
 
         private bool ConsumeRemoveSubscription(RemoveSubscription removeSubscription)
         {
-            RemoveSubscription(removeSubscription.Type, removeSubscription.Endpoint);
+            RemoveSubscription(removeSubscription.Type, removeSubscription.Endpoint.Uri.ToString());
             return true;
         }
 
         private bool ConsumeAddSubscription(CurrentMessageInformation msgInfo, AddSubscription addSubscription)
         {
-            bool newSubscription = AddSubscription(addSubscription.Type, addSubscription.Endpoint);
+            bool newSubscription = AddSubscription(addSubscription.Type, addSubscription.Endpoint.Uri.ToString());
 
             
             var msmqMsgInfo = msgInfo as MsmqCurrentMessageInformation;
@@ -285,7 +285,7 @@ namespace Rhino.ServiceBus.Msmq
                 AddMessageIdentifierForTracking(
                     message.Id,
                     addSubscription.Type,
-                    new Uri(addSubscription.Endpoint));
+                    addSubscription.Endpoint.Uri);
             
                 return true;
             }
@@ -293,7 +293,7 @@ namespace Rhino.ServiceBus.Msmq
             AddMessageIdentifierForTracking(
                 msgInfo.TransportMessageId,
                 addSubscription.Type,
-                new Uri(addSubscription.Endpoint));
+                addSubscription.Endpoint.Uri);
             return false;
         }
 

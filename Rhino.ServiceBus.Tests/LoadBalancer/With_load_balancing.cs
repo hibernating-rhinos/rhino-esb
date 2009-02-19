@@ -207,7 +207,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 bus.Send(loadBalancer.Endpoint, new AddSubscription
                 {
-                    Endpoint = bus.Endpoint.Uri.ToString(),
+                    Endpoint = bus.Endpoint,
                     Type = "foobar"
                 });
 

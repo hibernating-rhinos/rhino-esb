@@ -34,7 +34,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
                     () => subscriptionChanged.Set();
                 bus.Send(bus.Endpoint,new AddSubscription
                 {
-                    Endpoint = bus.Endpoint.Uri.ToString(),
+                    Endpoint = bus.Endpoint,
                     Type = typeof(int).FullName
                 });
 

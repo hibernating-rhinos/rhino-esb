@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Tests
             var msg = new Message();
             serializer.Serialize(new object[]{new AddSubscription
             {
-                Endpoint = TransactionalTestQueueUri.Uri.ToString(),
+                Endpoint = TransactionalTestQueueUri,
                 Type = typeof(TestMessage).FullName,
             }}, msg.BodyStream);
 
@@ -51,7 +51,7 @@ namespace Rhino.ServiceBus.Tests
             var msg = new Message();
             serializer.Serialize(new object[]{new AddSubscription
             {
-                Endpoint = TransactionalTestQueueUri.Uri.ToString(),
+                Endpoint = TransactionalTestQueueUri,
                 Type = typeof(TestMessage).FullName,
             }}, msg.BodyStream);
             msg.Extension = Guid.NewGuid().ToByteArray();
