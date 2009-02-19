@@ -186,12 +186,10 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         if (newEndpointPersisted == null)
                             continue;
 
-                        var endpoint = newEndpointPersisted.PersistedEndpoint.ToString()
-                            .ToLower()
-                            .Replace(Environment.MachineName.ToLower(), "localhost");
-                        if (endpoint == TestQueueUri2.Uri.ToString().ToLower())
+                        var endpoint = newEndpointPersisted.PersistedEndpoint;
+                        if (endpoint == TestQueueUri2.Uri)
                             work1 += 1;
-                        else if (endpoint == TransactionalTestQueueUri.Uri.ToString().ToLower())
+                        else if (endpoint == TransactionalTestQueueUri.Uri)
                             work2 += 1;
                     }
 

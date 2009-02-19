@@ -4,7 +4,25 @@ namespace Rhino.ServiceBus
 {
     public class Endpoint
     {
-        public Uri Uri { get; set; }
+        private Uri uri;
+        public Uri Uri
+        {
+            get { return uri; }
+            set
+            {
+                if(value.Host.ToLowerInvariant()=="localhost")
+                {
+                    uri = new UriBuilder(value)
+                    {
+                        Host = Environment.MachineName
+                    }.Uri;
+                }
+                else
+                {
+                    uri = value;
+                }
+            }
+        }
 
         public override string ToString()
         {
