@@ -70,7 +70,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
         public bool CanHandlePeekedMessage(Message message)
         {
-            return message.AppSpecific == 0;
+            return true; ;
         }
 
         public bool HandlePeekedMessage(IMsmqTransport transport, OpenedQueue queue, Message message)
