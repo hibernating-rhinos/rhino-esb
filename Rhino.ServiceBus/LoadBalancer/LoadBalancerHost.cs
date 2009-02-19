@@ -37,7 +37,10 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         public void InitialDeployment(string assembly, string user)
         {
-            throw new NotImplementedException();
         }
-    }
+
+        public void SetBootStrapperTypeName(string type)
+        {
+        }       
+        }
 }

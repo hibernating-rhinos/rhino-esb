@@ -6,5 +6,6 @@ namespace Rhino.ServiceBus.Hosting
     {
         void Start(string assembly);
         void InitialDeployment(string assembly, string user);
+        void SetBootStrapperTypeName(string type);
     }
 }

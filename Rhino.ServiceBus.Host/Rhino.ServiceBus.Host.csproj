@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\DebugAction.cs" />
+    <Compile Include="Actions\DeployAction.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Actions\InstallAction.cs" />
     <Compile Include="Actions\ServerAction.cs" />

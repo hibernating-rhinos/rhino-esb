@@ -308,8 +308,16 @@ namespace Rhino.ServiceBus.Msmq
                 if(action.CanHandlePeekedMessage(message)==false)
                     continue;
 
-                if (action.HandlePeekedMessage(this, queue, message))
-                    return;
+                try
+                {
+                    if (action.HandlePeekedMessage(this, queue, message))
+                        return;
+                }
+                catch (Exception e)
+                {
+                    logger.Error("Error when trying to execute action " + action + " on message " + message.Id + ". Message has been removed without handling!", e);
+                    queue.ConsumeMessage(message.Id);
+                }
             }
 
             ReceiveMessageInTransaction(message.Id, MessageArrived, MessageProcessingCompleted);

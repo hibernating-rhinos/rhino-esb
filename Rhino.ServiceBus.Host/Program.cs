@@ -13,7 +13,8 @@ namespace Rhino.ServiceBus.Host
             {Action.Debug, new DebugAction()},
             {Action.Server, new ServerAction()},
             {Action.Install, new InstallAction()},
-            {Action.Uninstall, new UninstallAction()}
+            {Action.Uninstall, new UninstallAction()},
+            {Action.Deploy, new DeployAction()}
         };
 
         public static void Main(string[] args)

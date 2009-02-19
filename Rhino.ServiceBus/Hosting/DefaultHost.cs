@@ -116,9 +116,13 @@ namespace Rhino.ServiceBus.Hosting
             if (bootStrappers.Length == 0)
                 throw new InvalidOperationException("Could not find a boot strapper for " + assembly);
 
-            if (bootStrappers.Length == 2)
+            if (bootStrappers.Length > 1)
+            {
+
                 throw new InvalidOperationException("Found more than one boot strapper for " + assembly +
-                                                    " you need to specify which boot strapper to use");
+                    " you need to specify which boot strapper to use: " + Environment.NewLine +
+                    string.Join(Environment.NewLine, bootStrappers.Select(x => x.FullName).ToArray()));
+            }
 
             return bootStrappers[0];
         }

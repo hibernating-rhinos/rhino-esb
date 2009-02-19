@@ -210,8 +210,11 @@ namespace Rhino.ServiceBus.Msmq
 				}
 				catch (Exception e)
 				{
+#if DEBUG
 					Debugger.Break();
 					Debug.Fail("should not happen", e.ToString());
+#endif
+				    logger.Fatal("BUG_IN_THE_BUS: An error occured during message dispatch by the bus itself. Please notify the developers", e);
 				}
 			}
 

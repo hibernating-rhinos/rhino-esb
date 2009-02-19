@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Configuration.Install;
 using Microsoft.Win32;
@@ -30,10 +31,6 @@ namespace Rhino.ServiceBus.Host.Actions
 
                 service.SetValue("ImagePath", path + options);
             }
-
-            var host = new RhinoServiceBusHost();
-            host.SetArguments(options.Assembly, options.ConfigFile);
-            host.InitialDeployment(installer.Account);
         }
     }
 }

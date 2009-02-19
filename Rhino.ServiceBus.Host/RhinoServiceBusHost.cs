@@ -11,21 +11,25 @@ namespace Rhino.ServiceBus.Host
 		private RemoteAppDomainHost host;
 		private string asm;
 	    private string cfg;
+	    private string hostType;
 
 	    public RhinoServiceBusHost()
 		{
 			InitializeComponent();
 		}
 
-		public void SetArguments(string assembly, string config)
+		public void SetArguments(ExecutingOptions options)
 		{
-		    asm = assembly;
-		    cfg = config;
+		    asm = options.Assembly;
+		    cfg = options.ConfigFile;
+		    hostType = options.Host;
 		}
 
 		protected override void OnStart(string[] ignored)
 		{
             host = new RemoteAppDomainHost(asm, cfg);
+            if (string.IsNullOrEmpty(hostType) == false)
+                host.SetHostType(hostType);
 			host.Start();
 		}
 
@@ -40,12 +44,9 @@ namespace Rhino.ServiceBus.Host
 			OnStart(arguments);
 		}
 
-	    public void InitialDeployment(ServiceAccount account)
+	    public void InitialDeployment(string user)
 	    {
 	        var tmpHost = new RemoteAppDomainHost(asm, cfg);
-	        var user = account.ToString();
-            if (account == ServiceAccount.User)
-                user = Environment.UserDomainName;
 	        tmpHost.InitialDeployment(user);
             tmpHost.Close();
 	        

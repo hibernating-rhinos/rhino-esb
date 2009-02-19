@@ -11,11 +11,13 @@ namespace Rhino.ServiceBus.Hosting
 
     public class RemoteAppDomainHost
     {
-        private readonly Type boosterType;
+        private readonly string boosterType;
         private readonly string assembly;
         private readonly string path;
         private HostedService current;
         private string configurationFile;
+        private string hostType = typeof (DefaultHost).FullName;
+        private string hostAsm = typeof (DefaultHost).Assembly.FullName;
 
         public RemoteAppDomainHost Configuration(string configFile)
         {
@@ -26,7 +28,7 @@ namespace Rhino.ServiceBus.Hosting
         public RemoteAppDomainHost(Type boosterType)
             : this(boosterType.Assembly.Location, null)
         {
-            this.boosterType = boosterType;
+            this.boosterType = boosterType.FullName;
         }
 
         public RemoteAppDomainHost(string assemblyPath, string config)
@@ -70,12 +72,12 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual HostedService CreateRemoteHost(AppDomain appDomain)
         {
-            object instance = appDomain.CreateInstanceAndUnwrap("Rhino.ServiceBus",
-                                                                "Rhino.ServiceBus.Hosting.DefaultHost");
-            var hoster = (DefaultHost)instance;
+            object instance = appDomain.CreateInstanceAndUnwrap(hostAsm,
+                                                                hostType);
+            var hoster = (IApplicationHost)instance;
 
             if (boosterType != null)
-                hoster.SetBootStrapperTypeName(boosterType.FullName);
+                hoster.SetBootStrapperTypeName(boosterType);
 
             return new HostedService(hoster, assembly, appDomain);
         }
@@ -137,6 +139,15 @@ namespace Rhino.ServiceBus.Hosting
         {
             HostedService service = CreateNewAppDomain();
             service.InitialDeployment(user);
+        }
+
+        public void SetHostType(string hostFullName)
+        {
+            var parts = hostType.Split(new[]{","},StringSplitOptions.RemoveEmptyEntries);
+            if(parts.Length!=2)
+                throw new InvalidOperationException("Could not parse host name");
+            hostType = parts[0].Trim();
+            hostAsm = parts[1].Trim();
         }
     }
 }

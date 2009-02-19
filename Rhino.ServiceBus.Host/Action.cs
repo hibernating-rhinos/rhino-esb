@@ -6,5 +6,6 @@ namespace Rhino.ServiceBus.Host
         Uninstall,
         Server,
         Debug,
+        Deploy
     }
 }
