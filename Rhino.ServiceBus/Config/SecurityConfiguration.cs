@@ -12,7 +12,7 @@ namespace Rhino.ServiceBus.Config
 {
     public class SecurityConfiguration : IBusConfigurationAware
     {
-        public void Configure(RhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
         {
             var kernel = facility.Kernel;
 

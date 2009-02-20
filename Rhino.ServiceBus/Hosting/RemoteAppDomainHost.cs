@@ -19,10 +19,10 @@ namespace Rhino.ServiceBus.Hosting
         private string hostType = typeof (DefaultHost).FullName;
         private string hostAsm = typeof (DefaultHost).Assembly.FullName;
 
-        public RemoteAppDomainHost Configuration(string configFile)
+        public RemoteAppDomainHost(Assembly asm, string configuration)
         {
-            configurationFile = configFile;
-            return this;
+            assembly = asm.Location;
+            configurationFile = configuration;
         }
 
         public RemoteAppDomainHost(Type boosterType)
@@ -141,13 +141,26 @@ namespace Rhino.ServiceBus.Hosting
             service.InitialDeployment(user);
         }
 
-        public void SetHostType(string hostFullName)
+        public RemoteAppDomainHost SetHostType(Type host)
         {
-            var parts = hostType.Split(new[]{","},StringSplitOptions.RemoveEmptyEntries);
+            hostType = host.FullName;
+            hostAsm = host.Assembly.FullName;
+            return this;
+        }
+
+        public void SetHostType(string hostTypeName)
+        {
+            var parts = hostTypeName.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             if(parts.Length!=2)
                 throw new InvalidOperationException("Could not parse host name");
             hostType = parts[0].Trim();
             hostAsm = parts[1].Trim();
+        }
+
+        public RemoteAppDomainHost Configuration(string configFile)
+        {
+            configurationFile = configFile;
+            return this;
         }
     }
 }

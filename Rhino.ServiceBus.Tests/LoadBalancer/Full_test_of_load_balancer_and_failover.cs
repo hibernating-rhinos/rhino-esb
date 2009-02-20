@@ -61,7 +61,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             }
         }
 
-        [Fact(Skip = "Not working yet")]
+        [Fact]
         public void Can_send_messages_to_worker_even_when_load_balancer_goes_does()
         {
             using (var transport = container.Resolve<ITransport>())
@@ -74,7 +74,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 transport.MessageArrived += information => waitForMsg.Set();
                 bus.ReroutedEndpoint += reroute => waitForReroute.Set();
 
-                secondaryLoadBalancer.TimeoutForHeartBeatFromPrimary = TimeSpan.FromSeconds(2);
+                secondaryLoadBalancer.TimeoutForHeartBeatFromPrimary = TimeSpan.FromSeconds(1);
 
                 bus.Start();
 
@@ -84,17 +84,17 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 transport.Send(loadBalancer.Endpoint, "test");
 
-                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30), false));
+                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(10), false));
 
                 loadBalancer.Dispose();
 
-                Assert.True(waitForReroute.WaitOne(TimeSpan.FromSeconds(30), false));
+                Assert.True(waitForReroute.WaitOne(TimeSpan.FromSeconds(10), false));
 
                 waitForMsg.Reset();
 
                 transport.Send(loadBalancer.Endpoint, "test2");
 
-                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(30), false));
+                Assert.True(waitForMsg.WaitOne(TimeSpan.FromSeconds(10), false));
                 Assert.True(secondaryLoadBalancer.TookOverWork);
             }
         }

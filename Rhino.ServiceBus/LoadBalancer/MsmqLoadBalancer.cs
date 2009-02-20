@@ -175,6 +175,9 @@ namespace Rhino.ServiceBus.LoadBalancer
 
                     switch ((MessageType)message.AppSpecific)
                     {
+                        case MessageType.ShutDownMessageMarker:
+                            //silently cnsume the message
+                            break;
                         case MessageType.LoadBalancerMessageMarker:
                             HandleLoadBalancerMessage(queue,message);
                             break;
@@ -226,7 +229,8 @@ namespace Rhino.ServiceBus.LoadBalancer
 
             try
             {
-                using (var secondaryLoadBalancerQueue = MsmqUtil.GetQueuePath(new Endpoint { Uri = queueUri }).Open(QueueAccessMode.Send))
+                var queueInfo = MsmqUtil.GetQueuePath(new Endpoint { Uri = queueUri });
+                using (var secondaryLoadBalancerQueue = queueInfo.Open(QueueAccessMode.Send))
                 {
                     secondaryLoadBalancerQueue.Send(GenerateMsmqMessageFromMessageBatch(msgs));
                 }

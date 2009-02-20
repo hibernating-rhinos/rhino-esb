@@ -9,7 +9,7 @@ namespace Rhino.ServiceBus.Config
 {
     public class LoadBalancerConfiguration : IBusConfigurationAware
     {
-        public void Configure(RhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
         {
             var bus = configuration.Children["bus"];
             if (bus == null)

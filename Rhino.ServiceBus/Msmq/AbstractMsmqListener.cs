@@ -122,6 +122,7 @@ namespace Rhino.ServiceBus.Msmq
                 queue.SendInSingleTransaction(new Message
                 {
                     Label = "Shutdown bus",
+                    Extension = Guid.NewGuid().ToByteArray(),
                     AppSpecific = (int)MessageType.ShutDownMessageMarker
                 });
             }

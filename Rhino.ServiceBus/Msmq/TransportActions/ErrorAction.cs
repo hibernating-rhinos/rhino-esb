@@ -70,7 +70,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
         public bool CanHandlePeekedMessage(Message message)
         {
-            return true; ;
+            return message.AppSpecific != (int) MessageType.ShutDownMessageMarker;
         }
 
         public bool HandlePeekedMessage(IMsmqTransport transport, OpenedQueue queue, Message message)
@@ -78,7 +78,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
             bool doesNotHaveMessageId = message.Extension.Length < 16;
             if(doesNotHaveMessageId)
             {
-                var errorMessage = "Message does not have Extension set to at least 16 bytes, which will be used as the message id. Probably not a bus message.";
+                const string errorMessage = "Message does not have Extension set to at least 16 bytes, which will be used as the message id. Probably not a bus message.";
                 transport.RaiseMessageSerializationException(queue,message,errorMessage);
                 MoveToErrorQueue(queue, message, errorMessage);
                 return true;

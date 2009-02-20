@@ -171,6 +171,8 @@
     <Compile Include="Exceptions\InvalidDeploymentException.cs" />
     <Compile Include="Exceptions\LoadBalancerException.cs" />
     <Compile Include="Hosting\IApplicationHost.cs" />
+    <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
+    <Compile Include="LoadBalancer\LoadBalancerFacility.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
     <Compile Include="Messages\Heartbeat.cs" />
     <Compile Include="Messages\NewEndpointPersisted.cs" />

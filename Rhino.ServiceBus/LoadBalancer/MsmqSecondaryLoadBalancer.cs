@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using log4net;
 using Rhino.ServiceBus.Internal;
@@ -10,7 +11,8 @@ namespace Rhino.ServiceBus.LoadBalancer
 {
     public class MsmqSecondaryLoadBalancer : MsmqLoadBalancer
     {
-        private ILog logger = LogManager.GetLogger(typeof (MsmqSecondaryLoadBalancer));
+        private readonly object locker = new object();
+        private readonly ILog logger = LogManager.GetLogger(typeof (MsmqSecondaryLoadBalancer));
         private readonly Uri primaryLoadBalancer;
         private volatile bool tookOverWork;
         private Timeout timeout;
@@ -45,16 +47,19 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         private void OnCheckPrimaryHeartbeat(object state)
         {
-            if (tookOverWork)
-                return;
+            lock(locker)
+            {
+                if (tookOverWork)
+                    return;
 
-            if (TransportState != TransportState.Started)
-                return;
+                if (TransportState != TransportState.Started)
+                    return;
 
-            if (timeout.CheckTimestamp() == false)
-                return;
+                if (timeout.CheckTimestamp() == false)
+                    return;
 
-            tookOverWork = true;
+                tookOverWork = true;
+            }
 
             checkPrimaryHearteat.Dispose();
             checkPrimaryHearteat = null;
@@ -107,7 +112,9 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         private void StartTrackingHeartbeats()
         {
-            checkPrimaryHearteat = new Timer(OnCheckPrimaryHeartbeat,null,TimeoutForHeartBeatFromPrimary,TimeoutForHeartBeatFromPrimary);
+            checkPrimaryHearteat = new Timer(OnCheckPrimaryHeartbeat,null,
+                TimeoutForHeartBeatFromPrimary,
+                TimeoutForHeartBeatFromPrimary);
             timeout.SetHeartbeat(DateTime.Now);
             tookOverWork = false;
         }
@@ -131,12 +138,27 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             var heartbeat = msg as Heartbeat;
             if (heartbeat == null)
-                return;
-
-            timeout.SetHeartbeat(DateTime.Now);
-            if (tookOverWork)
             {
-                StartTrackingHeartbeats();
+                timeout.SetHeartbeat(DateTime.Now);
+                logger.Debug("Got heartbeat from primary");
+                if (tookOverWork)
+                {
+                    logger.Info("Primary is now back in action, hurray!");
+                    StartTrackingHeartbeats();
+                }
+            }
+
+            var newEndpoint = msg as NewEndpointPersisted;
+            if(newEndpoint != null)
+            {
+                logger.InfoFormat("Got new endpoint persisted event from primary: {0}", newEndpoint.PersistedEndpoint);
+                KnownEndpoints.Add(newEndpoint.PersistedEndpoint);
+            }
+            var newWorker = msg as NewWorkerPersisted;
+            if(newWorker != null)
+            {
+                logger.InfoFormat("Got new worker persisted event from primary: {0}", newWorker.Endpoint);
+                KnownWorkers.Add(newWorker.Endpoint);
             }
         }
     }

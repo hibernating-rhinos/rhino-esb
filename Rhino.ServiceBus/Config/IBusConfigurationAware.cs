@@ -7,7 +7,7 @@ namespace Rhino.ServiceBus.Config
     public interface IBusConfigurationAware
     {
         void Configure(
-            RhinoServiceBusFacility facility, 
+            AbstractRhinoServiceBusFacility facility, 
             IConfiguration configuration
             );
     }

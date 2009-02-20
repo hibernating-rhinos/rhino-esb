@@ -54,6 +54,8 @@ namespace Rhino.ServiceBus.Hosting
 
             CreateBootStrapper();
 
+            log4net.GlobalContext.Properties["BusName"] = bootStrapper.GetType().Namespace;
+
             CreateContainer();
 
             InitializeContainer();

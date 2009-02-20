@@ -249,11 +249,17 @@ namespace Rhino.ServiceBus.Impl
         {
             foreach (var message in information.ConsumedMessages)
             {
+                bool subscribed = false;
                 foreach (var owner in messageOwners)
                 {
                     if (owner.IsOwner(message) == false)
                         continue;
 
+                    logger.DebugFormat("Instance subscribition for {0} on {1}",
+                        message.FullName,
+                        owner.Endpoint);
+
+                    subscribed = true;
                     Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new AddInstanceSubscription
                     {
                         Endpoint = Endpoint.Uri.ToString(),
@@ -261,6 +267,9 @@ namespace Rhino.ServiceBus.Impl
                         InstanceSubscriptionKey = information.InstanceSubscriptionKey
                     });
                 }
+                if(subscribed ==false)
+                    throw new SubscriptionException("Could not find any owner for message " + message +
+                                                    " that we could subscribe for");
             }
         }
 

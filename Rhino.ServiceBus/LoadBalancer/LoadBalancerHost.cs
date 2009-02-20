@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using log4net.Config;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 
@@ -18,10 +20,11 @@ namespace Rhino.ServiceBus.LoadBalancer
         public void Start()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.AddComponent<MsmqLoadBalancer>();
+            container.Kernel.AddFacility("rhino.esb", new LoadBalancerFacility());
 
             loadBalancer = container.Resolve<MsmqLoadBalancer>();
+            log4net.GlobalContext.Properties["BusName"] = loadBalancer.Endpoint.Uri.AbsolutePath;
+            loadBalancer.Start();
         }
 
         public void Dispose()
@@ -32,6 +35,10 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         public void Start(string assembly)
         {
+            string logfile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
+
+            XmlConfigurator.ConfigureAndWatch(new FileInfo(logfile)); 
+            
             Start();
         }
 
