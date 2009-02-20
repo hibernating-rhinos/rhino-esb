@@ -145,7 +145,7 @@ namespace Rhino.ServiceBus.Msmq
                 MsmqMessage = msg,
                 Queue = queue,
                 Message = null,
-                Source = queue.Uri,
+                Source = queue.RootUri,
                 MessageId = Guid.Empty
             };
             copy(messageInformation, new SerializationException(errorMessage));

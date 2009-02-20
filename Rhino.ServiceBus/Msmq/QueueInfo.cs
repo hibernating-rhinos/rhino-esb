@@ -65,7 +65,7 @@ namespace Rhino.ServiceBus.Msmq
 			var messageQueue = new MessageQueue(QueuePath, access);
 			if (formatter != null)
 				messageQueue.Formatter = formatter;
-			var openedQueue = new OpenedQueue(this, messageQueue)
+			var openedQueue = new OpenedQueue(this, messageQueue, QueueUri.ToString())
 			{
 				Formatter = formatter
 			};

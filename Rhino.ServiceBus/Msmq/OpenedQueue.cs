@@ -12,25 +12,32 @@ namespace Rhino.ServiceBus.Msmq
 		private readonly QueueInfo info;
 		private readonly OpenedQueue parent;
 		private readonly MessageQueue queue;
+	    private readonly string queueUrl;
 	    private readonly ILog logger = LogManager.GetLogger(typeof (OpenedQueue));
 
-		public OpenedQueue(QueueInfo info, MessageQueue queue)
+		public OpenedQueue(QueueInfo info, MessageQueue queue, string url)
 		{
 			if (!info.Exists)
 				throw new TransportException("The queue " + info.QueueUri + " does not exists");
 			this.info = info;
 			this.queue = queue;
-			queue.MessageReadPropertyFilter.SetAll();
+		    queueUrl = url;
+		    queue.MessageReadPropertyFilter.SetAll();
 			
 		}
 
-		public OpenedQueue(OpenedQueue parent, MessageQueue queue)
-			: this(parent.info, queue)
+		public OpenedQueue(OpenedQueue parent, MessageQueue queue, string url)
+			: this(parent.info, queue, url)
 		{
 			this.parent = parent;
 		}
 
-		public Uri Uri
+	    public string QueueUrl
+	    {
+	        get { return queueUrl; }
+	    }
+
+	    public Uri RootUri
 		{
 			get { return info.QueueUri; }
 		}
@@ -120,7 +127,7 @@ namespace Rhino.ServiceBus.Msmq
 			var messageQueue = new MessageQueue(info.QueuePath + ";" + subQueue);
 			if (Formatter != null)
 				messageQueue.Formatter = Formatter;
-			return new OpenedQueue(this, messageQueue);
+			return new OpenedQueue(this, messageQueue, queueUrl+";"+subQueue);
 		}
 
 		public Message ReceiveById(string id)
@@ -140,7 +147,7 @@ namespace Rhino.ServiceBus.Msmq
 
 		public OpenedQueue OpenSiblngQueue(SubQueue subQueue, QueueAccessMode accessMode)
 		{
-			return new OpenedQueue(info, new MessageQueue(info.QueuePath + "#" + subQueue));
+		    return new OpenedQueue(info, new MessageQueue(info.QueuePath + "#" + subQueue), queueUrl + "#" + subQueue);
 		}
 
 		public Message[] GetAllMessagesWithStringFormatter()

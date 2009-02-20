@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Messaging;
 using System.Threading;
 using System.Transactions;
+using log4net;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Internal;
 
@@ -10,6 +11,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 {
     public class TimeoutAction : AbstractTransportAction, IDisposable
     {
+        private readonly ILog logger = LogManager.GetLogger(typeof (TimeoutAction));
         private readonly IQueueStrategy queueStrategy;
         private Timer timeoutTimer;
         private IMsmqTransport parentTransport;
@@ -58,8 +60,11 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
 
               queue.Send(message.SetSubQueueToSendTo(SubQueue.Timeout));
-
               tx.Complete();
+
+              logger.DebugFormat("Moving message {0} to timeout queue, will be processed at: {1}",
+                                 message.Id,
+                                 processMessageAt);
 
               timeoutMessageIds.Write(writer => writer.Add(processMessageAt, message.Id));
 
@@ -85,19 +90,31 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
                 {
                     if (pair.Key > CurrentTime)
                         return;
-
+                    Uri queueUri = null;
                     try
                     {
                         using(var queue = parentTransport.CreateQueue())
                         using (var tx = new TransactionScope())
                         {
+                            queueUri = queue.RootUri;
+                            logger.DebugFormat("Moving message {0} to main queue: {1}",
+                                           pair.Value,
+                                           queueUri);
                             queueStrategy.MoveTimeoutToMainQueue(queue, pair.Value);
                             tx.Complete();
                         }
                     }
                     catch (InvalidOperationException)
                     {
-                        //message read by another thread
+                        logger.DebugFormat(
+                            "Could not move message {0} to main queue: {1}",
+                            pair.Value,
+                            queueUri);
+
+                        writer.Add(DateTime.Now.AddSeconds(1), pair.Value);
+                        logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second", 
+                                pair.Value,
+                                queueUri);
                     }
                 } 
             });

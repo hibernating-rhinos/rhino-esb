@@ -1,5 +1,6 @@
 using System;
 using System.Messaging;
+using log4net;
 using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Msmq
@@ -25,6 +26,7 @@ namespace Rhino.ServiceBus.Msmq
 	/// </remarks>
 	public class FlatQueueStrategy : IQueueStrategy
 	{
+	    private readonly ILog logger = LogManager.GetLogger(typeof (FlatQueueStrategy));
 	    private readonly IEndpointRouter endpointRouter;
 	    private readonly Uri endpoint;
 		private const string subscriptions = "#subscriptions";
@@ -82,7 +84,8 @@ namespace Rhino.ServiceBus.Msmq
 		{
 			using (var destinationQueue = new MessageQueue(GetTimeoutQueuePath(), QueueAccessMode.Receive))
 			{
-				var message = destinationQueue.ReceiveById(messageId);
+                destinationQueue.MessageReadPropertyFilter.SetAll();
+				var message = destinationQueue.ReceiveByCorrelationId(messageId);
 				message.AppSpecific = 0;//reset timeout flag
 				queue.Send(message);
 			}
@@ -102,9 +105,15 @@ namespace Rhino.ServiceBus.Msmq
                     msgId = null;
                     return false;
                 }
-                message.AppSpecific = 0;//reset flag
+                receiveById.AppSpecific = 0;//reset flag
+                receiveById.CorrelationId = message.Id;
                 destinationQueue.Send(receiveById);
                 msgId = receiveById.Id;
+                logger.DebugFormat("Moving messgage {0} from {1} to {2}, new id: {3}",
+                    message.Id, 
+                    queue.RootUri,
+                    destinationQueue.QueueUrl,
+                    receiveById.Id);
                 return true;
             }
 	    }

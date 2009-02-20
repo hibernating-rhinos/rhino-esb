@@ -48,7 +48,7 @@ namespace Rhino.ServiceBus.Tests
 
                 var beforeSend = DateTime.Now;
                 bus.DelaySend(bus.Endpoint, DateTime.Now.AddMilliseconds(250), 5);
-                ProcessInteger.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+                Assert.True(ProcessInteger.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false));
 
                 Assert.True((DateTime.Now - beforeSend).TotalMilliseconds >= 250);
             }

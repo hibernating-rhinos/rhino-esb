@@ -200,7 +200,7 @@ namespace Rhino.ServiceBus.Msmq
                         responseQueue = message.ResponseQueue.Path;
                     logger.DebugFormat("Got message {0} on {1} from {2}",
                                        message.Label,
-                                       queue.Uri,
+                                       queue.RootUri,
                                        responseQueue);
 
                     Raise(TransportMessageArrived);
@@ -323,7 +323,7 @@ namespace Rhino.ServiceBus.Msmq
                             MsmqMessage = transportMessage,
                             Queue = messageQueue,
                             Message = transportMessage,
-                            Source = messageQueue.Uri,
+                            Source = messageQueue.RootUri,
                             MessageId = transportMessage.GetMessageId()
                         };
                         messageSerializationException(information, e);

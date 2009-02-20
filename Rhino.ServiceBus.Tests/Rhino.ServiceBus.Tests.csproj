@@ -96,6 +96,7 @@
     <Compile Include="Dht\UsageErrors.cs" />
     <Compile Include="FailureToProcessMessage.cs" />
     <Compile Include="CanCreateInstancesOfServiceBusFromContainer.cs" />
+    <Compile Include="FlatQueuesDelayedMessages.cs" />
     <Compile Include="FlatQueueStrategyTests.cs" />
     <Compile Include="Hosting\Can_host_in_another_app_domain.cs" />
     <Compile Include="LoadBalancer\Full_test_of_load_balancer_and_failover.cs" />
