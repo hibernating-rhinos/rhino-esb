@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using log4net;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Msmq;
@@ -9,10 +10,11 @@ namespace Rhino.ServiceBus.LoadBalancer
 {
     public class MsmqSecondaryLoadBalancer : MsmqLoadBalancer
     {
+        private ILog logger = LogManager.GetLogger(typeof (MsmqSecondaryLoadBalancer));
         private readonly Uri primaryLoadBalancer;
         private volatile bool tookOverWork;
         private Timeout timeout;
-        private readonly Timer checkPrimaryHearteat;
+        private Timer checkPrimaryHearteat;
         public TimeSpan TimeoutForHeartBeatFromPrimary { get; set; }
 
         public Uri PrimaryLoadBalancer
@@ -38,12 +40,14 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             TimeoutForHeartBeatFromPrimary = TimeSpan.FromSeconds(10);
             this.primaryLoadBalancer = primaryLoadBalancer;
-            checkPrimaryHearteat = new Timer(OnCheckPrimaryHeartbeat);
             tookOverWork = false;
         }
 
         private void OnCheckPrimaryHeartbeat(object state)
         {
+            if (tookOverWork)
+                return;
+
             if (TransportState != TransportState.Started)
                 return;
 
@@ -52,23 +56,35 @@ namespace Rhino.ServiceBus.LoadBalancer
 
             tookOverWork = true;
 
-            checkPrimaryHearteat.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            checkPrimaryHearteat.Dispose();
+            checkPrimaryHearteat = null;
 
             foreach (var queueUri in KnownEndpoints.GetValues())
             {
+                logger.InfoFormat("Notifying {0} that secondary load balancer {1} is taking over from {2}",
+                    queueUri, 
+                    Endpoint.Uri,
+                    PrimaryLoadBalancer
+                    );
                 SendToQueue(queueUri, new Reroute
                 {
-                    NewEndPoint = queueUri,
+                    NewEndPoint = Endpoint.Uri,
                     OriginalEndPoint = PrimaryLoadBalancer
                 });
             }
 
             foreach (var queueUri in KnownWorkers.GetValues())
             {
+                logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work",
+                   queueUri,
+                   Endpoint.Uri,
+                   PrimaryLoadBalancer
+                   );
+
                 SendToQueue(queueUri,
                     new AcceptingWork
                     {
-                        Endpoint = queueUri
+                        Endpoint = Endpoint.Uri
                     });
             }
 
@@ -91,8 +107,9 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         private void StartTrackingHeartbeats()
         {
+            checkPrimaryHearteat = new Timer(OnCheckPrimaryHeartbeat,null,TimeoutForHeartBeatFromPrimary,TimeoutForHeartBeatFromPrimary);
             timeout.SetHeartbeat(DateTime.Now);
-            checkPrimaryHearteat.Change(TimeoutForHeartBeatFromPrimary, TimeoutForHeartBeatFromPrimary);
+            tookOverWork = false;
         }
 
         protected override bool ShouldNotifyWorkersLoaderIsReadyToAcceptWorkOnStartup
@@ -106,7 +123,8 @@ namespace Rhino.ServiceBus.LoadBalancer
         protected override void OnStop()
         {
             base.OnStop();
-            checkPrimaryHearteat.Dispose();
+            if (checkPrimaryHearteat != null)
+                checkPrimaryHearteat.Dispose();
         }
 
         protected override void HandleLoadBalancerMessages(object msg)

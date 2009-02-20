@@ -151,7 +151,8 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             var acceptingWork = new AcceptingWork { Endpoint = Endpoint.Uri };
             SendToAllWorkers(
-                GenerateMsmqMessageFromMessageBatch(acceptingWork)
+                GenerateMsmqMessageFromMessageBatch(acceptingWork),
+                "Notifing {1} that {1} is accepting work"
                 );
         }
 
@@ -178,7 +179,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                             HandleLoadBalancerMessage(queue,message);
                             break;
                         case MessageType.AdministrativeMessageMarker:
-                            SendToAllWorkers(message);
+                            SendToAllWorkers(message,"Dispatching administrative message from {0} to load balancer {1}");
                             break;
                         default:
                             HandleStandardMessage(queue,message);
@@ -201,6 +202,8 @@ namespace Rhino.ServiceBus.LoadBalancer
             bool needToPersist = knownEndpoints.Add(queueUri);
             if (needToPersist == false)
                 return;
+            
+            logger.InfoFormat("Adding new endpoint: {0}",queueUri);
             var persistedEndPoint = new Message
             {
                 Formatter = new XmlMessageFormatter(new[] { typeof(string) }),
@@ -247,12 +250,13 @@ namespace Rhino.ServiceBus.LoadBalancer
                 var workerEndpoint = endpointRouter.GetRoutedEndpoint(worker);
 				using (var workerQueue = MsmqUtil.GetQueuePath(workerEndpoint).Open(QueueAccessMode.Send))
                 {
+                    logger.DebugFormat("Dispatching message '{0}' to {1}", message.Id, workerEndpoint.Uri);
                     workerQueue.Send(message);
                 }
             }
         }
 
-        private void SendToAllWorkers(Message message)
+        private void SendToAllWorkers(Message message, string logMessage)
         {
             var values = KnownWorkers.GetValues();
             foreach (var worker in values)
@@ -260,6 +264,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                 var workerEndpoint = endpointRouter.GetRoutedEndpoint(worker);
 				using (var workerQueue = MsmqUtil.GetQueuePath(workerEndpoint).Open(QueueAccessMode.Send))
                 {
+                    logger.DebugFormat(logMessage, Endpoint.Uri, worker);
                     workerQueue.Send(message);
                 }
             }
@@ -285,6 +290,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                 var work = msg as ReadyToWork;
                 if (work != null)
                 {
+                    logger.DebugFormat("{0} is ready to work", work.Endpoint);
                     var needToAddToQueue = KnownWorkers.Add(work.Endpoint);
 
                     if (needToAddToQueue)
@@ -350,6 +356,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                 Body = work.Endpoint.ToString(),
                 Label = ("Known worker: " + work.Endpoint).EnsureLabelLength()
             };
+            logger.DebugFormat("New worker: {0}", work.Endpoint);
             queue.Send(persistedWorker.SetSubQueueToSendTo(SubQueue.Workers));
 
             SendToQueue(SecondaryLoadBalancer, new NewWorkerPersisted

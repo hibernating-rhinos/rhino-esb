@@ -98,8 +98,8 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
                 secondary.TimeoutForHeartBeatFromPrimary = TimeSpan.FromMilliseconds(10);
-                secondary.KnownWorkers.Add(TestQueueUri2.Uri);
-                secondary.KnownEndpoints.Add(TestQueueUri2.Uri);//any worker is also endpoint
+                secondary.KnownWorkers.Add(TestQueueUri.Uri);
+                secondary.KnownEndpoints.Add(TestQueueUri.Uri);//any worker is also endpoint
 
                 var wait = new ManualResetEvent(false);
                 secondary.TookOverAsActiveLoadBalancer += () => wait.Set();
@@ -112,7 +112,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 Reroute reroute = null;
                 while (reroute == null)
                 {
-                    var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                    var message = queue.Receive(TimeSpan.FromSeconds(30));
                     reroute = serializer.Deserialize(message.BodyStream)
                         .OfType<Reroute>().FirstOrDefault();
                     Assert.True(tries > 0);
@@ -124,14 +124,14 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             }
         }
 
-        [Fact(Skip="Not sure why it is not working")]
+        [Fact]
         public void When_secondary_takes_over_it_will_let_workers_know_that_it_is_accepting_work()
         {
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
                 secondary.TimeoutForHeartBeatFromPrimary = TimeSpan.FromMilliseconds(10);
-                secondary.KnownWorkers.Add(TestQueueUri2.Uri);
-                secondary.KnownEndpoints.Add(TestQueueUri2.Uri);//any worker is also endpoint
+                secondary.KnownWorkers.Add(TestQueueUri.Uri);
+                secondary.KnownEndpoints.Add(TestQueueUri.Uri);//any worker is also endpoint
 
                 var wait = new ManualResetEvent(false);
                 secondary.TookOverAsActiveLoadBalancer += () => wait.Set();
@@ -144,14 +144,14 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 AcceptingWork acceptingWork = null;
                 while(acceptingWork==null)
                 {
-                    var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                    var message = queue.Receive(TimeSpan.FromSeconds(30));
                     var deserialize = serializer.Deserialize(message.BodyStream);
                     acceptingWork = deserialize.OfType<AcceptingWork>().FirstOrDefault();
                     Assert.True(tries > 0);
                     tries -= 1;
                 }
 
-                Assert.Equal(acceptingWork.Endpoint, secondary.Endpoint.Uri);
+                Assert.Equal(secondary.Endpoint.Uri, acceptingWork.Endpoint);
             }
         }
     }

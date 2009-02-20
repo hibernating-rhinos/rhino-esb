@@ -29,6 +29,7 @@ namespace Rhino.ServiceBus.Msmq
         public event Action MessageMoved;
         public event Action TransportMessageArrived;
 
+
         protected AbstractMsmqListener(
             IQueueStrategy queueStrategy,
             Uri endpoint,

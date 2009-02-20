@@ -1,6 +1,9 @@
 using System;
 using System.Messaging;
 using Castle.MicroKernel;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Layout;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
@@ -11,6 +14,14 @@ namespace Rhino.ServiceBus.Tests
 {
     public class MsmqTestBase : IDisposable
     {
+        static MsmqTestBase()
+        {
+            BasicConfigurator.Configure(new DebugAppender
+            {
+                Layout = new SimpleLayout()
+            });    
+        }
+
         private readonly string subbscriptionQueuePath;
         protected readonly Endpoint SubscriptionsUri;
 
