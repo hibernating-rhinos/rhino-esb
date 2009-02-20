@@ -38,7 +38,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 );
         }
 
-        [Fact(Skip = "Not working yet")]
+        [Fact]
         public void Can_send_messages_to_worker()
         {
             using (var transport = container.Resolve<ITransport>())

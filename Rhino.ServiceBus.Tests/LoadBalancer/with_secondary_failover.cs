@@ -74,7 +74,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             using (var secondary = container.Resolve<MsmqSecondaryLoadBalancer>())
             {
                 secondary.TimeoutForHeartBeatFromPrimary = TimeSpan.FromMilliseconds(10);
-                secondary.KnownEndpoints.Add(TestQueueUri2.Uri);
+                secondary.KnownEndpoints.Add(TestQueueUri.Uri);
 
                 var wait = new ManualResetEvent(false);
                 secondary.TookOverAsActiveLoadBalancer += () => wait.Set();
@@ -82,7 +82,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
                 Assert.True(wait.WaitOne());
 
-                var message = testQueue2.Receive(TimeSpan.FromSeconds(30));
+                var message = queue.Receive(TimeSpan.FromSeconds(30));
                 var serializer = container.Resolve<IMessageSerializer>();
                 var reroute = serializer.Deserialize(message.BodyStream)
                     .OfType<Reroute>().First();
