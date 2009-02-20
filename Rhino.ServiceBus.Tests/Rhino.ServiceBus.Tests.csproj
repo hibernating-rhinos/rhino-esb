@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bugs\Can_read_subscriptions_from_queue.cs" />
+    <Compile Include="Bugs\When_using_ip_of_machine.cs" />
     <Compile Include="Bugs\Resolving_consumer_from_container.cs" />
     <Compile Include="Bugs\Restarting_server_when_using_flat_queue_strategy.cs" />
     <Compile Include="Bugs\When_cannot_resolve_consumer_should_error.cs" />
@@ -149,6 +150,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="App.config" />
+    <None Include="Bugs\Bus_with_ip.config" />
     <None Include="BusWithLogging.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -71,7 +71,16 @@ namespace Rhino.ServiceBus.Msmq
         {
             try
             {
-                if (MessageQueue.Exists(newQueuePath) == false)
+                bool exists;
+                try
+                {
+                    exists = MessageQueue.Exists(newQueuePath);
+                }
+                catch (InvalidOperationException)// probably a queue on a remote machine
+                {
+                    return new MessageQueue(newQueuePath);
+                }
+                if (exists == false)
                 {
                     try
                     {
