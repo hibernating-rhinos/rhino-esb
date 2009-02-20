@@ -44,7 +44,7 @@ namespace Rhino.ServiceBus.Msmq
 		{
 			if (currentMessageInformation == null)
 				throw new TransactionException("There is no message to reply to, sorry.");
-
+            logger.DebugFormat("Replying to {0}", currentMessageInformation.Source);
             Send(endpointRouter.GetRoutedEndpoint(currentMessageInformation.Source), messages);
 		}
 

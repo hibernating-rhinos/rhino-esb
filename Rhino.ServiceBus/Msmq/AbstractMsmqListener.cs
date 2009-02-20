@@ -194,9 +194,13 @@ namespace Rhino.ServiceBus.Msmq
                         Raise(MessageMoved);
                         continue;
                     }
-                    logger.DebugFormat("Got message {0} from {1}",
+                    string responseQueue = "null://middle/of/nowhere?turn=left";
+                    if (message.ResponseQueue!=null)
+                        responseQueue = message.ResponseQueue.Path;
+                    logger.DebugFormat("Got message {0} on {1} from {2}",
                                        message.Label,
-                                       queue.Uri);
+                                       queue.Uri,
+                                       responseQueue);
 
                     Raise(TransportMessageArrived);
 

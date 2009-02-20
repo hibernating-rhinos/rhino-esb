@@ -9,6 +9,12 @@ namespace Rhino.ServiceBus.Msmq
 
     public class MsmqUtil
     {
+        private static Regex guidRegEx = 
+            new Regex(@"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$",
+                RegexOptions.Compiled);
+
+
+
         public static QueueInfo GetQueuePath(Endpoint endpoint)
         {
             var uri = endpoint.Uri;
@@ -49,6 +55,15 @@ namespace Rhino.ServiceBus.Msmq
                     QueueUri = uri
                 };
             }
+            if (guidRegEx.IsMatch(hostName))
+            {
+                return new QueueInfo
+                {
+                    IsLocal = false,
+                    QueuePath = "FormatName:PRIVATE=" + hostName + @"\" + queuePathWithFlatSubQueue,
+                    QueueUri = uri
+                };  
+            }
             return new QueueInfo
             {
                 IsLocal = false,
@@ -57,14 +72,25 @@ namespace Rhino.ServiceBus.Msmq
             };
         }
 
-        static readonly Regex queuePath = new Regex(@"FormatName:DIRECT=(?<transport>\w+):(?<machineName>[\w\d-_.#$;]+)\\private\$\\(?<queueName>[\w\d-_.#$;]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        static readonly Regex queuePathDirect = new Regex(@"FormatName:DIRECT=(?<transport>\w+):(?<machineName>[\w\d-_.#$;]+)\\private\$\\(?<queueName>[\w\d-_.#$;]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        static readonly Regex queuePath = new Regex(@"FormatName:PRIVATE=(?<machineGuid>[\w\d-_.#$;]+)\\(?<queueNumber>[\w\d-_.#$;]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         public static Uri GetQueueUri(MessageQueue queue)
         {
             if (queue == null)
                 return null;
+            var directMatch = queuePathDirect.Match(queue.Path);
+            if (directMatch.Success)
+            {
+                return new Uri("msmq://" + directMatch.Groups["machineName"] + "/" +
+                               directMatch.Groups["queueName"]);
+            }
             var match = queuePath.Match(queue.Path);
-            return new Uri("msmq://" + match.Groups["machineName"] + "/" +
-                match.Groups["queueName"]);
+            if (match.Success)
+            {
+                return new Uri("msmq://" + match.Groups["machineGuid"] + "/" +
+                               match.Groups["queueNumber"]);
+            }
+            throw new ArgumentException("Could not understand queue format: " + queue.Path);
         }
 
         public static MessageQueue CreateQueue(string newQueuePath, QueueAccessMode accessMode)

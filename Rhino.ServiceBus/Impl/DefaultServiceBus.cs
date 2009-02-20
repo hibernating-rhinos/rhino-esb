@@ -361,8 +361,31 @@ namespace Rhino.ServiceBus.Impl
 
                 foreach (var consumer in consumers)
                 {
-                    reflection.InvokeConsume(consumer, msg.Message);
-
+                    logger.DebugFormat("Invoking consume on {0} for message {1}, from '{2}' to '{3}'",
+                                       consumer,
+                                       msg.Message,
+                                       msg.Source,
+                                       msg.Destination);
+                    try
+                    {
+                        reflection.InvokeConsume(consumer, msg.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        if(logger.IsDebugEnabled)
+                        {
+                            var message = string.Format("Consumer {0} failed to process message {1}",
+                                                       consumer,
+                                                       msg.Message
+                                );
+                            logger.Debug(message,e);
+                        }
+                        throw;
+                    }
+                    finally
+                    {
+                        logger.DebugFormat("Consumer {0} finished processing {1}", consumer, msg.Message);
+                    }
                     var sagaEntity = consumer as IAccessibleSaga;
                     if (sagaEntity == null)
                         continue;

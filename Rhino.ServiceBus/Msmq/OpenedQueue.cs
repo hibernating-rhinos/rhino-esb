@@ -1,3 +1,5 @@
+using log4net;
+
 namespace Rhino.ServiceBus.Msmq
 {
 	using System;
@@ -10,6 +12,7 @@ namespace Rhino.ServiceBus.Msmq
 		private readonly QueueInfo info;
 		private readonly OpenedQueue parent;
 		private readonly MessageQueue queue;
+	    private readonly ILog logger = LogManager.GetLogger(typeof (OpenedQueue));
 
 		public OpenedQueue(QueueInfo info, MessageQueue queue)
 		{
@@ -55,7 +58,14 @@ namespace Rhino.ServiceBus.Msmq
 
 		public void Send(Message msg)
 		{
-			queue.Send(msg, GetTransactionType());
+		    var responsePath = "no response queue";
+            if (msg.ResponseQueue != null)
+                responsePath = msg.ResponseQueue.Path;
+		    logger.DebugFormat("Sending message {0} to {1}, reply: {2}",
+                    msg.Label,
+                    queue.Path,
+                    responsePath);
+            queue.Send(msg, GetTransactionType());
 		}
 
 		public MessageQueueTransactionType GetTransactionType()
