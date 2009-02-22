@@ -427,14 +427,15 @@ namespace Rhino.ServiceBus.Impl
         public object[] GatherConsumers(CurrentMessageInformation msg)
         {
             var sagaMessage = msg.Message as ISagaMessage;
-                object[] sagas = GetSagasFor(sagaMessage);
+            object[] sagas = GetSagasFor(sagaMessage);
 
             var msgType = msg.Message.GetType();
             object[] instanceConsumers = subscriptionStorage
                 .GetInstanceSubscriptions(msgType);
 
             Type consumerType = reflection.GetGenericTypeOf(typeof(ConsumerOf<>), msg.Message);
-            var consumers = GetAllConsumers(consumerType, sagas);
+        	Type occasionalConsumerType = reflection.GetGenericTypeOf(typeof (OccasionalConsumerOf<>), msg.Message);
+            var consumers = GetAllNonOccasionalConsumers(consumerType, occasionalConsumerType, sagas);
             for (var i = 0; i < consumers.Length; i++)
             {
                 var saga = consumers[i] as IAccessibleSaga;
@@ -473,13 +474,15 @@ namespace Rhino.ServiceBus.Impl
 		/// Here we don't use ResolveAll from Windsor because we want to get an error
 		/// if a component exists which isn't valid
 		/// </summary>
-    	private object[] GetAllConsumers(Type consumerType, IEnumerable<object> instanceOfTypesToSkipResolving)
+    	private object[] GetAllNonOccasionalConsumers(Type consumerType, Type occasionalConsumerType, IEnumerable<object> instanceOfTypesToSkipResolving)
     	{
 			var handlers = kernel.GetAssignableHandlers(consumerType);
 			var consumers = new List<object>(handlers.Length);
 			foreach (var handler in handlers)
 			{
 			    var implementation = handler.ComponentModel.Implementation;
+				if(occasionalConsumerType.IsAssignableFrom(implementation))
+					continue;
                 if (instanceOfTypesToSkipResolving.Any(x => x.GetType() == implementation))
                     continue;
 

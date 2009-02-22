@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bugs\Can_read_subscriptions_from_queue.cs" />
+    <Compile Include="Bugs\Occasional_consumer_resolving_when_not_subscribed.cs" />
     <Compile Include="Bugs\Private_queue_formatting.cs" />
     <Compile Include="Bugs\When_using_ip_of_machine.cs" />
     <Compile Include="Bugs\Resolving_consumer_from_container.cs" />
