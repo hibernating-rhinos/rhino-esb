@@ -31,7 +31,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
 				using (bus.AddInstanceSubscription(this))
 				{
 					bus.Send(new SimpleMessage());
-					wait.WaitOne(TimeSpan.FromSeconds(5));
+					wait.WaitOne(TimeSpan.FromSeconds(5), false);
 				}
 			}
 			Assert.False(GotConsumed);
