@@ -8,9 +8,6 @@ using log4net;
 using log4net.Config;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.MessageModules;
-using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -22,6 +19,7 @@ namespace Rhino.ServiceBus.Hosting
         private IWindsorContainer container;
         private IStartableServiceBus serviceBus;
         private string bootStrapperName;
+    	private string standaloneCastleConfigurationFileName;
 
         public void SetBootStrapperTypeName(string typeName)
         {
@@ -74,8 +72,13 @@ namespace Rhino.ServiceBus.Hosting
 
         private void CreateContainer()
         {
-            container = new WindsorContainer(new XmlInterpreter());
-            var facility = new RhinoServiceBusFacility();
+			if (container == null)
+			{
+				container = string.IsNullOrEmpty(standaloneCastleConfigurationFileName) 
+					? new WindsorContainer(new XmlInterpreter()) 
+					: new WindsorContainer(new XmlInterpreter(standaloneCastleConfigurationFileName));
+			}
+        	var facility = new RhinoServiceBusFacility();
             bootStrapper.ConfigureBusFacility(facility);
             container.Kernel.AddFacility("rhino.esb", facility);
         }
@@ -158,5 +161,15 @@ namespace Rhino.ServiceBus.Hosting
                 action.Execute();
             }
         }
+
+		public void UseContainer(IWindsorContainer theContainer)
+		{
+			this.container = theContainer;
+		}
+
+		public void UseStandaloneCastleConfigurationFileName(string configurationFileName)
+		{
+			this.standaloneCastleConfigurationFileName = configurationFileName;
+		}
     }
 }
