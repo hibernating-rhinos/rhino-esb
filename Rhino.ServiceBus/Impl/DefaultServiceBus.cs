@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Castle.MicroKernel;
 using log4net;
@@ -375,6 +376,8 @@ namespace Rhino.ServiceBus.Impl
                                        msg.Message,
                                        msg.Source,
                                        msg.Destination);
+                    
+                    var sp = Stopwatch.StartNew();
                     try
                     {
                         reflection.InvokeConsume(consumer, msg.Message);
@@ -393,7 +396,9 @@ namespace Rhino.ServiceBus.Impl
                     }
                     finally
                     {
-                        logger.DebugFormat("Consumer {0} finished processing {1}", consumer, msg.Message);
+                        sp.Stop();
+                        var elapsed = sp.Elapsed;
+                        logger.DebugFormat("Consumer {0} finished processing {1} in {2}", consumer, msg.Message, elapsed);
                     }
                     var sagaEntity = consumer as IAccessibleSaga;
                     if (sagaEntity == null)
