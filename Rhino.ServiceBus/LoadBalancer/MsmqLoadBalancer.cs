@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 {
     public class MsmqLoadBalancer : AbstractMsmqListener
     {
-        public Uri SecondaryLoadBalancer { get; set; }
+        private readonly Uri secondaryLoadBalancer;
         private readonly IQueueStrategy queueStrategy;
         private readonly ILog logger = LogManager.GetLogger(typeof(MsmqLoadBalancer));
 
@@ -40,9 +40,21 @@ namespace Rhino.ServiceBus.LoadBalancer
             this.queueStrategy = queueStrategy;
         }
 
+        public MsmqLoadBalancer(
+                    IMessageSerializer serializer,
+                    IQueueStrategy queueStrategy,
+                    IEndpointRouter endpointRouter,
+                    Uri endpoint,
+                    int threadCount,
+                    Uri secondaryLoadBalancer)
+            : this(serializer ,queueStrategy, endpointRouter,endpoint, threadCount)
+        {
+            this.secondaryLoadBalancer = secondaryLoadBalancer;
+        }
+
         protected void SendHeartBeatToSecondaryServer(object ignored)
         {
-            SendToQueue(SecondaryLoadBalancer, new Heartbeat
+            SendToQueue(secondaryLoadBalancer, new Heartbeat
             {
                 From = Endpoint.Uri,
                 At = DateTime.Now,
@@ -68,7 +80,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             try
             {
-                queueStrategy.InitializeQueue(Endpoint);
+                queueStrategy.InitializeQueue(Endpoint, QueueType.LoadBalancer);
             }
             catch (Exception e)
             {
@@ -77,9 +89,23 @@ namespace Rhino.ServiceBus.LoadBalancer
                     "Queue path: " + MsmqUtil.GetQueuePath(Endpoint), e);
             }
 
-            ReadUrisFromSubQueue(KnownWorkers, SubQueue.Workers);
+            try
+            {
+                ReadUrisFromSubQueue(KnownWorkers, SubQueue.Workers);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Could not read workers subqueue", e);
+            }
 
-            ReadUrisFromSubQueue(KnownEndpoints, SubQueue.Endpoints);
+            try
+            {
+                ReadUrisFromSubQueue(KnownEndpoints, SubQueue.Endpoints);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Could not read endpoints subqueue", e);
+            }
 
             RemoveAllReadyToWorkMessages();
         }
@@ -129,7 +155,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         protected override void AfterStart(OpenedQueue queue)
         {
-            if (SecondaryLoadBalancer != null)
+            if (secondaryLoadBalancer != null)
             {
                 SendHeartBeatToSecondaryServer(null);
                 heartBeatTimer.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
@@ -215,7 +241,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             };
             queue.Send(persistedEndPoint.SetSubQueueToSendTo(SubQueue.Endpoints));
 
-            SendToQueue(SecondaryLoadBalancer, new NewEndpointPersisted
+            SendToQueue(secondaryLoadBalancer, new NewEndpointPersisted
             {
                 PersistedEndpoint = queueUri
             });
@@ -363,7 +389,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             logger.DebugFormat("New worker: {0}", work.Endpoint);
             queue.Send(persistedWorker.SetSubQueueToSendTo(SubQueue.Workers));
 
-            SendToQueue(SecondaryLoadBalancer, new NewWorkerPersisted
+            SendToQueue(secondaryLoadBalancer, new NewWorkerPersisted
             {
                 Endpoint = work.Endpoint
             });

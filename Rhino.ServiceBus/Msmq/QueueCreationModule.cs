@@ -18,7 +18,7 @@ namespace Rhino.ServiceBus.Msmq
 		{
 			try
 			{
-				queueStrategy.InitializeQueue(bus.Endpoint);
+				queueStrategy.InitializeQueue(bus.Endpoint, QueueType.Standard);
 			}
 			catch (Exception e)
 			{

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Castle.Core;
-using Castle.Core.Configuration;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
-using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
@@ -31,7 +29,7 @@ namespace Rhino.ServiceBus.Impl
         private Type queueStrategyImpl = typeof(SubQueueStrategy);
         private bool useCreationModule = true;
 
-        public AbstractRhinoServiceBusFacility()
+        protected AbstractRhinoServiceBusFacility()
         {
             DetectQueueStrategy();
         }
@@ -107,6 +105,10 @@ namespace Rhino.ServiceBus.Impl
 
         protected override void Init()
         {
+            if(FacilityConfig==null)
+                throw new ConfigurationErrorsException(
+                    "could not find facility configuration section with the same name of the facility");
+
             Kernel.ComponentModelCreated += Kernel_OnComponentModelCreated;
             Kernel.Resolver.AddSubResolver(new ArrayResolver(Kernel));
 
@@ -136,10 +138,6 @@ namespace Rhino.ServiceBus.Impl
             RegisterComponents();
 
             Kernel.Register(
-               Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLogQueueAction>(),
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateQueuesAction>(),
                 Component.For<IReflection>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy<DefaultReflection>(),

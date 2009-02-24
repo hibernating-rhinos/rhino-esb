@@ -152,8 +152,15 @@ namespace Rhino.ServiceBus.Msmq
 
 		public Message[] GetAllMessagesWithStringFormatter()
 		{
-			queue.Formatter = new XmlMessageFormatter(new[] { typeof(string) });
-			return queue.GetAllMessages();
+		    try
+		    {
+		        queue.Formatter = new XmlMessageFormatter(new[] { typeof(string) });
+		        return queue.GetAllMessages();
+		    }
+		    catch (Exception e)
+		    {
+		        throw new InvalidOperationException("Could not read messages from: " + queue.Path, e);
+		    }
 		}
 
 		public Message Peek(TimeSpan timeout)

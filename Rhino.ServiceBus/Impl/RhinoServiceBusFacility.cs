@@ -4,6 +4,7 @@ using System.Configuration;
 using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
+using Rhino.ServiceBus.Actions;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -20,6 +21,10 @@ namespace Rhino.ServiceBus.Impl
         protected override void RegisterComponents()
         {
             Kernel.Register(
+                Component.For<IDeploymentAction>()
+                    .ImplementedBy<CreateLogQueueAction>(),
+                Component.For<IDeploymentAction>()
+                    .ImplementedBy<CreateQueuesAction>(),
                 Component.For<IServiceBus, IStartableServiceBus>()
                     .ImplementedBy<DefaultServiceBus>()
                     .LifeStyle.Is(LifestyleType.Singleton)

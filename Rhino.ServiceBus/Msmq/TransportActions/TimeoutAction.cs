@@ -58,15 +58,17 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
               if (msg == null)
                   return false;
 
-
-              queue.Send(message.SetSubQueueToSendTo(SubQueue.Timeout));
+              string id;
+              if(queueStrategy.TryMoveMessage(queue, message, SubQueue.Timeout, out id)==false)
+              {
+                  logger.DebugFormat("Failed to move message to timeout queue");
+              }
               tx.Complete();
 
               logger.DebugFormat("Moving message {0} to timeout queue, will be processed at: {1}",
-                                 message.Id,
-                                 processMessageAt);
+                                 id,processMessageAt);
 
-              timeoutMessageIds.Write(writer => writer.Add(processMessageAt, message.Id));
+              timeoutMessageIds.Write(writer => writer.Add(processMessageAt, id));
 
               return true;
           }
@@ -111,7 +113,14 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
                             pair.Value,
                             queueUri);
 
-                        writer.Add(DateTime.Now.AddSeconds(1), pair.Value);
+                        if((CurrentTime - pair.Key).TotalMinutes > 0)
+                        {
+                            logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
+                                               pair.Value);
+                            continue;
+                        }
+
+                        writer.Add(pair.Key, pair.Value);
                         logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second", 
                                 pair.Value,
                                 queueUri);

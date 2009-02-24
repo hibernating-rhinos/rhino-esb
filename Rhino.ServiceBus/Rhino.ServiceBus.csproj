@@ -162,6 +162,7 @@
     <Compile Include="Util\GuidCombGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\CreateLoadBalancerQueuesAction.cs" />
     <Compile Include="Actions\CreateLogQueueAction.cs" />
     <Compile Include="Actions\CreateQueuesAction.cs" />
     <Compile Include="Actions\IDeploymentAction.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Messages\Reroute.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
+    <Compile Include="Msmq\QueueType.cs" />
     <None Include="PublicApi.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

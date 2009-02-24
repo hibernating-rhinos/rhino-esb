@@ -93,5 +93,10 @@ namespace Rhino.ServiceBus.Msmq
 				throw new InvalidAsynchronousStateException("Could not create queue: " + QueueUri, e);
 			}
 		}
+
+        public override string ToString()
+        {
+            return this.QueueUri.ToString();
+        }
 	}
 }

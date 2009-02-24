@@ -23,7 +23,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
             flatQueueStrategy.InitializeQueue(new Endpoint
             {
                 Uri = endpoint
-            });
+            }, QueueType.Standard);
         }
     }
 }

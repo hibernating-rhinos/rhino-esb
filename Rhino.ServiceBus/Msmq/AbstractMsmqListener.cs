@@ -159,8 +159,8 @@ namespace Rhino.ServiceBus.Msmq
             {
                 throw new TransportException(
                     "Could not open queue: " + endpoint + Environment.NewLine +
-                    "Queue path: " + MsmqUtil.GetQueuePath(endpoint) +
-                    "Did you create the queue or disable the queue initialization module?", e);
+                    "Queue path: " + MsmqUtil.GetQueuePath(endpoint) + Environment.NewLine +
+                    "Did you forget to create the queue or disable the queue initialization module?", e);
             }
 
         }

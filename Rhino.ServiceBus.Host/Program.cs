@@ -22,6 +22,9 @@ namespace Rhino.ServiceBus.Host
             var executingOptions = new ExecutingOptions();
             if (Parser.ParseArguments(args, executingOptions) == false)
             {
+                Console.WriteLine("Invalid arguments:");
+                Console.WriteLine("\t{0}",
+                    string.Join(" ",args));
                 Console.WriteLine();
                 Console.WriteLine(Parser.ArgumentsUsage(typeof(ExecutingOptions)));
                 return;

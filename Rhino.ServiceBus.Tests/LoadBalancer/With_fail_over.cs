@@ -31,7 +31,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                     {
                         threadCount = 1,
                         endpoint = new Uri(loadBalancerQueue),
-                        SecondaryLoadBalancer = TestQueueUri2.Uri
+                        secondaryLoadBalancer = TestQueueUri2.Uri
                     })
                 );
         }

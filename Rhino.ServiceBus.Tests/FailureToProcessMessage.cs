@@ -202,11 +202,9 @@ namespace Rhino.ServiceBus.Tests
                 {
                     errorQueue.Formatter = new XmlMessageFormatter(new[] { typeof(string) });
                 	errorQueue.MessageReadPropertyFilter.SetAll();
-                    errorQueue.Peek(TimeSpan.FromSeconds(30));//for debugging
 
                     var messageCausingError = errorQueue.Receive(TimeSpan.FromSeconds(30));
                     Assert.NotNull(messageCausingError);
-                    errorQueue.Peek(TimeSpan.FromSeconds(30));//for debugging
                     var messageErrorDescription = errorQueue.Receive(TimeSpan.FromSeconds(30));
                     var error = (string)messageErrorDescription.Body;
                     Assert.Contains(

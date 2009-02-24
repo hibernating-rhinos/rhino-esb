@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Rhino.ServiceBus.Tests.Hosting
 {
-    public class Can_host_in_another_app_domain : MsmqTestBase, IDisposable, OccasionalConsumerOf<string>
+    public class Can_host_in_another_app_domain : MsmqTestBase, OccasionalConsumerOf<StringMsg>
     {
         readonly RemoteAppDomainHost host = new RemoteAppDomainHost(typeof(TestBootStrapper));
         private string reply;
@@ -45,12 +45,15 @@ namespace Rhino.ServiceBus.Tests.Hosting
             using(var bus = container.Resolve<IStartableServiceBus>())
             {
                 bus.Start();
-
+                
                 using(bus.AddInstanceSubscription(this))
                 {
-                    bus.Send(new Uri("msmq://localhost/test_queue").ToEndpoint(), "hello");
+                    bus.Send(new Uri("msmq://localhost/test_queue").ToEndpoint(), new StringMsg
+                    {
+                        Value = "hello"
+                    });
 
-                    resetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+                    Assert.True(resetEvent.WaitOne(TimeSpan.FromSeconds(10), false));
 
                     Assert.Equal("olleh", reply);
                 }
@@ -63,9 +66,9 @@ namespace Rhino.ServiceBus.Tests.Hosting
             host.Close();
         }
 
-        public void Consume(string message)
+        public void Consume(StringMsg message)
         {
-            reply = message;
+            reply = message.Value;
             resetEvent.Set();
         }
     }
@@ -83,7 +86,7 @@ namespace Rhino.ServiceBus.Tests.Hosting
         }
     }
 
-    public class TestRemoteHandler : ConsumerOf<string>
+    public class TestRemoteHandler : ConsumerOf<StringMsg>
     {
         private readonly IServiceBus bus;
 
@@ -92,9 +95,17 @@ namespace Rhino.ServiceBus.Tests.Hosting
             this.bus = bus;
         }
 
-        public void Consume(string message)
+        public void Consume(StringMsg message)
         {
-            bus.Reply(new String(message.Reverse().ToArray()));
+            bus.Reply(new StringMsg
+            {
+                Value = new String(message.Value.Reverse().ToArray())
+            });
         }
+    }
+
+    public class StringMsg
+    {
+        public string Value { get; set; }
     }
 }

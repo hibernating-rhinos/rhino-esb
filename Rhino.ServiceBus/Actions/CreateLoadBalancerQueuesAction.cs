@@ -1,24 +1,25 @@
 using System;
 using System.Messaging;
+using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Actions
 {
-    public class CreateQueuesAction : IDeploymentAction
+    public class CreateLoadBalancerQueuesAction : IDeploymentAction
     {
-        private readonly IQueueStrategy queueStrategy;
-        private readonly IServiceBus serviceBus;
+        private IQueueStrategy queueStrategy;
+        private MsmqLoadBalancer loadBalancer;
 
-        public CreateQueuesAction(IQueueStrategy queueStrategy, IServiceBus serviceBus)
+        public CreateLoadBalancerQueuesAction(IQueueStrategy queueStrategy, MsmqLoadBalancer loadBalancer)
         {
             this.queueStrategy = queueStrategy;
-            this.serviceBus = serviceBus;
+            this.loadBalancer = loadBalancer;
         }
 
         public void Execute(string user)
         {
             // will create the queues if they are not already there
-            var queues = queueStrategy.InitializeQueue(serviceBus.Endpoint, QueueType.Standard);
+            var queues = queueStrategy.InitializeQueue(loadBalancer.Endpoint, QueueType.LoadBalancer);
             foreach (var queue in queues)
             {
                 queue.SetPermissions(user,
@@ -32,7 +33,7 @@ namespace Rhino.ServiceBus.Actions
                                      MessageQueueAccessRights.ReceiveMessage |
                                      MessageQueueAccessRights.WriteMessage,
                                      AccessControlEntryType.Allow);
-            }
+            }   
         }
     }
 }
