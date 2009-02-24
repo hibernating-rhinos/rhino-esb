@@ -112,7 +112,7 @@ namespace Rhino.ServiceBus.Msmq
             using (var destinationQueue = new MessageQueue(GetTimeoutQueuePath(), QueueAccessMode.Receive))
             {
                 destinationQueue.MessageReadPropertyFilter.SetAll();
-                var message = destinationQueue.ReceiveByCorrelationId(messageId);
+                var message = destinationQueue.ReceiveById(messageId);
                 message.AppSpecific = 0;//reset timeout flag
                 queue.Send(message);
             }

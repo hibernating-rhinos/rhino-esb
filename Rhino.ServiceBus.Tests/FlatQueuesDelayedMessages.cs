@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
@@ -41,7 +42,7 @@ namespace Rhino.ServiceBus.Tests
         public void Can_send_message_with_time_delay()
         {
             HandleMessageLater.ResetEvent = new ManualResetEvent(false);
-            using (var bus = container.Resolve<IStartableServiceBus>())
+            using (var bus = container.Resolve<IStartableServiceBus>()) 
             {
                 bus.Start();
 

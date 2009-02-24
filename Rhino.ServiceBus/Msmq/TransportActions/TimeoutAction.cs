@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Messaging;
 using System.Threading;
 using System.Transactions;
@@ -54,14 +55,11 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
               if (CurrentTime >= processMessageAt)
                   return false;
 
-              var msg = queue.TryGetMessageFromQueue(message.Id);
-              if (msg == null)
-                  return false;
-
               string id;
               if(queueStrategy.TryMoveMessage(queue, message, SubQueue.Timeout, out id)==false)
               {
                   logger.DebugFormat("Failed to move message to timeout queue");
+                  return false;
               }
               tx.Complete();
 
@@ -113,7 +111,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
                             pair.Value,
                             queueUri);
 
-                        if((CurrentTime - pair.Key).TotalMinutes > 0)
+                        if((CurrentTime - pair.Key).TotalMinutes >= 1.0D)
                         {
                             logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
                                                pair.Value);
@@ -124,6 +122,11 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
                         logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second", 
                                 pair.Value,
                                 queueUri);
+                    }
+                    catch(Exception e)
+                    {
+                        logger.Error("Could not move message " + pair.Value + 
+                            " from timeout queue", e);
                     }
                 } 
             });
