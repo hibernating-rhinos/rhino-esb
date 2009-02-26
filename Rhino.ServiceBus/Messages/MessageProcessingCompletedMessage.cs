@@ -11,5 +11,7 @@ namespace Rhino.ServiceBus.Messages
         public string MessageType { get; set; }
 
         public Guid MessageId { get; set; }
+
+        public TimeSpan Duration { get; set; }
     }
 }

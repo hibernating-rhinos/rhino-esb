@@ -14,6 +14,8 @@ namespace Rhino.ServiceBus.MessageModules
         private readonly Uri logQueue;
         private OpenedQueue queue;
 
+        [ThreadStatic] private static DateTime messageArrival;
+
         public Uri LogQueue
         {
             get { return logQueue; }
@@ -85,15 +87,17 @@ namespace Rhino.ServiceBus.MessageModules
         }
 
          private void Transport_OnMessageProcessingCompleted(CurrentMessageInformation info, Exception ex)
-        {
-            Send(new MessageProcessingCompletedMessage
+         {
+             var timestamp = DateTime.Now;
+             Send(new MessageProcessingCompletedMessage
             {
-                Timestamp = DateTime.Now,
+                Timestamp = timestamp,
+                Duration = timestamp - messageArrival,
                 MessageType = info.Message.ToString(),
                 MessageId = info.MessageId,
                 Source = info.Source,
             });
-        }
+         }
 
         internal void Transport_OnMessageProcessingFailure(CurrentMessageInformation info, Exception e)
         {
@@ -121,9 +125,10 @@ namespace Rhino.ServiceBus.MessageModules
 
     	private bool Transport_OnMessageArrived(CurrentMessageInformation info)
         {
+    	    messageArrival = DateTime.Now;
             Send(new MessageArrivedMessage
             {
-                Timestamp = DateTime.Now,
+                Timestamp = messageArrival,
                 MessageType = info.Message.ToString(),
                 MessageId = info.MessageId,
                 Source = info.Source,
