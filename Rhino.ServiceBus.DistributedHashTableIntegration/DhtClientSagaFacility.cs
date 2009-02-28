@@ -14,12 +14,9 @@ namespace Rhino.ServiceBus.DistributedHashTableIntegration
 	{
 		private void Kernel_OnComponentRegistered(string key, IHandler handler)
 		{
-			RegisterDhtSagaPersister(handler.ComponentModel);
-		}
+		    var model = handler.ComponentModel;
 
-		private void RegisterDhtSagaPersister(ComponentModel model)
-		{
-			var list = model.Implementation.GetInterfaces()
+		    var list = model.Implementation.GetInterfaces()
 				.Where(x => x.IsGenericType &&
 							x.IsGenericTypeDefinition == false &&
 							x.GetGenericTypeDefinition() == typeof(ISaga<>))
@@ -60,7 +57,7 @@ namespace Rhino.ServiceBus.DistributedHashTableIntegration
 			else
 			{
 				throw new InvalidUsageException(
-					"When using DHT for saga state, you must specify either SupportsOptimisticConcurrency or Orchestrates<MergeSagaState>");
+					"When using DHT for saga state, you must implement either SupportsOptimisticConcurrency or Orchestrates<MergeSagaState>");
 			}
 		}
 
