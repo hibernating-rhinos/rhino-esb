@@ -189,6 +189,9 @@ namespace Rhino.ServiceBus.Serializers
             if (type == typeof(DateTime))
                 return XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.Utc);
 
+			if (type == typeof(DateTimeOffset))
+				return XmlConvert.ToDateTimeOffset(value);
+
             if (type == typeof(TimeSpan))
                 return XmlConvert.ToTimeSpan(value);
 
@@ -214,6 +217,10 @@ namespace Rhino.ServiceBus.Serializers
 
             if (value is DateTime)
                 return ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+
+			if(value is DateTimeOffset)
+				return XmlConvert.ToString((DateTimeOffset)value);
+
             if (value is TimeSpan)
             {
                 var ts = (TimeSpan)value;
@@ -319,6 +326,9 @@ namespace Rhino.ServiceBus.Serializers
 
             if (type == typeof(DateTime))
                 return true;
+
+			if (type == typeof(DateTimeOffset))
+				return true;
 
             if (type == typeof(TimeSpan))
                 return true;

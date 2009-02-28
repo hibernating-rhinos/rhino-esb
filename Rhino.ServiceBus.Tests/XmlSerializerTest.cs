@@ -58,6 +58,17 @@ namespace Rhino.ServiceBus.Tests
 			Assert.Equal(new byte[]{1,2,3,4}, actual);
 		}
 
+		[Fact]
+		public void Can_serialize_and_deserialize_DateTimeOffset()
+		{
+			var value = DateTimeOffset.Now;
+			var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+			var stream = new MemoryStream();
+			serializer.Serialize(new object[] { value }, stream);
+			stream.Position = 0;
+			var actual = (DateTimeOffset)serializer.Deserialize(stream)[0];
+			Assert.Equal(value, actual);
+		}
 
         [Fact]
         public void Can_serialize_and_deserialize_array()
