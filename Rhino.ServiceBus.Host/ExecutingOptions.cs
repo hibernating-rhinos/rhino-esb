@@ -22,8 +22,9 @@ namespace Rhino.ServiceBus.Host
         {
             var sb = new StringBuilder();
             sb.Append(" /Action:").Append(Action)
-                .Append(" /Name:")
-                .Append(Name);
+                .Append(" /Name:\"")
+                .Append(Name)
+				.Append("\"");
 
             if(string.IsNullOrEmpty(Account)==false)
             {
@@ -47,13 +48,15 @@ namespace Rhino.ServiceBus.Host
                 
             if (string.IsNullOrEmpty(Assembly) == false)
             {
-                sb.Append(" /Assembly:")
-                    .Append(Assembly);
+                sb.Append(" /Assembly:\"")
+                    .Append(Assembly)
+					.Append("\"");
             }
             if (string.IsNullOrEmpty(ConfigFile) == false)
             {
-                sb.Append(" /ConfigFile:")
-                    .Append(ConfigFile);
+                sb.Append(" /ConfigFile:\"")
+                    .Append(ConfigFile)
+					.Append("\"");
             }
             return sb.ToString();
         }
