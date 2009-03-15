@@ -8,10 +8,19 @@ namespace Rhino.ServiceBus.Host.Actions
         {
             var host = new RhinoServiceBusHost();
             host.SetArguments(options);
-            host.DebugStart(new string[0]);
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-            host.Stop();
+            try
+            {
+                host.DebugStart(new string[0]);
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                host.Stop();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadKey();
+            }
+            
         }
     }
 }
