@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Security;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -73,17 +72,28 @@ namespace Rhino.ServiceBus.Serializers
 
         private void WriteObject(string name, object value, XContainer parent, IDictionary<string, XNamespace> namespaces)
         {
-            if(HaveCustomSerializer(value.GetType()))
+            if(HaveCustomValueConvertor(value.GetType()))
             {
                 var valueConvertorType = reflection.GetGenericTypeOf(typeof (IValueConvertor<>), value);
                 var convertor = kernel.Resolve(valueConvertorType);
 
                 var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
 
-                var covertedValue = reflection.InvokeToElement(convertor, value, v => GetXmlNamespace(namespaces, v));
+                var convertedValue = reflection.InvokeToElement(convertor, value, v => GetXmlNamespace(namespaces, v));
 
-                parent.Add(new XElement(elementName, covertedValue));
+            	convertedValue = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), convertedValue);
+
+                parent.Add(new XElement(elementName, convertedValue));
             }
+			else if(HaveCustomSerializer(value.GetType()))
+			{
+				var customSerializer = kernel.ResolveAll<ICustomElementSerializer>().First(s => s.CanSerialize(value.GetType()));
+				var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
+				var element = customSerializer.ToElement(value, v => GetXmlNamespace(namespaces, v));
+				var customElement = new XElement(elementName, element);
+				customElement = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), customElement);
+				parent.Add(customElement);
+			}
             else if (ShouldPutAsString(value))
             {
                 var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
@@ -113,7 +123,6 @@ namespace Rhino.ServiceBus.Serializers
             else
             {
                 XElement content = GetContentWithNamespace(value, namespaces, name);
-                parent.Add(content);
                 foreach (var property in reflection.GetProperties(value))
                 {
                     var propVal = reflection.Get(value, property);
@@ -121,8 +130,30 @@ namespace Rhino.ServiceBus.Serializers
                         continue;
                     WriteObject(property, propVal, content, namespaces);
                 }
+            	content = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), content);
+				parent.Add(content);
             }
         }
+
+		private XElement ApplyMessageSerializationBehaviorIfNecessary(Type messageType, XElement element)
+		{
+			foreach (var afterSerializedBehavior in kernel.ResolveAll<IElementSerializationBehavior>())
+			{
+				if (afterSerializedBehavior.ShouldApplyBehavior(messageType))
+					return afterSerializedBehavior.ApplyElementBehavior(element);
+			}
+			return element;
+		}
+
+		private XElement ApplyMessageDeserializationBehaviorIfNecessary(Type messageType, XElement element)
+		{
+			foreach (var afterSerializedBehavior in kernel.ResolveAll<IElementSerializationBehavior>())
+			{
+				if (afterSerializedBehavior.ShouldApplyBehavior(messageType))
+					return afterSerializedBehavior.RemoveElementBehavior(element);
+			}
+			return element;
+		}
 
         private XNamespace GetXmlNamespace(IDictionary<string, XNamespace> namespaces, Type type)
         {
@@ -135,7 +166,13 @@ namespace Rhino.ServiceBus.Serializers
             return xmlNs;
         }
 
-        private bool HaveCustomSerializer(Type type)
+		private bool HaveCustomSerializer(Type type)
+		{
+			return kernel.ResolveAll<ICustomElementSerializer>()
+				.Any(s => s.CanSerialize(type));
+		}
+
+        private bool HaveCustomValueConvertor(Type type)
         {
             bool? hasConvertor = null;
             typeHasConvertorCache.Read(
@@ -280,12 +317,19 @@ namespace Rhino.ServiceBus.Serializers
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            if(HaveCustomSerializer(type))
+        	element = ApplyMessageDeserializationBehaviorIfNecessary(type, element);
+
+            if(HaveCustomValueConvertor(type))
             {
                 var convertorType = reflection.GetGenericTypeOf(typeof(IValueConvertor<>),type);
                 var convertor = kernel.Resolve(convertorType);
                 return reflection.InvokeFromElement(convertor, element);
             }
+			if(HaveCustomSerializer(type))
+			{
+				var customSerializer = kernel.ResolveAll<ICustomElementSerializer>().First(s => s.CanSerialize(type));
+				return customSerializer.FromElement(type, element);
+			}
 			if(type == typeof(byte[]))
 			{
 				return Convert.FromBase64String(element.Value);

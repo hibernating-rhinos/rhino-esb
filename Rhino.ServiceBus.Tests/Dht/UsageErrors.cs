@@ -21,7 +21,7 @@ namespace Rhino.ServiceBus.Tests.Dht
             var exception = Assert.Throws<InvalidUsageException>(
                 () => container.AddComponent<InvalidBaristaSaga>());
             Assert.Equal(
-                "When using DHT for saga state, you must specify either SupportsOptimisticConcurrency or Orchestrates<MergeSagaState>",
+                "When using DHT for saga state, you must implement either SupportsOptimisticConcurrency or Orchestrates<MergeSagaState>",
                 exception.Message);
         }
     }

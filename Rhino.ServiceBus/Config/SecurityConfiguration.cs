@@ -1,7 +1,6 @@
 using System;
 using System.Configuration;
 using Castle.Core.Configuration;
-using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Convertors;
 using Rhino.ServiceBus.DataStructures;
@@ -24,6 +23,10 @@ namespace Rhino.ServiceBus.Config
                     Component.For<IValueConvertor<WireEcryptedString>>()
                         .ImplementedBy<ThrowingWireEcryptedStringConvertor>()
                     );
+				kernel.Register(
+					Component.For<IElementSerializationBehavior>()
+						.ImplementedBy<ThrowingWireEncryptedMessageConvertor>()
+					);
                 return;
             }
 
@@ -32,13 +35,28 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException("<security> element must have a <key> element with content");
 
             var keyBuffer = Convert.FromBase64String(key.Value);
+
+        	kernel.Register(
+				Component.For<IEncryptionService>()
+					.ImplementedBy<RijndaelEncryptionService>()
+					.DependsOn(new
+					{
+						key = keyBuffer,
+					})
+					.Named("esb.security")
+				);
+
             kernel.Register(
                 Component.For<IValueConvertor<WireEcryptedString>>()
                     .ImplementedBy<WireEcryptedStringConvertor>()
-                    .DependsOn(
-                        Property.ForKey("key").Eq(keyBuffer)
-                    )
+					.ServiceOverrides(ServiceOverride.ForKey("encryptionService").Eq("esb.security"))
                 );
+
+        	kernel.Register(
+				Component.For<IElementSerializationBehavior>()
+					.ImplementedBy<WireEncryptedMessageConvertor>()
+					.ServiceOverrides(ServiceOverride.ForKey("encryptionService").Eq("esb.security"))
+        		);
         }
     }
 }

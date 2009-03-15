@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Xml.Linq;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Internal;
@@ -9,37 +7,19 @@ namespace Rhino.ServiceBus.Convertors
 {
     public class WireEcryptedStringConvertor : IValueConvertor<WireEcryptedString>
     {
-        public byte[] Key{ get; set;}
+    	public IEncryptionService EncryptionService { get; set;}
 
-        public WireEcryptedStringConvertor(byte[] key)
+        public WireEcryptedStringConvertor(IEncryptionService encryptionService)
         {
-            Key = key;
+        	EncryptionService = encryptionService;
         }
 
         public XElement ToElement(WireEcryptedString val, Func<Type, XNamespace> getNamespace)
         {
-            using (var rijndael = new RijndaelManaged())
-            {
-                rijndael.Key = Key;
-                rijndael.Mode = CipherMode.CBC;
-                rijndael.GenerateIV();
-
-                using (var encryptor = rijndael.CreateEncryptor())
-                using (var memoryStream = new MemoryStream())
-                using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                using (var writer = new StreamWriter(cryptoStream))
-                {
-                    writer.Write(val);
-                    writer.Flush();
-                    cryptoStream.Flush();
-                    cryptoStream.FlushFinalBlock();
-
-                    return new XElement(getNamespace(typeof (string)) + "Value",
-                                        new XAttribute("iv", Convert.ToBase64String(rijndael.IV)),
-                                        Convert.ToBase64String(memoryStream.ToArray())
-                        );
-                }
-            }
+        	var encryptedValue = EncryptionService.Encrypt(val);
+			return new XElement(getNamespace(typeof(string)) + "Value",
+				new XAttribute("iv", encryptedValue.Base64Iv),
+				encryptedValue.EncryptedBase64Value);
         }
 
         public WireEcryptedString FromElement(XElement element)
@@ -50,24 +30,15 @@ namespace Rhino.ServiceBus.Convertors
             
             var attribute = value.Attribute("iv");
             if(attribute==null)
-                throw new ArgumentException("element must contain a <value> element with iv attribue");
+                throw new ArgumentException("element must contain a <value> element with iv attribute");
 
-            var base64String = Convert.FromBase64String(element.Value);
+        	var encryptedValue = new EncryptedValue
+        	{
+				EncryptedBase64Value = element.Value,
+				Base64Iv = attribute.Value,
+        	};
 
-            using (var rijndael = new RijndaelManaged())
-            {
-                rijndael.Key = Key;
-                rijndael.IV = Convert.FromBase64String(attribute.Value);
-                rijndael.Mode = CipherMode.CBC;
-
-                using (var decryptor = rijndael.CreateDecryptor())
-                using (var memoryStream = new MemoryStream(base64String))
-                using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
-                using (var reader = new StreamReader(cryptoStream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
+        	return EncryptionService.Decrypt(encryptedValue);
         }
     }
 }

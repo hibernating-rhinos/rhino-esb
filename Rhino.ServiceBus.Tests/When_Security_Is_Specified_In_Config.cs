@@ -1,6 +1,5 @@
 using System.IO;
 using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
@@ -8,8 +7,8 @@ using Rhino.ServiceBus.Convertors;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Messages;
 using Xunit;
-using System.Linq;
 
 namespace Rhino.ServiceBus.Tests
 {
@@ -30,6 +29,14 @@ namespace Rhino.ServiceBus.Tests
             Assert.IsType<WireEcryptedStringConvertor>(convertor);
         }
 
+		[Fact]
+		public void Will_register_wire_encrypted_message_convertor_on_container()
+		{
+			var container = CreateContainer();
+			var encryptionBehavior = container.Resolve<IElementSerializationBehavior>();
+			Assert.IsType<WireEncryptedMessageConvertor>(encryptionBehavior);
+		}
+
 
         public class ClassWithSecretField
         {
@@ -39,6 +46,11 @@ namespace Rhino.ServiceBus.Tests
             }
 
         }
+
+		public class SecretMessage : IWireEncryptedMessage
+		{
+			public int Secret { get; set; }
+		}
 
         public const string encryptedMessage =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -99,6 +111,59 @@ namespace Rhino.ServiceBus.Tests
             Assert.Equal("abc", msg.ShouldBeEncrypted.Value);
         }
 
+		[Fact]
+		public void Will_encrypt_entire_message_for_wire_encrypted_message()
+		{
+			var container = CreateContainer();
+			var serializer = container.Resolve<IMessageSerializer>();
+			var memoryStream = new MemoryStream();
+			serializer.Serialize(new[]
+            {
+                new SecretMessage
+                {
+                    Secret = 1234,
+                }
+            }, memoryStream);
+
+			memoryStream.Position = 0;
+			var msg = new StreamReader(memoryStream).ReadToEnd();
+
+			var document = XDocument.Parse(msg);
+			var secretMessage = document
+				.Element(XName.Get("messages", "http://servicebus.hibernatingrhinos.com/2008/12/20/esb"))
+				.Element(XName.Get("SecretMessage", "Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+SecretMessage, Rhino.ServiceBus.Tests"));
+
+			var secret = secretMessage.Element(XName.Get("Secret", "int"));
+			Assert.Null(secret);
+
+			var valueElement = secretMessage.Element(XName.Get("Value", "string"));
+			Assert.NotNull(valueElement);
+
+			var iv = valueElement.Attribute("iv");
+			Assert.NotNull(iv);
+		}
+
+		[Fact]
+		public void Will_decrypt_message_for_wire_encrypted_message()
+		{
+			var container = CreateContainer();
+			var serializer = container.Resolve<IMessageSerializer>();
+			var memoryStream = new MemoryStream();
+			serializer.Serialize(new[]
+            {
+                new SecretMessage 
+                {
+					Secret = 1234,
+                }
+            }, memoryStream);
+
+			memoryStream.Position = 0;
+
+			var msg = (SecretMessage)serializer.Deserialize(memoryStream)[0];
+
+			Assert.Equal(1234, msg.Secret);
+		}
+
         [Fact]
         public void When_key_is_different_deserializing_key_will_fail()
         {
@@ -109,7 +174,7 @@ namespace Rhino.ServiceBus.Tests
             var managed = new RijndaelManaged();
             managed.GenerateKey();
 
-            convertor.Key = managed.Key;
+            convertor.EncryptionService.Key = managed.Key;
 
             var memoryStream = new MemoryStream();
             var writer = new StreamWriter(memoryStream);

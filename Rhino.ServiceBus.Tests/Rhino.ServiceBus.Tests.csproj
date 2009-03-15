@@ -49,7 +49,7 @@
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build\net-3.5\debug\Rhino.Mocks.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Rhino\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -57,6 +57,9 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -121,6 +124,7 @@
     <Compile Include="SagaTests.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Warnings\Warnings_would_be_generated.cs" />
+    <Compile Include="When_custom_element_serialization_is_used.cs" />
     <Compile Include="When_Security_Is_Not_Specified_In_Config.cs" />
     <Compile Include="When_Security_Is_Specified_In_Config.cs" />
     <Compile Include="SendAndReceiveMessages.cs" />

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Runtime.Serialization;
 using Castle.Windsor;
@@ -38,6 +37,27 @@ namespace Rhino.ServiceBus.Tests
                     e.InnerException.Message);
             }
         }
+
+		[Fact]
+		public void Will_throw_for_wire_encrypted_message()
+		{
+			var container = CreateContainer();
+			var serializer = container.Resolve<IMessageSerializer>();
+			var memoryStream = new MemoryStream();
+			try
+			{
+				serializer.Serialize(new[]
+                {
+                    new When_Security_Is_Specified_In_Config.SecretMessage() {Secret = 1234}
+                }, memoryStream);
+				Assert.True(false, "Expected exception");
+			}
+			catch (SerializationException e)
+			{
+				Assert.Equal("Cannot send IWireEncryptedMessage when <security> was not properly set up",
+					e.InnerException.Message);
+			}
+		}
 
         [Fact]
         public void Will_not_be_able_to_read_encypted_content()
