@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Messaging;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
 using log4net;
@@ -274,7 +275,15 @@ namespace Rhino.ServiceBus.Msmq
         {
             var message = new Message();
 
-            messageSerializer.Serialize(msgs, message.BodyStream);
+        	try
+        	{
+        		messageSerializer.Serialize(msgs, message.BodyStream);
+        	}
+        	catch (SerializationException ex)
+        	{
+        		logger.Error("Error when trying to serialize message.", ex);
+        		throw;
+        	}
 
             message.ResponseQueue = InitalizeQueue(Endpoint).ToResponseQueue();
 
