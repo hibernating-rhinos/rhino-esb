@@ -53,17 +53,17 @@ namespace Rhino.ServiceBus.Msmq
                     return new[]
 	                {
 	                    MsmqUtil.GetQueuePath(queueEndpoint).Create(),
-	                    MsmqUtil.CreateQueue(GetErrorsQueuePath(), QueueAccessMode.SendAndReceive),
-	                    MsmqUtil.CreateQueue(GetSubscriptionQueuePath(), QueueAccessMode.SendAndReceive),
-	                    MsmqUtil.CreateQueue(GetDiscardedQueuePath(), QueueAccessMode.SendAndReceive),
-	                    MsmqUtil.CreateQueue(GetTimeoutQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetErrorsQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetSubscriptionQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetDiscardedQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetTimeoutQueuePath(), QueueAccessMode.SendAndReceive),
 	                };
                 case QueueType.LoadBalancer:
                     return new[]
 	                {
 	                    MsmqUtil.GetQueuePath(queueEndpoint).Create(),
-	                    MsmqUtil.CreateQueue(GetKnownWorkersQueuePath(), QueueAccessMode.SendAndReceive),
-	                    MsmqUtil.CreateQueue(GetKnownEndpointsQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetKnownWorkersQueuePath(), QueueAccessMode.SendAndReceive),
+	                    MsmqUtil.OpenOrCreateQueue(GetKnownEndpointsQueuePath(), QueueAccessMode.SendAndReceive),
 	                };
                 default:
                     throw new ArgumentOutOfRangeException("queueType", "Can't handle queue type: " + queueType);

@@ -86,7 +86,7 @@ namespace Rhino.ServiceBus.Msmq
 			    return new MessageQueue(queuePath);
 			try
 			{
-				return MessageQueue.Create(QueuePath, true);
+                return MsmqUtil.CreateQueue(queuePath);
 			}
 			catch (Exception e)
 			{
