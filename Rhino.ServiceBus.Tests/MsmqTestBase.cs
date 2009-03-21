@@ -9,6 +9,7 @@ using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.Serializers;
+using System.Transactions;
 
 namespace Rhino.ServiceBus.Tests
 {
@@ -130,7 +131,8 @@ namespace Rhino.ServiceBus.Tests
                             new SubQueueStrategy(),
                             TestQueueUri.Uri, 1, 
                             defaultTransportActions,
-                            new EndpointRouter());
+                            new EndpointRouter(),
+							IsolationLevel.Serializable);
                     transport.Start();
                 }
                 return transport;
@@ -149,7 +151,8 @@ namespace Rhino.ServiceBus.Tests
                         TransactionalTestQueueUri.Uri, 
                         1,
                         defaultTransportActions,
-                            new EndpointRouter());
+                            new EndpointRouter(),
+							IsolationLevel.Serializable);
                     transactionalTransport.Start();
                 }
                 return transactionalTransport;

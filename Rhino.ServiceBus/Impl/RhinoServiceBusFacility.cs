@@ -5,6 +5,7 @@ using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Actions;
+using System.Transactions;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -95,6 +96,11 @@ namespace Rhino.ServiceBus.Impl
             string threads = busConfig.Attributes["threadCounts"];
             if (int.TryParse(threads, out result))
                 threadCount = result;
+
+        	string isolationLevel = busConfig.Attributes["queueIsolationLevel"];
+			if (!string.IsNullOrEmpty(isolationLevel))
+				queueIsolationLevel = (IsolationLevel)Enum.Parse(typeof(IsolationLevel), isolationLevel);
+			
 
             string uriString = busConfig.Attributes["endpoint"];
             if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)

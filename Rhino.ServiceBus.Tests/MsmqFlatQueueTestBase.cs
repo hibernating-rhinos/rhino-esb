@@ -7,6 +7,7 @@ using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.Serializers;
+using System.Transactions;
 
 namespace Rhino.ServiceBus.Tests
 {
@@ -126,7 +127,8 @@ namespace Rhino.ServiceBus.Tests
                             new FlatQueueStrategy(new EndpointRouter(),testQueueEndPoint.Uri),
                             testQueueEndPoint.Uri, 1,
                         DefaultTransportActions(testQueueEndPoint.Uri),
-                            new EndpointRouter());
+                            new EndpointRouter(),
+							IsolationLevel.Serializable);
                     transport.Start();
                 }
                 return transport;
@@ -155,7 +157,8 @@ namespace Rhino.ServiceBus.Tests
                         new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()),
                         new FlatQueueStrategy(new EndpointRouter(),transactionalTestQueueEndpoint.Uri),
                         transactionalTestQueueEndpoint.Uri, 1, DefaultTransportActions(transactionalTestQueueEndpoint.Uri),
-                            new EndpointRouter());
+                            new EndpointRouter(),
+							IsolationLevel.Serializable);
                     transactionalTransport.Start();
                 }
                 return transactionalTransport;

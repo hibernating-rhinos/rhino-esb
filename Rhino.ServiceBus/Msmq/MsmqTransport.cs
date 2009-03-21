@@ -23,14 +23,16 @@ namespace Rhino.ServiceBus.Msmq
 
         private readonly ILog logger = LogManager.GetLogger(typeof(MsmqTransport));
         private readonly ITransportAction[] transportActions;
+    	private IsolationLevel queueIsolationLevel;
 
-        public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, ITransportAction[] transportActions, IEndpointRouter endpointRouter)
+    	public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, ITransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel)
             :base(queueStrategy,endpoint, threadCount, serializer,endpointRouter)
         {
-            this.transportActions = transportActions;
+        	this.transportActions = transportActions;
+        	this.queueIsolationLevel = queueIsolationLevel;
         }
 
-        #region ITransport Members
+    	#region ITransport Members
 
         protected override void BeforeStart(OpenedQueue queue)
         {
@@ -124,7 +126,12 @@ namespace Rhino.ServiceBus.Msmq
 
         public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted)
 		{
-			using (var tx = new TransactionScope(TransactionScopeOption.Required, GetTransactionTimeout()))
+        	var transactionOptions = new TransactionOptions
+        	{
+				IsolationLevel = queueIsolationLevel,
+				Timeout = GetTransactionTimeout(),
+        	};
+			using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
 			{
 				var message = queue.TryGetMessageFromQueue(messageId);
                 

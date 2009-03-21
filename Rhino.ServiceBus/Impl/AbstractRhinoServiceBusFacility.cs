@@ -14,6 +14,7 @@ using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.Sagas;
 using Rhino.ServiceBus.Serializers;
+using System.Transactions;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -28,6 +29,7 @@ namespace Rhino.ServiceBus.Impl
         protected int threadCount = 1;
         private Type queueStrategyImpl = typeof(SubQueueStrategy);
         private bool useCreationModule = true;
+    	protected IsolationLevel queueIsolationLevel = IsolationLevel.Serializable;
 
         protected AbstractRhinoServiceBusFacility()
         {
@@ -158,6 +160,7 @@ namespace Rhino.ServiceBus.Impl
                     {
                         threadCount,
                         endpoint,
+						queueIsolationLevel,
                     }),
                 Component.For<IMessageSerializer>()
                     .LifeStyle.Is(LifestyleType.Singleton)
