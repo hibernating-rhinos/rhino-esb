@@ -1,6 +1,7 @@
 using System;
 using System.Messaging;
 using System.Net;
+using System.Security.Principal;
 using Rhino.ServiceBus.Exceptions;
 
 namespace Rhino.ServiceBus.Msmq
@@ -129,7 +130,10 @@ namespace Rhino.ServiceBus.Msmq
         public static MessageQueue CreateQueue(string newQueuePath)
         {
             var queue = MessageQueue.Create(newQueuePath, true);
-            queue.SetPermissions(".\\Administrators", MessageQueueAccessRights.FullControl, AccessControlEntryType.Allow);
+            var administratorsGroupName = new SecurityIdentifier("S-1-5-32-544")
+                                                .Translate(typeof(NTAccount))
+                                                .ToString();
+            queue.SetPermissions(administratorsGroupName, MessageQueueAccessRights.FullControl, AccessControlEntryType.Allow);
             return queue;
         }
         
