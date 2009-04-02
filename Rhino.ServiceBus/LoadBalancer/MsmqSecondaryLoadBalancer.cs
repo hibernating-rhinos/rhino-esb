@@ -137,7 +137,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         protected override void HandleLoadBalancerMessages(object msg)
         {
             var heartbeat = msg as Heartbeat;
-            if (heartbeat == null)
+            if (heartbeat != null)
             {
                 timeout.SetHeartbeat(DateTime.Now);
                 logger.Debug("Got heartbeat from primary");

@@ -160,6 +160,15 @@ namespace Rhino.ServiceBus.LoadBalancer
             {
                 SendHeartBeatToSecondaryServer(null);
                 heartBeatTimer.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+
+                SendToAllWorkers(
+                    GenerateMsmqMessageFromMessageBatch(new Reroute
+                    {
+                        NewEndPoint = Endpoint.Uri,
+                        OriginalEndPoint = Endpoint.Uri
+                    }),
+                    "Rerouting {1} back to {0}"
+                    );
             }
 
             if (ShouldNotifyWorkersLoaderIsReadyToAcceptWorkOnStartup)
@@ -179,7 +188,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             var acceptingWork = new AcceptingWork { Endpoint = Endpoint.Uri };
             SendToAllWorkers(
                 GenerateMsmqMessageFromMessageBatch(acceptingWork),
-                "Notifing {1} that {1} is accepting work"
+                "Notifing {1} that {0} is accepting work"
                 );
         }
 
