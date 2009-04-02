@@ -17,6 +17,8 @@
 			<include name="Castle.Core.dll"/>
 			<include name="Castle.MicroKernel.dll"/>
 			<include name="Castle.Windsor.dll"/>
+			<include name="Rhino.Queues.dll"/>
+			<include name="Rhino.PersistentHashTable.dll"/>
 			
 			<include name="log4net.dll"/>
 			

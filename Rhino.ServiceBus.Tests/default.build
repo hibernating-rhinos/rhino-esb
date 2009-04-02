@@ -7,7 +7,7 @@
 >
   <property overwrite="false" name="assembly.is-cls-compliant" value="false" />
   <property name="root.dir" value="../.." />
-	
+
   <include buildfile="${root.dir}/common-project.xml" />
 
   <target name="init" depends="common.init">
@@ -18,12 +18,13 @@
       <include name="Rhino.Mocks.dll" />
       <include name="Rhino.DistributedHashTable.dll" />
       <include name="Rhino.ServiceBus.dll" />
+      <include name="Rhino.Queues.dll"/>
       <include name="Rhino.ServiceBus.DistributedHashTableIntegration.dll"/>
       <include name="Rhino.PersistentHashTable.dll"/>
       <include name="Castle.Windsor.dll" />
-      <include name="Castle.Core.dll" />      
+      <include name="Castle.Core.dll" />
       <include name="Castle.MicroKernel.dll" />
-	  
+
       <include name="System.dll" />
       <include name="System.Configuration.dll" />
       <include name="System.Core.dll" />
@@ -31,7 +32,7 @@
       <include name="System.Transactions.dll" />
       <include name="System.Xml.dll" />
       <include name="System.Xml.Linq.dll" />
-	  
+
     </assemblyfileset>
 
     <resourcefileset id="project.resources" prefix="Rhino.ServiceBus.Test" dynamicprefix="true" basedir="${src.dir}">
