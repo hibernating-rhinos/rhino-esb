@@ -8,6 +8,8 @@ using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq.TransportActions;
+using Rhino.ServiceBus.Transport;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
 {
@@ -22,10 +24,10 @@ namespace Rhino.ServiceBus.Msmq
         }
 
         private readonly ILog logger = LogManager.GetLogger(typeof(MsmqTransport));
-        private readonly ITransportAction[] transportActions;
-    	private IsolationLevel queueIsolationLevel;
+        private readonly IMsmqTransportAction[] transportActions;
+    	private readonly IsolationLevel queueIsolationLevel;
 
-    	public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, ITransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel)
+    	public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel)
             :base(queueStrategy,endpoint, threadCount, serializer,endpointRouter)
         {
         	this.transportActions = transportActions;
@@ -98,14 +100,14 @@ namespace Rhino.ServiceBus.Msmq
             SendMessageToQueue(message, endpoint);
 		}
 
-        public void Send(Endpoint endpoint, params object[] msgs)
+        public void Send(Endpoint destination, object[] msgs)
 		{
 			if(HaveStarted==false)
 				throw new InvalidOperationException("Cannot send a message before transport is started");
 
 			var message = GenerateMsmqMessageFromMessageBatch(msgs);
 
-            SendMessageToQueue(message, endpoint);
+            SendMessageToQueue(message, destination);
 
 			var copy = MessageSent;
 			if (copy == null)
@@ -115,7 +117,7 @@ namespace Rhino.ServiceBus.Msmq
 			{
 				AllMessages = msgs,
 				Source = Endpoint.Uri,
-				Destination = endpoint.Uri,
+				Destination = destination.Uri,
                 MessageId = message.GetMessageId(),
 			});
 		}
@@ -129,7 +131,7 @@ namespace Rhino.ServiceBus.Msmq
         	var transactionOptions = new TransactionOptions
         	{
 				IsolationLevel = queueIsolationLevel,
-				Timeout = GetTransactionTimeout(),
+				Timeout = TransportUtil.GetTransactionTimeout(),
         	};
 			using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
 			{
@@ -225,7 +227,7 @@ namespace Rhino.ServiceBus.Msmq
                     {
                         currentMessageInformation = CreateMessageInformation(messageQueue,message, messages, msg);
 
-                        if(ProcessSingleMessage(messageRecieved)==false)
+                        if(TransportUtil.ProcessSingleMessage(currentMessageInformation,messageRecieved)==false)
                             Discard(currentMessageInformation.Message);
                     }
                 }
@@ -258,20 +260,6 @@ namespace Rhino.ServiceBus.Msmq
                 currentMessageInformation = null;
 		    } 
 		}
-
-	    private static bool ProcessSingleMessage(Func<CurrentMessageInformation, bool> messageRecieved)
-	    {
-	        if (messageRecieved == null)
-	            return false;
-	        foreach (Func<CurrentMessageInformation, bool> func in messageRecieved.GetInvocationList())
-	        {
-	            if (func(currentMessageInformation))
-	            {
-	                return true;
-	            }
-	        }
-	        return false;
-	    }
 
 	    private MsmqCurrentMessageInformation CreateMessageInformation(OpenedQueue queue,Message message, object[] messages, object msg)
 	    {

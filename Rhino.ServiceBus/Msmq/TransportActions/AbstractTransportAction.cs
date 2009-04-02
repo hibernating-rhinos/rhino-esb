@@ -1,9 +1,10 @@
 using System.Messaging;
 using Rhino.ServiceBus.Internal;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq.TransportActions
 {
-    public abstract class AbstractTransportAction : ITransportAction
+    public abstract class AbstractTransportAction : IMsmqTransportAction
     {
         public abstract MessageType HandledType { get; }
 

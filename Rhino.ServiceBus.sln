@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.PersistentHashTable",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.PersistentHashTable.Tests", "..\pht\Rhino.PersistentHashTable.Tests\Rhino.PersistentHashTable.Tests.csproj", "{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Queues", "..\queues\Rhino.Queues\Rhino.Queues.csproj", "{398BF580-41F5-418E-A017-19D19B289A97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Queues.Tests", "..\queues\Rhino.Queues.Tests\Rhino.Queues.Tests.csproj", "{98D394CA-9FEF-49AD-8DAB-FE039152E001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BC9E44C-6E3B-4E3C-B7E1-4850C3DB5251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398BF580-41F5-418E-A017-19D19B289A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398BF580-41F5-418E-A017-19D19B289A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398BF580-41F5-418E-A017-19D19B289A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398BF580-41F5-418E-A017-19D19B289A97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98D394CA-9FEF-49AD-8DAB-FE039152E001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98D394CA-9FEF-49AD-8DAB-FE039152E001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98D394CA-9FEF-49AD-8DAB-FE039152E001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98D394CA-9FEF-49AD-8DAB-FE039152E001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

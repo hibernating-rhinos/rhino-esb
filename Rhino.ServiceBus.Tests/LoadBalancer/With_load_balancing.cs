@@ -9,6 +9,7 @@ using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Transport;
 using Xunit;
 using System.Linq;
 

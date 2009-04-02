@@ -135,10 +135,10 @@ namespace Rhino.ServiceBus.Tests
             }
         }
 
-        private static ITransportAction[] DefaultTransportActions(Uri endpoint)
+        private static IMsmqTransportAction[] DefaultTransportActions(Uri endpoint)
         {
             var qs = new FlatQueueStrategy(new EndpointRouter(),endpoint);
-            return new ITransportAction[]
+            return new IMsmqTransportAction[]
             {
                 new AdministrativeAction(),
                 new ErrorAction(5, qs),

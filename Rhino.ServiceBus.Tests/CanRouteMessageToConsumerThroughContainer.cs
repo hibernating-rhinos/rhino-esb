@@ -31,7 +31,7 @@ namespace Rhino.ServiceBus.Tests
                 TestConsumer.Wait = new ManualResetEvent(false);
 
                 var transport = container.Resolve<ITransport>();
-                transport.Send(transport.Endpoint, msg);
+                transport.Send(transport.Endpoint, new object[] { msg });
 
                 TestConsumer.Wait.WaitOne(TimeSpan.FromSeconds(30), false);
 

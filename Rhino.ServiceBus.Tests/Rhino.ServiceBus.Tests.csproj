@@ -121,6 +121,10 @@
     <Compile Include="PublishingTests.cs" />
     <Compile Include="QueueCreationModuleTests.cs" />
     <Compile Include="RequestAndReply.cs" />
+    <Compile Include="RhinoQueues\PhtSubscriptionStorageFixture.cs" />
+    <Compile Include="RhinoQueues\UsingRhinoQueuesBus.cs" />
+    <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
+    <Compile Include="RhinoQueues\WithDebugging.cs" />
     <Compile Include="SagaTests.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Warnings\Warnings_would_be_generated.cs" />
@@ -138,6 +142,10 @@
     <ProjectReference Include="..\..\pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj">
       <Project>{F30B2D63-CED5-4C8A-908F-0B5503D984A9}</Project>
       <Name>Rhino.PersistentHashTable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\queues\Rhino.Queues\Rhino.Queues.csproj">
+      <Project>{398BF580-41F5-418E-A017-19D19B289A97}</Project>
+      <Name>Rhino.Queues</Name>
     </ProjectReference>
     <ProjectReference Include="..\Rhino.DistributedHashTable\Rhino.DistributedHashTable.csproj">
       <Project>{63530BA6-3424-49D9-B32C-A35A603817CE}</Project>
@@ -171,6 +179,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="LoadBalancer\BusWithLoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RhinoQueues\RhinoQueues.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

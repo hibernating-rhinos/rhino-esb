@@ -34,7 +34,7 @@ namespace Rhino.ServiceBus.Tests
 			container = new WindsorContainer(new XmlInterpreter(
 			                                 	Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InitBus.config")
 			                                 	));
-			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility().UseSubqueuesQueueStructure());
+			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
 			using (var bus = container.Resolve<IStartableServiceBus>())
 			{
 				bus.Start();

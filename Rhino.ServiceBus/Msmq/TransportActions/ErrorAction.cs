@@ -4,10 +4,12 @@ using log4net;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Transport;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq.TransportActions
 {
-    public class ErrorAction : ITransportAction
+    public class ErrorAction : IMsmqTransportAction
     {
         private readonly ILog logger = LogManager.GetLogger(typeof(ErrorAction));
         private readonly int numberOfRetries;

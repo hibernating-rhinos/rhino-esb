@@ -4,8 +4,9 @@ using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Transport;
 using Xunit;
-using MessageType=Rhino.ServiceBus.Msmq.MessageType;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Tests.Bugs
 {

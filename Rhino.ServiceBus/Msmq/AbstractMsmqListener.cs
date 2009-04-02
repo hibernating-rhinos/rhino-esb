@@ -10,6 +10,8 @@ using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
+using Rhino.ServiceBus.Transport;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
 {
@@ -179,7 +181,7 @@ namespace Rhino.ServiceBus.Msmq
                     if (peek == false || shouldStop)//error reading from queue
                     {
                         TransportState = TransportState.FailedToReadFromQueue;
-                        return; // return from method, we have failed}
+                        return; // return from method, we have failed
                     }
                     if (peek == null) //nothing was found 
                         continue;
@@ -262,13 +264,6 @@ namespace Rhino.ServiceBus.Msmq
                 return false;
             }
             return true;
-        }
-
-        protected static TimeSpan GetTransactionTimeout()
-        {
-            if (Debugger.IsAttached)
-                return TimeSpan.FromMinutes(45);
-            return TimeSpan.Zero;
         }
 
         protected Message GenerateMsmqMessageFromMessageBatch(params object[] msgs)

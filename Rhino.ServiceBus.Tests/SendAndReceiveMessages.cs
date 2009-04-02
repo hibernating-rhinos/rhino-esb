@@ -19,11 +19,14 @@ namespace Rhino.ServiceBus.Tests
                 waitHandle.Set();
                 return true;
             };
-            Transport.Send(TestQueueUri, new TestMessage
+            Transport.Send(TestQueueUri, new object[]
             {
-                Count = 1,
-                Name = "ayende",
-                SendAt = today
+                new TestMessage
+                {
+                    Count = 1,
+                    Name = "ayende",
+                    SendAt = today
+                }
             });
             waitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 
@@ -55,11 +58,14 @@ namespace Rhino.ServiceBus.Tests
                 waitHandle.Set();
                 return true;
             };
-            Transport.Send(testQueueEndPoint, new TestMessage
+            Transport.Send(testQueueEndPoint, new object[]
             {
-                Count = 1,
-                Name = "ayende",
-                SendAt = today
+                new TestMessage
+                {
+                    Count = 1,
+                    Name = "ayende",
+                    SendAt = today
+                }
             });
             waitHandle.WaitOne(TimeSpan.FromSeconds(30), false);
 

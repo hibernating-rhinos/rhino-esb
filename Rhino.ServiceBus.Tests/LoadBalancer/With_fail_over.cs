@@ -10,7 +10,7 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Msmq;
 using Xunit;
-using MessageType = Rhino.ServiceBus.Msmq.MessageType;
+using MessageType = Rhino.ServiceBus.Transport.MessageType;
 using System.Linq;
 
 namespace Rhino.ServiceBus.Tests.LoadBalancer

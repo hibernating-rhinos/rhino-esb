@@ -6,6 +6,7 @@ using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Serializers;
+using Rhino.ServiceBus.Transport;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests

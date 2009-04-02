@@ -7,6 +7,8 @@ using System.Transactions;
 using log4net;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Transport;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq.TransportActions
 {

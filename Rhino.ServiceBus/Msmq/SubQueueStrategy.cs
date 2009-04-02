@@ -1,6 +1,7 @@
 using System;
 using System.Messaging;
 using Rhino.ServiceBus.Exceptions;
+using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.Msmq
 {

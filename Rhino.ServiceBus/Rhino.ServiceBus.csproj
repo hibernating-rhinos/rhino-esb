@@ -105,7 +105,7 @@
     <Compile Include="Messages\ReadyToWork.cs" />
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
-    <Compile Include="Msmq\SubQueue.cs" />
+    <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
     <Compile Include="Msmq\TransportState.cs" />
     <Compile Include="Sagas\Persisters\InMemorySagaPersister.cs" />
@@ -131,7 +131,7 @@
     <Compile Include="Messages\SerializationErrorMessage.cs" />
     <Compile Include="Msmq\FlatQueueStrategy.cs" />
     <Compile Include="Msmq\IQueueStrategy.cs" />
-    <Compile Include="Msmq\MessageType.cs" />
+    <Compile Include="Transport\MessageType.cs" />
     <Compile Include="Msmq\MsmqCurrentMessageInformation.cs" />
     <Compile Include="Msmq\MsmqExtensions.cs" />
     <Compile Include="Msmq\NativeMethods.cs" />
@@ -140,9 +140,9 @@
     <Compile Include="Msmq\TransportActions\AdministrativeAction.cs" />
     <Compile Include="Msmq\TransportActions\ErrorAction.cs" />
     <Compile Include="Msmq\TransportActions\AbstractTransportAction.cs" />
-    <Compile Include="Msmq\TransportActions\ITransportAction.cs" />
+    <Compile Include="Msmq\TransportActions\IMsmqTransportAction.cs" />
     <Compile Include="Msmq\TransportActions\TimeoutAction.cs" />
-    <Compile Include="Msmq\TypeAndUriKey.cs" />
+    <Compile Include="Transport\TypeAndUriKey.cs" />
     <Compile Include="OccasionalConsumerOf.cs" />
     <Compile Include="Internal\IAccessibleSaga.cs" />
     <Compile Include="Sagas\InitiatedBy.cs" />
@@ -168,6 +168,8 @@
     <Compile Include="Actions\IDeploymentAction.cs" />
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
     <Compile Include="Config\LoadBalancerConfiguration.cs" />
+    <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
+    <Compile Include="Config\RhinoQueuesConfiguratinAware.cs" />
     <Compile Include="Convertors\ThrowingWireEncryptedMessageConvertor.cs" />
     <Compile Include="Convertors\WireEncryptedMessageConvertor.cs" />
     <Compile Include="DataStructures\EncryptedValue.cs" />
@@ -191,7 +193,24 @@
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
+    <Compile Include="RhinoQueues\ErrorAction.cs" />
+    <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />
+    <Compile Include="RhinoQueues\RhinoQueueCurrentMessageInformation.cs" />
+    <Compile Include="RhinoQueues\RhinoQueuesTransport.cs" />
+    <Compile Include="RhinoQueues\TimeoutAction.cs" />
+    <Compile Include="Transport\TransportUtil.cs" />
+    <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\pht\Rhino.PersistentHashTable\Rhino.PersistentHashTable.csproj">
+      <Project>{F30B2D63-CED5-4C8A-908F-0B5503D984A9}</Project>
+      <Name>Rhino.PersistentHashTable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\queues\Rhino.Queues\Rhino.Queues.csproj">
+      <Project>{398BF580-41F5-418E-A017-19D19B289A97}</Project>
+      <Name>Rhino.Queues</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

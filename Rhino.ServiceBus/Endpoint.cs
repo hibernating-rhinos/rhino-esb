@@ -10,7 +10,7 @@ namespace Rhino.ServiceBus
             get { return uri; }
             set
             {
-                if(value.Host.ToLowerInvariant()=="localhost")
+                if (value.Host.Equals("localhost",StringComparison.InvariantCultureIgnoreCase))
                 {
                     uri = new UriBuilder(value)
                     {

@@ -159,12 +159,12 @@ namespace Rhino.ServiceBus.Tests
             }
         }
 
-        private static ITransportAction[] defaultTransportActions
+        private static IMsmqTransportAction[] defaultTransportActions
         {
             get
             {
                 var qs = new SubQueueStrategy();
-                return new ITransportAction[]
+                return new IMsmqTransportAction[]
                 {
                     new AdministrativeAction(),
                     new ErrorAction(5, qs),

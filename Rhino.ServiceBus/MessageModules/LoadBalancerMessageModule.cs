@@ -73,9 +73,12 @@ namespace Rhino.ServiceBus.MessageModules
             logger.DebugFormat("Telling load balancer {0} that we {1} are ready for more work",
                                endpoint,
                                theTransport.Endpoint);
-            theTransport.Send(endpoint, new ReadyToWork
+            theTransport.Send(endpoint, new object[]
             {
-                Endpoint = theTransport.Endpoint.Uri
+                new ReadyToWork
+                {
+                    Endpoint = theTransport.Endpoint.Uri
+                }
             });
         }
 

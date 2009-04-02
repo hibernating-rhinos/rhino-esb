@@ -21,14 +21,14 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             logger.InfoFormat("Configuring load balancer '{0}' with endpoint '{1}', primary '{2}', secondary '{3}'",
                 loadBalancerType.Name,
-                endpoint,
+                Endpoint,
                 primaryLoadBalancer,
                 secondaryLoadBalancer);
 
             var dependencies = new
             {
-                endpoint,
-                threadCount,
+                endpoint=Endpoint,
+                threadCount = ThreadCount,
                 primaryLoadBalancer
             };
             var component = Component.For<MsmqLoadBalancer>()
@@ -56,14 +56,16 @@ namespace Rhino.ServiceBus.LoadBalancer
             int result;
             string threads = busConfig.Attributes["threadCounts"];
             if (int.TryParse(threads, out result))
-                threadCount = result;
+                ThreadCount = result;
 
             string uriString = busConfig.Attributes["endpoint"];
+            Uri endpoint;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)
             {
                 throw new ConfigurationErrorsException(
                     "Attribute 'endpoint' on 'loadBalancer' has an invalid value '" + uriString + "'");
             }
+            Endpoint = endpoint;
 
             var secondaryUri = busConfig.Attributes["secondaryLoadBalancerEndpoint"];
             if (secondaryUri != null)//primary with secondary

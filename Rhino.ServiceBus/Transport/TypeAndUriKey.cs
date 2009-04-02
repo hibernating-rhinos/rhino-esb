@@ -1,6 +1,6 @@
 using System;
 
-namespace Rhino.ServiceBus.Msmq
+namespace Rhino.ServiceBus.Transport
 {
     public class TypeAndUriKey
     {

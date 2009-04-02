@@ -2,6 +2,7 @@ using System;
 using System.Messaging;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Transport;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests

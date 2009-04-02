@@ -4,6 +4,8 @@ using System.Messaging;
 using System.Runtime.InteropServices;
 using System.Transactions;
 using Rhino.ServiceBus.Exceptions;
+using Rhino.ServiceBus.Transport;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
 {

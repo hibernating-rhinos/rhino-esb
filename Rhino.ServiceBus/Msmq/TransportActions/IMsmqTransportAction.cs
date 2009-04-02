@@ -3,7 +3,7 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Msmq.TransportActions
 {
-    public interface ITransportAction
+    public interface IMsmqTransportAction
     {
         void Init(IMsmqTransport transport, OpenedQueue queue);
 

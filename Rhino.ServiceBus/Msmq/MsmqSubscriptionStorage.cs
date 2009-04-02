@@ -9,6 +9,7 @@ using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Messages;
+using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.Msmq
 {
@@ -227,12 +228,12 @@ namespace Rhino.ServiceBus.Msmq
             var removeInstanceSubscription = msgInfo.Message as RemoveInstanceSubscription;
             if (removeInstanceSubscription != null)
             {
-                return ConsumeRemoveInstanceSubscrion(removeInstanceSubscription);
+                return ConsumeRemoveInstanceSubscription(removeInstanceSubscription);
             }
             return false;
         }
 
-        private bool ConsumeRemoveInstanceSubscrion(RemoveInstanceSubscription subscription)
+        private bool ConsumeRemoveInstanceSubscription(RemoveInstanceSubscription subscription)
         {
             string msgId;
             if(remoteInstanceSubscriptions.TryRemove(subscription.InstanceSubscriptionKey,out msgId))

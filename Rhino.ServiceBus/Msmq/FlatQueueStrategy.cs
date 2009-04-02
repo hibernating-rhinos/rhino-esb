@@ -2,6 +2,7 @@ using System;
 using System.Messaging;
 using log4net;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.Msmq
 {

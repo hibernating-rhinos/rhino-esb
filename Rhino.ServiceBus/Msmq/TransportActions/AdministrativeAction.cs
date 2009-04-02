@@ -2,6 +2,7 @@ using System;
 using System.Messaging;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
+using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq.TransportActions
 {

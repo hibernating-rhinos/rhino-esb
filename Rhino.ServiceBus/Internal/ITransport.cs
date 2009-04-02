@@ -11,7 +11,7 @@ namespace Rhino.ServiceBus.Internal
         Endpoint Endpoint { get; }
         int ThreadCount { get; }
 
-        void Send(Endpoint endpoint, params object[] msgs);
+        void Send(Endpoint destination, object[] msgs);
         void Send(Endpoint endpoint, DateTime processAgainAt, object[] msgs);
 
         void Reply(params object[] messages);

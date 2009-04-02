@@ -1,4 +1,4 @@
-namespace Rhino.ServiceBus.Msmq
+namespace Rhino.ServiceBus.Transport
 {
     public enum SubQueue
     {

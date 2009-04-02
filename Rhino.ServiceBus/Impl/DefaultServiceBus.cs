@@ -298,7 +298,7 @@ namespace Rhino.ServiceBus.Impl
     	/// </summary>
     	public void HandleCurrentMessageLater()
     	{
-			transport.Send(Endpoint, DateTime.Now, currentMessage);
+            transport.Send(Endpoint, DateTime.Now, new[] { currentMessage });
     	}
 
         /// <summary>

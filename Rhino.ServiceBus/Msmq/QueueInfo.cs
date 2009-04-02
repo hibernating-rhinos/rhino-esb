@@ -1,3 +1,5 @@
+using Rhino.ServiceBus.Transport;
+
 namespace Rhino.ServiceBus.Msmq
 {
 	using System;

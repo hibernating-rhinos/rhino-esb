@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using Castle.Core;
 using Castle.Core.Configuration;
+using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Actions;
 using System.Transactions;
@@ -91,11 +92,11 @@ namespace Rhino.ServiceBus.Impl
             string retries = busConfig.Attributes["numberOfRetries"];
             int result;
             if (int.TryParse(retries, out result))
-                numberOfRetries = result;
+                NumberOfRetries = result;
 
             string threads = busConfig.Attributes["threadCounts"];
             if (int.TryParse(threads, out result))
-                threadCount = result;
+                ThreadCount = result;
 
         	string isolationLevel = busConfig.Attributes["queueIsolationLevel"];
 			if (!string.IsNullOrEmpty(isolationLevel))
@@ -103,12 +104,19 @@ namespace Rhino.ServiceBus.Impl
 			
 
             string uriString = busConfig.Attributes["endpoint"];
+            Uri endpoint;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)
             {
                 throw new ConfigurationErrorsException(
                     "Attribute 'endpoint' on 'bus' has an invalid value '" + uriString + "'");
             }
+            Endpoint = endpoint;
         }
 
+	    public IFacility UseFlatQueueStructure()
+	    {
+	        UseFlatQueue = true;
+	        return this;
+	    }
     }
 }
