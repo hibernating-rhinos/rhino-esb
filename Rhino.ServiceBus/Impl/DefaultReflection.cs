@@ -125,9 +125,9 @@ namespace Rhino.ServiceBus.Impl
             {
                 Type type = instance.GetType();
                 PropertyInfo property = type.GetProperty(name);
-                if (property == null)
+                if (property == null || property.CanWrite == false)
                 {
-                    logger.InfoFormat("Could not find property {0} to set on {1}", name, type);
+                    logger.DebugFormat("Could not find settable property {0} to set on {1}", name, type);
                     return;
                 }
                 object value = generateValue(property.PropertyType);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Rhino.ServiceBus.Sagas;
 
 namespace Rhino.ServiceBus.Internal
 {
