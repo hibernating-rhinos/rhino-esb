@@ -139,11 +139,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 if (shouldContinue == false)
                     return;
 
-                var transactionOptions = new TransactionOptions
-                {
-                    IsolationLevel = queueIsolationLevel,
-                    Timeout = TransportUtil.GetTransactionTimeout(),
-                };
+            	var transactionOptions = GetTransactionOptions();
                 using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
                 {
                     Message message;
@@ -379,7 +375,12 @@ namespace Rhino.ServiceBus.RhinoQueues
                 };
                 logger.DebugFormat("Sending a message with id '{0}' to '{1}'", messageId, destination.Uri);
                 customizeHeaders(payload.Headers);
-                queueManager.Send(destination.Uri, payload);
+				var transactionOptions = GetTransactionOptions();
+				using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
+				{
+					queueManager.Send(destination.Uri, payload);
+					tx.Complete();
+				}
             }
 
             var copy = MessageSent;
@@ -395,7 +396,16 @@ namespace Rhino.ServiceBus.RhinoQueues
             });
         }
 
-        protected static MessageType GetAppSpecificMarker(object[] msgs)
+    	private TransactionOptions GetTransactionOptions()
+    	{
+    		return new TransactionOptions
+    		{
+    			IsolationLevel = Transaction.Current == null ? queueIsolationLevel : Transaction.Current.IsolationLevel,
+    			Timeout = TransportUtil.GetTransactionTimeout(),
+    		};
+    	}
+
+    	protected static MessageType GetAppSpecificMarker(object[] msgs)
         {
             var msg = msgs[0];
             if (msg is AdministrativeMessage)
