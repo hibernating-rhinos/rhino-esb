@@ -47,7 +47,7 @@ namespace Rhino.ServiceBus.Tests
 			public string Value { get; set; }
 		}
 
-		[DataContract(IsReference = true)]
+		[DataContract(/*IsReference = true*/)]
 		public class DataContractMessage
 		{
 			[DataMember]

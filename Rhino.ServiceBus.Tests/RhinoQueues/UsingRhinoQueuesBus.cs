@@ -42,7 +42,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 tx.Complete();
             }
 
-            Assert.True(StringConsumer.Wait.WaitOne(TimeSpan.FromSeconds(100)));
+            Assert.True(StringConsumer.Wait.WaitOne(TimeSpan.FromSeconds(100), false));
 
             Assert.Equal("hello", StringConsumer.Value);
         }

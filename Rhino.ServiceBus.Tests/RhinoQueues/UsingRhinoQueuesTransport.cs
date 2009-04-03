@@ -53,7 +53,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 tx.Complete();
             }
 
-            wait.WaitOne(TimeSpan.FromSeconds(5));
+            wait.WaitOne(TimeSpan.FromSeconds(5), false);
             Assert.Equal("test", val);
         }
 
@@ -80,7 +80,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 tx.Complete();
             }
 
-            wait.WaitOne(TimeSpan.FromSeconds(5));
+            wait.WaitOne(TimeSpan.FromSeconds(5), false);
             Assert.Equal("test", val);
         }
 
@@ -131,7 +131,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 tx.Complete();
             }
 
-            Assert.True(wait.WaitOne(TimeSpan.FromSeconds(10)));
+            Assert.True(wait.WaitOne(TimeSpan.FromSeconds(10), false));
 
             Assert.InRange(val - sendTime, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
         }
