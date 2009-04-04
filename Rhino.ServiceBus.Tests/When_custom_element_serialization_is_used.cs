@@ -47,7 +47,7 @@ namespace Rhino.ServiceBus.Tests
 			public string Value { get; set; }
 		}
 
-		[DataContract(/*IsReference = true*/)]
+		[DataContract]
 		public class DataContractMessage
 		{
 			[DataMember]
@@ -66,7 +66,7 @@ namespace Rhino.ServiceBus.Tests
 
 			public XElement ToElement(object val, Func<Type, XNamespace> getNamespace)
 			{
-				var serializer = new DataContractSerializer(val.GetType());
+				var serializer = new NetDataContractSerializer();
 				using (var ms = new MemoryStream())
 				{
 					serializer.WriteObject(ms, val);
@@ -77,7 +77,7 @@ namespace Rhino.ServiceBus.Tests
 
 			public object FromElement(Type type, XElement element)
 			{
-				var serializer = new DataContractSerializer(type);
+				var serializer = new NetDataContractSerializer();
 				var childElement = element.FirstNode.NextNode;
 				return serializer.ReadObject(XmlReader.Create(new StringReader(childElement.ToString())));
 			}
