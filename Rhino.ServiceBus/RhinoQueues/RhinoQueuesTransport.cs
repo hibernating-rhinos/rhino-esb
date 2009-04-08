@@ -370,7 +370,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                         {
                             {"id", messageId.ToString()},
                             {"type", GetAppSpecificMarker(msgs).ToString()},
-                            {"source", endpoint.ToString()},
+                            {"source", Endpoint.Uri.ToString()},
                         }
                 };
                 logger.DebugFormat("Sending a message with id '{0}' to '{1}'", messageId, destination.Uri);
