@@ -25,12 +25,9 @@ namespace Rhino.ServiceBus.RhinoQueues
             this.queue = queue;
             timeoutMessageIds.Write(writer =>
             {
-                foreach (var message in queue.GetAllMessages(SubQueue.Discarded.ToString()))
+                foreach (var message in queue.GetAllMessages(SubQueue.Timeout.ToString()))
                 {
-                	var timeToSendHeader = message.Headers["time-to-send"];
-					if(string.IsNullOrEmpty(timeToSendHeader))
-						continue;
-                    var timeToSend = XmlConvert.ToDateTime(timeToSendHeader,XmlDateTimeSerializationMode.Utc);
+                    var timeToSend = XmlConvert.ToDateTime(message.Headers["time-to-send"],XmlDateTimeSerializationMode.Utc);
                     logger.DebugFormat("Registering message {0} to be sent at {1} on {2}",
                                   message.Id, timeToSend, queue.QueueName);
                     writer.Add(timeToSend, message.Id);
