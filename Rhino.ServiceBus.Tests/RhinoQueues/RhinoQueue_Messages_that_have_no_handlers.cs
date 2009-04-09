@@ -1,16 +1,12 @@
 using System;
 using System.IO;
-using System.Messaging;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
 using Rhino.ServiceBus.Tests.RhinoQueues;
-using Rhino.ServiceBus.Transport;
 using Xunit;
-using Rhino.Queues;
-using System.Net;
 using System.Threading;
 
 namespace Rhino.ServiceBus.Tests
@@ -33,7 +29,7 @@ namespace Rhino.ServiceBus.Tests
 
 
         [Fact]
-        public void Should_go_to_discard_sub_queue()
+        public void Should_go_to_discard_sub_queue_and_be_able_to_restart_bus()
         {
             using (var bus = container.Resolve<IStartableServiceBus>())
             {
