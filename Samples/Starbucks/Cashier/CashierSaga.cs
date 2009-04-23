@@ -5,7 +5,9 @@ using Starbucks.Messages.Cashier;
 
 namespace Starbucks.Cashier
 {
-    public class CashierSaga :
+	using Rhino.Queues.Utils;
+
+	public class CashierSaga :
         ConsumerOf<NewOrder>,
         ConsumerOf<SubmitPayment>
     {

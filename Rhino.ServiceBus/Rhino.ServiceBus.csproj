@@ -159,7 +159,6 @@
     <Compile Include="Sagas\Orchestrates.cs" />
     <Compile Include="Sagas\SupportsOptimisticConcurrency.cs" />
     <Compile Include="Serializers\XmlMessageSerializer.cs" />
-    <Compile Include="Util\GuidCombGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\CreateLoadBalancerQueuesAction.cs" />
