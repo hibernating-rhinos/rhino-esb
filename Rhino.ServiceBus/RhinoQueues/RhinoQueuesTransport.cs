@@ -58,7 +58,11 @@ namespace Rhino.ServiceBus.RhinoQueues
 
             queueName = endpoint.GetQueueName();
 
-            threads = new Thread[threadCount];
+			threads = new Thread[threadCount];
+
+			// This has to be the first subscriber to the transport events
+			// in order to successfuly handle the errors semantics
+			new ErrorAction(numberOfRetries).Init(this);
          }
 
         public void Dispose()
@@ -97,7 +101,6 @@ namespace Rhino.ServiceBus.RhinoQueues
 
             queue = queueManager.GetQueue(queueName);
      
-            new ErrorAction(numberOfRetries).Init(this);
             timeout = new TimeoutAction(queue);
             logger.DebugFormat("Starting {0} threads to handle messages on {1}, number of retries: {2}",
                 threadCount, endpoint, numberOfRetries);

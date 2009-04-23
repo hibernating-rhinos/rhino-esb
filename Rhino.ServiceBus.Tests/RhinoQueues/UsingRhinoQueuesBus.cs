@@ -9,7 +9,11 @@ using Xunit;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
-    public class UsingRhinoQueuesBus : WithDebugging, IDisposable
+	using Internal;
+	using ServiceBus.RhinoQueues;
+	using Transport;
+
+	public class UsingRhinoQueuesBus : WithDebugging, IDisposable
     {
         private readonly IWindsorContainer container;
         private readonly IStartableServiceBus bus;
@@ -28,6 +32,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
             container.AddComponent<StringConsumer>();
+			container.AddComponent<ThrowingIntConsumer>();
             bus = container.Resolve<IStartableServiceBus>();
             bus.Start();
         }
@@ -46,6 +51,28 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
 
             Assert.Equal("hello", StringConsumer.Value);
         }
+
+		[Fact]
+		public void Can_handle_errors_gracefully()
+		{
+			var transport = (RhinoQueuesTransport)container.Resolve<ITransport>();
+			
+			using (var tx = new TransactionScope())
+			{
+				bus.Send(bus.Endpoint, 5);
+
+				tx.Complete();
+			}
+
+			using (var tx = new TransactionScope())
+			{
+				var message = transport.Queue.Receive(SubQueue.Errors.ToString());
+				var msgs = container.Resolve<IMessageSerializer>().Deserialize(new MemoryStream(message.Data));
+				Assert.Equal(5, msgs[0]);
+
+				tx.Complete();
+			}
+		}
         
         public void Dispose()
         {
@@ -63,5 +90,14 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 Wait.Set();
             }
         }
+
+
+		public class ThrowingIntConsumer : ConsumerOf<int>
+		{
+			public void Consume(int message)
+			{
+				throw new InvalidOperationException("I want to be Long consumer");
+			}
+		}
     }
 }
