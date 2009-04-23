@@ -11,9 +11,8 @@ using System.Threading;
 
 namespace Rhino.ServiceBus.Tests
 {
-	public class RhinoQueues_Messages_that_have_no_handlers : WithDebugging, IDisposable
+	public class RhinoQueues_Messages_that_have_no_handlers : WithDebugging
     {
-        private readonly IWindsorContainer container;
 
 		public RhinoQueues_Messages_that_have_no_handlers()
         {
@@ -23,29 +22,35 @@ namespace Rhino.ServiceBus.Tests
             if (Directory.Exists("test_subscriptions.esent"))
                 Directory.Delete("test_subscriptions.esent", true);
 
-            container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
         }
 
+		private static IWindsorContainer CreateContainer()
+		{
+			var container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
+			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+			return container;
+		}
 
-        [Fact]
+
+		[Fact]
         public void Should_go_to_discard_sub_queue_and_be_able_to_restart_bus()
         {
+			using (var container = CreateContainer())
             using (var bus = container.Resolve<IStartableServiceBus>())
             {
                 bus.Start();
-                bus.Send(bus.Endpoint, "foobar");
-            	var transport = (RhinoQueuesTransport) container.Resolve<ITransport>();
-				Thread.Sleep(2000);
-				//in RhinoQueuesTransport.Start() the TimeoutAction is created and threw NullReferenceException
-				//if the queue had discarded message due to no handlers
-            	var timeoutAction = new TimeoutAction(transport.Queue);
+            	var wait = new ManualResetEvent(false);
+				var transport = (RhinoQueuesTransport)container.Resolve<ITransport>();
+            	transport.MessageProcessingCompleted += (information, exception) => wait.Set();
+				bus.Send(bus.Endpoint, "foobar");
+            	wait.WaitOne();
             }
-        }
 
-		public void Dispose()
-		{
-			container.Dispose();
-		}
+			using (var container = CreateContainer())
+			using (var bus = container.Resolve<IStartableServiceBus>())
+			{
+				bus.Start();
+			}
+        }
     }
 }
