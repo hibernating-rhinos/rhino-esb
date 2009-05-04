@@ -287,7 +287,21 @@ namespace Rhino.ServiceBus.Impl
                 string fullName = assembly.FullName ?? assembly.GetName().Name;
                 return type.FullName + ", " + fullName.Split(',')[0];
             }
-            return type.AssemblyQualifiedName;
+			var genericParameterNameMap = new Dictionary<string,string>();
+			if(type.IsGenericType)
+			{
+				foreach (var argument in type.GetGenericArguments())
+				{
+					genericParameterNameMap.Add(argument.AssemblyQualifiedName,GetAssemblyQualifiedNameWithoutVersion(argument));
+				}
+			}
+
+			var qualified = type.AssemblyQualifiedName;
+        	foreach (var genericParamToVersionless in genericParameterNameMap)
+        	{
+        		qualified = qualified.Replace(genericParamToVersionless.Key, genericParamToVersionless.Value);
+        	}
+        	return qualified;
         }
 
         public IEnumerable<string> GetProperties(object value)

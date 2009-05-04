@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Sagas;
@@ -63,6 +64,14 @@ namespace Rhino.ServiceBus.Tests
         {
             Assert.Throws<NotImplementedException>(() => reflection.InvokeSagaPersisterSave(new ThrowingPersister(), new ThrowingList()));
         }
+		[Fact]
+		public void Gets_assembly_name_without_version_for_generic_lists()
+		{
+			var list = new List<SomeMsg>();
+			var output = reflection.GetAssemblyQualifiedNameWithoutVersion(list.GetType());
+			
+			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=",output.Replace(" ",""));
+		}
 		public class SomeMsg{}
 		public class SomeMsgConsumer:GenericConsumer<SomeMsg>{}
 		public class GenericConsumer<T>:ConsumerOf<T>
