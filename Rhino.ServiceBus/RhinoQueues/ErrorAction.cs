@@ -44,7 +44,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 info.Queue.MoveTo(SubQueue.Errors.ToString(), info.TransportMessage);
                 info.Queue.EnqueueDirectlyTo(SubQueue.Errors.ToString(), new MessagePayload
                 {
-                    Data = Encoding.Unicode.GetBytes(val.ExceptionText),
+                    Data = val.ExceptionText == null ? null : Encoding.Unicode.GetBytes(val.ExceptionText),
                     Headers =
                         {
                             {"correlation-id", info.TransportMessageId},
@@ -63,7 +63,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             var info = (RhinoQueueCurrentMessageInformation) information;
             failureCounts.Write(writer => writer.Add(info.TransportMessageId, new ErrorCounter
             {
-                ExceptionText = exception.ToString(),
+                ExceptionText = exception == null ? null : exception.ToString(),
                 FailureCount = numberOfRetries + 1
             }));
         }
@@ -89,7 +89,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 {
                     errorCounter = new ErrorCounter
                     {
-                        ExceptionText = exception.ToString(),
+                        ExceptionText = exception == null ? null : exception.ToString(),
                         FailureCount = 0
                     };
                     writer.Add(information.TransportMessageId, errorCounter);
