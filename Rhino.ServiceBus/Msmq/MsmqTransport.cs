@@ -169,36 +169,58 @@ namespace Rhino.ServiceBus.Msmq
 			Message message,
 			TransactionScope tx,
             OpenedQueue messageQueue,
-			Exception exception)
+			Exception exception,
+			Action<CurrentMessageInformation, Exception> messageCompleted)
 		{
 			if (exception == null)
 			{
 				try
 				{
 					if (tx != null)
+					{
 						tx.Complete();
+						tx.Dispose();
+					}
+					try
+					{
+						if (messageCompleted != null)
+							messageCompleted(currentMessageInformation, exception);
+					}
+					catch (Exception e)
+					{
+						logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+					}
 					return;
 				}
 				catch (Exception e)
 				{
 					logger.Warn("Failed to complete transaction, moving to error mode", e);
+					exception = e;
 				}
 			}
 			if (message == null)
 				return;
 
-            try
+
+			try
+			{
+				if (messageCompleted != null)
+					messageCompleted(currentMessageInformation, exception);
+			}
+			catch (Exception e)
+			{
+				logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+			} 
+			
+			try
             {
-                Action<CurrentMessageInformation, Exception> copy = MessageProcessingFailure;
+                var copy = MessageProcessingFailure;
                 if (copy != null)
                     copy(currentMessageInformation, exception);
             }
             catch (Exception moduleException)
             {
-                string exMsg = "";
-                if (exception != null)
-                    exMsg = exception.Message;
-                logger.Error("Module failed to process message failure: " + exMsg,
+                logger.Error("Module failed to process message failure: " + exception.Message,
                                              moduleException);
             }
 
@@ -215,50 +237,38 @@ namespace Rhino.ServiceBus.Msmq
             Func<CurrentMessageInformation, bool> messageRecieved,
             Action<CurrentMessageInformation, Exception> messageCompleted)
 		{
-		    Exception ex = null;
-		    currentMessageInformation = CreateMessageInformation(messageQueue, message, null, null);
-            try
-            {
-                //deserialization errors do not count for module events
-                object[] messages = DeserializeMessages(messageQueue, message, MessageSerializationException);
-                try
-                {
-                    foreach (object msg in messages)
-                    {
-                        currentMessageInformation = CreateMessageInformation(messageQueue,message, messages, msg);
+			Exception ex = null;
+				currentMessageInformation = CreateMessageInformation(messageQueue, message, null, null);
+				try
+				{
+					//deserialization errors do not count for module events
+					object[] messages = DeserializeMessages(messageQueue, message, MessageSerializationException);
+					try
+					{
+						foreach (object msg in messages)
+						{
+							currentMessageInformation = CreateMessageInformation(messageQueue, message, messages, msg);
 
-                        if(TransportUtil.ProcessSingleMessage(currentMessageInformation,messageRecieved)==false)
-                            Discard(currentMessageInformation.Message);
-                    }
-                }
-                catch (Exception e)
-                {
-                    ex = e;
-                    logger.Error("Failed to process message", e);
-                }
-                finally
-                {
-                    try
-                    {
-                        if (messageCompleted != null)
-                            messageCompleted(currentMessageInformation, ex);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                ex = e;
-                logger.Error("Failed to deserialize message", e);
-            }
-            finally
-		    {
-                HandleMessageCompletion(message, tx, messageQueue, ex);
-                currentMessageInformation = null;
-		    } 
+							if (TransportUtil.ProcessSingleMessage(currentMessageInformation, messageRecieved) == false) Discard(currentMessageInformation.Message);
+						}
+					}
+					catch (Exception e)
+					{
+						ex = e;
+						logger.Error("Failed to process message", e);
+					}
+				}
+				catch (Exception e)
+				{
+					ex = e;
+					logger.Error("Failed to deserialize message", e);
+				}
+				finally
+				{
+					HandleMessageCompletion(message, tx, messageQueue, ex, messageCompleted);
+					currentMessageInformation = null;
+				}
+		
 		}
 
 	    private MsmqCurrentMessageInformation CreateMessageInformation(OpenedQueue queue,Message message, object[] messages, object msg)

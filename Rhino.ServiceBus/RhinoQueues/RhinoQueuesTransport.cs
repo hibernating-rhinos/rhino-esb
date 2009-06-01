@@ -244,18 +244,6 @@ namespace Rhino.ServiceBus.RhinoQueues
                     ex = e;
                     logger.Error("Failed to process message", e);
                 }
-                finally
-                {
-                    try
-                    {
-                        if (messageCompleted != null)
-                            messageCompleted(currentMessageInformation, ex);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
-                    }
-                }
             }
             catch (Exception e)
             {
@@ -264,7 +252,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             }
             finally
             {
-                HandleMessageCompletion(message, tx, ex);
+                HandleMessageCompletion(message, tx, ex, messageCompleted);
                 currentMessageInformation = null;
             }
         }
@@ -272,24 +260,46 @@ namespace Rhino.ServiceBus.RhinoQueues
         private void HandleMessageCompletion(
             Message message,
             TransactionScope tx,
-            Exception exception)
+			Exception exception,
+			Action<CurrentMessageInformation, Exception> messageCompleted)
         {
             if (exception == null)
             {
                 try
                 {
                     if (tx != null)
-                        tx.Complete();
+                    {
+                    	tx.Complete();
+						tx.Dispose();
+                    }
+					try
+					{
+						if (messageCompleted != null)
+							messageCompleted(currentMessageInformation, exception);
+					}
+					catch (Exception e)
+					{
+						logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+					}
                     return;
                 }
                 catch (Exception e)
                 {
                     logger.Warn("Failed to complete transaction, moving to error mode", e);
+                	exception = e;
                 }
             }
             if (message == null)
                 return;
-
+			try
+			{
+				if (messageCompleted != null)
+					messageCompleted(currentMessageInformation, exception);
+			}
+			catch (Exception e)
+			{
+				logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+			}
             try
             {
                 var copy = MessageProcessingFailure;

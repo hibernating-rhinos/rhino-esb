@@ -100,37 +100,37 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Can_register_to_get_message_completion_notification_even_on_error()
         {
-            using (var serviceBus = (DefaultServiceBus)container.Resolve<IServiceBus>())
-            {
-                serviceBus.Start();
-                Module1.CompletionResetEvent = new ManualResetEvent(false);
-                Module1.ErrorResetEvent = new ManualResetEvent(false);
-                
-                Module1.Completion = false;
+        	using (var serviceBus = (DefaultServiceBus) container.Resolve<IServiceBus>())
+        	{
+        		serviceBus.Start();
+        		Module1.CompletionResetEvent = new ManualResetEvent(false);
+        		Module1.ErrorResetEvent = new ManualResetEvent(false);
 
-                serviceBus.Send(serviceBus.Endpoint, 3);
-                Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
-                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
-            }
-            Assert.True(Module1.Completion);
+        		Module1.Completion = false;
+
+        		serviceBus.Send(serviceBus.Endpoint, 3);
+        		Module1.ErrorResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+        		Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+        	}
+        	Assert.True(Module1.Completion);
         }
 
-        [Fact]
+    	[Fact]
         public void Can_register_to_get_message_completion_notification()
-        {
-            using (var serviceBus = (DefaultServiceBus)container.Resolve<IServiceBus>())
-            {
-                serviceBus.Start();
-                Module1.CompletionResetEvent = new ManualResetEvent(false);
-                Module1.Completion = false;
+    	{
+    		using (var serviceBus = (DefaultServiceBus) container.Resolve<IServiceBus>())
+    		{
+    			serviceBus.Start();
+    			Module1.CompletionResetEvent = new ManualResetEvent(false);
+    			Module1.Completion = false;
 
-                serviceBus.Send(serviceBus.Endpoint, "hello");
-                Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
-            }
-            Assert.True(Module1.Completion);
-        }
+    			serviceBus.Send(serviceBus.Endpoint, "hello");
+    			Module1.CompletionResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+    		}
+    		Assert.True(Module1.Completion);
+    	}
 
-        public class Module1 : IMessageModule
+    	public class Module1 : IMessageModule
         {
             public static Exception Exception;
             public static ManualResetEvent ErrorResetEvent;
@@ -145,11 +145,11 @@ namespace Rhino.ServiceBus.Tests
 
             private static void Transport_OnMessageProcessingCompleted(CurrentMessageInformation t, Exception e)
             {
-                Completion = true;
-                CompletionResetEvent.Set();
+            	Completion = true;
+            	CompletionResetEvent.Set();
             }
 
-            private static void Transport_OnMessageProcessingFailure(CurrentMessageInformation t1, Exception t2)
+    		private static void Transport_OnMessageProcessingFailure(CurrentMessageInformation t1, Exception t2)
             {
                 Exception = t2;
                 ErrorResetEvent.Set();
