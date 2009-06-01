@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Xml.Linq;
 using Castle.MicroKernel.Proxy;
 using log4net;
@@ -275,34 +276,41 @@ namespace Rhino.ServiceBus.Impl
             return typeName.Substring(0,typeName.Length-1);
         }
 
-        public string GetAssemblyQualifiedNameWithoutVersion(Type type)
-        {
-            string value;
-            if(typeToWellKnownTypeName.TryGetValue(type, out value))
-                return value;
+	   public string GetAssemblyQualifiedNameWithoutVersion(Type type)
+	   {
+		   string value;
+		   if (typeToWellKnownTypeName.TryGetValue(type, out value))
+			   return value;
 
-            Assembly assembly = type.Assembly;
-            if (assembly.GlobalAssemblyCache == false)
-            {
-                string fullName = assembly.FullName ?? assembly.GetName().Name;
-                return type.FullName + ", " + fullName.Split(',')[0];
-            }
-			var genericParameterNameMap = new Dictionary<string,string>();
-			if(type.IsGenericType)
-			{
-				foreach (var argument in type.GetGenericArguments())
-				{
-					genericParameterNameMap.Add(argument.AssemblyQualifiedName,GetAssemblyQualifiedNameWithoutVersion(argument));
-				}
-			}
+		   Assembly assembly = type.Assembly;
+		   string fullName = assembly.FullName ?? assembly.GetName().Name;
+		   if (type.IsGenericType)
+		   {
+			   var builder = new StringBuilder();
+			   builder.Append(type.Namespace).Append(".")
+				   .Append(type.Name).Append("[")
+				   .Append(String.Join(",",
+								   type.GetGenericArguments()
+									   .Select(t => "[" + GetAssemblyQualifiedNameWithoutVersion(t) + "]")
+									   .ToArray()))
+				   .Append("], ");
+			   if (assembly.GlobalAssemblyCache)
+			   {
+				   builder.Append(fullName);
+			   }
+			   else
+			   {
+				   builder.Append(fullName.Split(',')[0]);
+			   }
+			   return builder.ToString();
+		   }
 
-			var qualified = type.AssemblyQualifiedName;
-        	foreach (var genericParamToVersionless in genericParameterNameMap)
-        	{
-        		qualified = qualified.Replace(genericParamToVersionless.Key, genericParamToVersionless.Value);
-        	}
-        	return qualified;
-        }
+		   if (assembly.GlobalAssemblyCache == false)
+		   {
+			   return type.FullName + ", " + fullName.Split(',')[0];
+		   }
+		   return type.AssemblyQualifiedName;
+	   }
 
         public IEnumerable<string> GetProperties(object value)
         {

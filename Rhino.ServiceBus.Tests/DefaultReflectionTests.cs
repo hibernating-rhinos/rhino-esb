@@ -72,6 +72,21 @@ namespace Rhino.ServiceBus.Tests
 			
 			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=",output.Replace(" ",""));
 		}
+		[Fact]
+		public void Gets_assembly_name_without_version_for_generic_types_in_local_assemblies()
+		{
+			var output = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(GenericConsumer<SomeMsg>));
+		
+			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
+		}
+		[Fact]
+		public void Gets_assembly_name_with_more_than_one_type_parameter()
+		{
+			string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(Dictionary<object, object>));
+			Assert.Equal(
+				typeof(Dictionary<object, object>).AssemblyQualifiedName,
+				name);
+		}
 		public class SomeMsg{}
 		public class SomeMsgConsumer:GenericConsumer<SomeMsg>{}
 		public class GenericConsumer<T>:ConsumerOf<T>
