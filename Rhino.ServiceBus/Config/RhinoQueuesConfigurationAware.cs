@@ -7,11 +7,10 @@ using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
-using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Config
 {
-    public class RhinoQueuesConfiguratinAware : IBusConfigurationAware
+    public class RhinoQueuesConfigurationAware : IBusConfigurationAware
     {
         public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
         {

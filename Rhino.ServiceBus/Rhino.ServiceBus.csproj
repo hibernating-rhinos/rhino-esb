@@ -168,7 +168,7 @@
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
     <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
-    <Compile Include="Config\RhinoQueuesConfiguratinAware.cs" />
+    <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Convertors\ThrowingWireEncryptedMessageConvertor.cs" />
     <Compile Include="Convertors\WireEncryptedMessageConvertor.cs" />
     <Compile Include="DataStructures\EncryptedValue.cs" />
