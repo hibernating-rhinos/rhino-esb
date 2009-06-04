@@ -20,10 +20,10 @@ namespace Rhino.ServiceBus.Config
 
             IConfiguration busConfig = facility.FacilityConfig.Children["bus"];
             if (busConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'bus' node in confiuration");
+                throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
             var name = busConfig.Attributes["name"];
             if (string.IsNullOrEmpty(name))
-                throw new ConfigurationErrorsException("Could not find attribute 'name' in node 'bus' in confiuration");
+                throw new ConfigurationErrorsException("Could not find attribute 'name' in node 'bus' in configuration");
 
             var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 

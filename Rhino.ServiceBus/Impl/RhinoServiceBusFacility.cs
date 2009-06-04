@@ -53,7 +53,7 @@ namespace Rhino.ServiceBus.Impl
         {
             IConfiguration messageConfig = FacilityConfig.Children["messages"];
             if (messageConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'messages' node in confiuration");
+                throw new ConfigurationErrorsException("Could not find 'messages' node in configuration");
 
             foreach (IConfiguration configuration in messageConfig.Children)
             {
@@ -87,14 +87,14 @@ namespace Rhino.ServiceBus.Impl
         {
             IConfiguration busConfig = FacilityConfig.Children["bus"];
             if (busConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'bus' node in confiuration");
+                throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
 
             string retries = busConfig.Attributes["numberOfRetries"];
             int result;
             if (int.TryParse(retries, out result))
                 NumberOfRetries = result;
 
-            string threads = busConfig.Attributes["threadCounts"];
+            string threads = busConfig.Attributes["threadCount"];
             if (int.TryParse(threads, out result))
                 ThreadCount = result;
 

@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.IO;
-using System.Threading;
-using log4net;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -12,17 +9,16 @@ namespace Rhino.ServiceBus.Hosting
     public class RemoteAppDomainHost
     {
         private readonly string boosterType;
-        private readonly string assembly;
-        private readonly string path;
+        private readonly string assemblyName;
+        private readonly string assemblyLocation;
         private HostedService current;
         private string configurationFile;
         private string hostType = typeof (DefaultHost).FullName;
         private string hostAsm = typeof (DefaultHost).Assembly.FullName;
 
-        public RemoteAppDomainHost(Assembly asm, string configuration)
+        public RemoteAppDomainHost(Assembly assembly, string configuration) 
+            : this(assembly.Location, configuration)
         {
-            assembly = asm.Location;
-            configurationFile = configuration;
         }
 
         public RemoteAppDomainHost(Type boosterType)
@@ -31,11 +27,11 @@ namespace Rhino.ServiceBus.Hosting
             this.boosterType = boosterType.FullName;
         }
 
-        public RemoteAppDomainHost(string assemblyPath, string config)
+        public RemoteAppDomainHost(string assemblyPath, string configuration)
         {
-            configurationFile = config;
-            assembly = Path.GetFileNameWithoutExtension(assemblyPath);
-            path = Path.GetDirectoryName(assemblyPath);
+            configurationFile = configuration;
+            assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
+            assemblyLocation = Path.GetDirectoryName(assemblyPath);
         }
 
         public void Start()
@@ -61,12 +57,12 @@ namespace Rhino.ServiceBus.Hosting
         {
             var appDomainSetup = new AppDomainSetup
             {
-                ApplicationBase = path,
-                ApplicationName = assembly,
+                ApplicationBase = assemblyLocation,
+                ApplicationName = assemblyName,
                 ConfigurationFile = ConfigurationFile,
                 ShadowCopyFiles = "true" //yuck
             };
-            AppDomain appDomain = AppDomain.CreateDomain(assembly, null, appDomainSetup);
+            AppDomain appDomain = AppDomain.CreateDomain(assemblyName, null, appDomainSetup);
             return CreateRemoteHost(appDomain);
         }
 
@@ -79,7 +75,7 @@ namespace Rhino.ServiceBus.Hosting
             if (boosterType != null)
                 hoster.SetBootStrapperTypeName(boosterType);
 
-            return new HostedService(hoster, assembly, appDomain);
+            return new HostedService(hoster, assemblyName, appDomain);
         }
 
         private string ConfigurationFile
@@ -88,9 +84,9 @@ namespace Rhino.ServiceBus.Hosting
             {
                 if (configurationFile != null)
                     return configurationFile;
-                configurationFile = Path.Combine(path, assembly + ".dll.config");
+                configurationFile = Path.Combine(assemblyLocation, assemblyName + ".dll.config");
                 if (File.Exists(configurationFile) == false)
-                    configurationFile = Path.Combine(path, assembly + ".exe.config");
+                    configurationFile = Path.Combine(assemblyLocation, assemblyName + ".exe.config");
                 return configurationFile;
             }
         }

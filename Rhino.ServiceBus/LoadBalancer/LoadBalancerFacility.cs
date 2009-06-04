@@ -51,10 +51,10 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             IConfiguration busConfig = FacilityConfig.Children["loadBalancer"];
             if (busConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'loadBalancer' node in confiuration");
+                throw new ConfigurationErrorsException("Could not find 'loadBalancer' node in configuration");
 
             int result;
-            string threads = busConfig.Attributes["threadCounts"];
+            string threads = busConfig.Attributes["threadCount"];
             if (int.TryParse(threads, out result))
                 ThreadCount = result;
 

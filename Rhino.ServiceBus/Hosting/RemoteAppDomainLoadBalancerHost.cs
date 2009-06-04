@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Rhino.ServiceBus.LoadBalancer;
 
 namespace Rhino.ServiceBus.Hosting
@@ -11,6 +12,11 @@ namespace Rhino.ServiceBus.Hosting
 
         public RemoteAppDomainLoadBalancerHost(string assemblyPath, string configuration)
             : base(assemblyPath, configuration)
+        {
+        }
+
+        public RemoteAppDomainLoadBalancerHost(Assembly assembly, string configuration) : 
+            base(assembly, configuration)
         {
         }
 

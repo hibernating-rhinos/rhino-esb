@@ -1,10 +1,6 @@
 using System;
-using System.IO;
-using log4net;
-using log4net.Config;
 using Rhino.ServiceBus;
 using Rhino.ServiceBus.Hosting;
-using Rhino.ServiceBus.LoadBalancer;
 using Starbucks.Barista;
 using Starbucks.Cashier;
 using Starbucks.Customer;
@@ -21,9 +17,7 @@ namespace Starbucks
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier");
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer");
 
-
-            var baristaLoadBalancer = new RemoteAppDomainHost(typeof(RemoteAppDomainHost).Assembly,"LoadBalancer.config")
-                .SetHostType(typeof(LoadBalancerHost));
+            var baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof(RemoteAppDomainHost).Assembly, "LoadBalancer.config");
             baristaLoadBalancer.Start();
             
             Console.WriteLine("Barista load balancer has started");

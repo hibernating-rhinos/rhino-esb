@@ -28,7 +28,7 @@ namespace Rhino.ServiceBus.Tests
         }
 
         [Fact]
-        public void Trying_to_notify_with_no_notifications_will_throw()
+        public void Trying_to_notify_with_no_notifications_will_not_throw()
         {
             using (var bus = container.Resolve<IStartableServiceBus>())
             {
