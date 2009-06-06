@@ -253,7 +253,7 @@ namespace Rhino.ServiceBus.Serializers
                 return value.ToString();
 
             if (value is DateTime)
-                return ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+                return ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fffffff", CultureInfo.InvariantCulture);
 
 			if(value is DateTimeOffset)
 				return XmlConvert.ToString((DateTimeOffset)value);
