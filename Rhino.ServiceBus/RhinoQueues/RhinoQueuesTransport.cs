@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -433,7 +434,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             SendInternal(msgs, endpoint,
                 nv =>
                 {
-                    nv["time-to-send"] = processAgainAt.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+                    nv["time-to-send"] = processAgainAt.ToString("yyyy-MM-ddTHH:mm:ss.fffffff", CultureInfo.InvariantCulture);
                     nv["type"] = MessageType.TimeoutMessageMarker.ToString();
                 });
         }

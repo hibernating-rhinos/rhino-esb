@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Xml.Serialization;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -21,7 +20,6 @@ namespace Rhino.ServiceBus.Tests
 
             container1.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
             container2.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-
 
             container1.AddComponent<PingHandler>();
             container2.AddComponent<PongHandler>();

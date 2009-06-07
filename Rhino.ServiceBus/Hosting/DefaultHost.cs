@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Castle.Core.Configuration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using log4net;
@@ -14,12 +15,13 @@ namespace Rhino.ServiceBus.Hosting
     public class DefaultHost : MarshalByRefObject, IApplicationHost
     {
         private readonly ILog logger = LogManager.GetLogger(typeof(DefaultHost));
-        private string assebmlyName;
+        private string assemblyName;
         private AbstractBootStrapper bootStrapper;
         private IWindsorContainer container;
         private IStartableServiceBus serviceBus;
         private string bootStrapperName;
     	private string standaloneCastleConfigurationFileName;
+        private IConfiguration hostConfiguration;
 
         public void SetBootStrapperTypeName(string typeName)
         {
@@ -48,7 +50,7 @@ namespace Rhino.ServiceBus.Hosting
 
             XmlConfigurator.ConfigureAndWatch(new FileInfo(logfile));
 
-            assebmlyName = asmName;
+            assemblyName = asmName;
 
             CreateBootStrapper();
 
@@ -69,25 +71,29 @@ namespace Rhino.ServiceBus.Hosting
             bootStrapper.InitializeContainer(container);
         }
 
-
         private void CreateContainer()
         {
 			if (container == null)
 			{
 				container = string.IsNullOrEmpty(standaloneCastleConfigurationFileName) 
-					? new WindsorContainer(new XmlInterpreter()) 
+					? File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
+                        ? new WindsorContainer(new XmlInterpreter()) 
+                        : new WindsorContainer() 
 					: new WindsorContainer(new XmlInterpreter(standaloneCastleConfigurationFileName));
 			}
+
+            if(hostConfiguration != null)
+                container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
+
         	var facility = new RhinoServiceBusFacility();
             bootStrapper.ConfigureBusFacility(facility);
             container.Kernel.AddFacility("rhino.esb", facility);
         }
 
-
         private void CreateBootStrapper()
         {
-            logger.DebugFormat("Loading {0}", assebmlyName);
-            var assembly = Assembly.Load(assebmlyName);
+            logger.DebugFormat("Loading {0}", assemblyName);
+            var assembly = Assembly.Load(assemblyName);
 
             Type bootStrapperType = null;
 
@@ -104,7 +110,6 @@ namespace Rhino.ServiceBus.Hosting
             {
                 throw new InvalidOperationException("Failed to create " + bootStrapperType + ".", e);
             }
-
         }
 
         public IWindsorContainer Container
@@ -164,12 +169,17 @@ namespace Rhino.ServiceBus.Hosting
 
 		public void UseContainer(IWindsorContainer theContainer)
 		{
-			this.container = theContainer;
+			container = theContainer;
 		}
 
 		public void UseStandaloneCastleConfigurationFileName(string configurationFileName)
 		{
-			this.standaloneCastleConfigurationFileName = configurationFileName;
+			standaloneCastleConfigurationFileName = configurationFileName;
 		}
+
+        public void BusConfiguration(Func<HostConfiguration, HostConfiguration> configuration)
+        {
+            hostConfiguration = configuration(new HostConfiguration()).ToIConfiguration();
+        }
     }
 }

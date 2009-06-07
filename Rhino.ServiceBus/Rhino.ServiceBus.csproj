@@ -175,6 +175,7 @@
     <Compile Include="DataStructures\Timeout.cs" />
     <Compile Include="Exceptions\InvalidDeploymentException.cs" />
     <Compile Include="Exceptions\LoadBalancerException.cs" />
+    <Compile Include="Hosting\HostConfiguration.cs" />
     <Compile Include="Hosting\IApplicationHost.cs" />
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />

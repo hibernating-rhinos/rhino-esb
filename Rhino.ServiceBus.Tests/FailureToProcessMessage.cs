@@ -65,7 +65,7 @@ namespace Rhino.ServiceBus.Tests
             Transport.MessageArrived += o =>
             {
                 Interlocked.Increment(ref count);
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Operation is not valid due to the current state of the object.");
             };
 
             Transport.Send(TestQueueUri, new object[] { DateTime.Today });
@@ -193,7 +193,7 @@ namespace Rhino.ServiceBus.Tests
                 Transport.MessageArrived += o =>
                 {
                     Interlocked.Increment(ref count);
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("Operation is not valid due to the current state of the object.");
                 };
 
                 Transport.Send(testQueueEndPoint, new object[] { DateTime.Today });

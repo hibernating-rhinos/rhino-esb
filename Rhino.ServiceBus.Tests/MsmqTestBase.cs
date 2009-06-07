@@ -23,7 +23,7 @@ namespace Rhino.ServiceBus.Tests
             });    
         }
 
-        private readonly string subbscriptionQueuePath;
+        private readonly string subscriptionQueuePath;
         protected readonly Endpoint SubscriptionsUri;
 
         protected readonly string testQueuePath;
@@ -59,7 +59,7 @@ namespace Rhino.ServiceBus.Tests
 			subbscriptionQueuePath2 = MsmqUtil.GetQueuePath(SubscriptionsUri2).QueuePathWithSubQueue;
 
             SubscriptionsUri = new Uri("msmq://localhost/test_queue;subscriptions").ToEndpoint();
-			subbscriptionQueuePath = MsmqUtil.GetQueuePath(SubscriptionsUri).QueuePathWithSubQueue;
+			subscriptionQueuePath = MsmqUtil.GetQueuePath(SubscriptionsUri).QueuePathWithSubQueue;
 
             if (MessageQueue.Exists(testQueuePath) == false)
                 MessageQueue.Create(testQueuePath);
@@ -104,7 +104,7 @@ namespace Rhino.ServiceBus.Tests
 				timeoutQueue.Purge();
 			}
 
-            subscriptions = new MessageQueue(subbscriptionQueuePath)
+            subscriptions = new MessageQueue(subscriptionQueuePath)
             {
                 Formatter = new XmlMessageFormatter(new[] { typeof(string) })
             };

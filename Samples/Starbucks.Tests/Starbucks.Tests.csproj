@@ -75,9 +75,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Starbucks\App.config">
-      <Link>App.config</Link>
-    </None>
     <None Include="..\Starbucks\Barista.config">
       <Link>Barista.config</Link>
     </None>
@@ -86,6 +83,9 @@
     </None>
     <None Include="..\Starbucks\LoadBalancer.config">
       <Link>LoadBalancer.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -35,6 +35,9 @@ namespace Starbucks
             Console.WriteLine("Barista has started");
 
             var customerHost = new DefaultHost();
+            customerHost.BusConfiguration(c => c.Bus("msmq://localhost/starbucks.customer")
+                .Receive("Starbucks.Messages.Cashier", "msmq://localhost/starbucks.cashier")
+                .Receive("Starbucks.Messages.Barista", "msmq://localhost/starbucks.barista.balancer"));
             customerHost.Start<CustomerBootStrapper>();
 
             var bus = customerHost.Container.Resolve<IServiceBus>();

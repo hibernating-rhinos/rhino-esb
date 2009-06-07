@@ -36,7 +36,7 @@ namespace Rhino.ServiceBus.Tests
 
             transport.Raise(x => x.MessageSerializationException += null,
                 new CurrentMessageInformation { MessageId = Guid.NewGuid() },
-                new InvalidOperationException());
+                new InvalidOperationException("Operation is not valid due to the current state of the object."));
 
             var msg = queue.Receive(TimeSpan.FromSeconds(30));
 
@@ -97,7 +97,7 @@ namespace Rhino.ServiceBus.Tests
                     MessageId = Guid.NewGuid(),
                     Message = "tst"
                 },
-                new IndexOutOfRangeException());
+                new IndexOutOfRangeException("Index was outside the bounds of the array."));
 
             var msg = queue.Receive(TimeSpan.FromSeconds(30));
 
@@ -141,7 +141,7 @@ namespace Rhino.ServiceBus.Tests
                     MessageId = Guid.NewGuid(),
                     Message = "tst"
                 },
-                new IndexOutOfRangeException());
+                new IndexOutOfRangeException("Index was outside the bounds of the array."));
             }
 
             var msg = queue.Receive(TimeSpan.FromSeconds(30));
