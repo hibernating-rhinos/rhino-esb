@@ -7,7 +7,7 @@ namespace Starbucks
 {
     public static class PrepareQueues
     {
-        public static void Prepare(string queueName)
+        public static void Prepare(string queueName, QueueType queueType)
         {
             var queueUri = new Uri(queueName);
             var queuePath = MsmqUtil.GetQueuePath(new Endpoint
@@ -16,7 +16,7 @@ namespace Starbucks
             });
             CreateQueueIfNotExists(queuePath.QueuePath);
             PurgeQueue(queuePath.QueuePath);
-            PurgeSubqueues(queuePath.QueuePath);
+            PurgeSubqueues(queuePath.QueuePath, queueType);
         }
 
         private static void CreateQueueIfNotExists(string queuePath)
@@ -35,12 +35,23 @@ namespace Starbucks
             }
         }
 
-        private static void PurgeSubqueues(string queuePath)
+        private static void PurgeSubqueues(string queuePath, QueueType queueType)
         {
-            PurgeSubqueue(queuePath, "errors");
-            PurgeSubqueue(queuePath, "discarded");
-            PurgeSubqueue(queuePath, "timeout");
-            PurgeSubqueue(queuePath, "subscriptions");
+            switch (queueType)
+            {
+                case QueueType.Standard:
+                    PurgeSubqueue(queuePath, "errors");
+                    PurgeSubqueue(queuePath, "discarded");
+                    PurgeSubqueue(queuePath, "timeout");
+                    PurgeSubqueue(queuePath, "subscriptions");
+                    break;
+                case QueueType.LoadBalancer:
+                    PurgeSubqueue(queuePath, "endpoints");
+                    PurgeSubqueue(queuePath, "workers");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("queueType", "Can't handle queue type: " + queueType);
+            }
         }
 
         private static void PurgeSubqueue(string queuePath, string subqueueName)

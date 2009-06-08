@@ -1,6 +1,7 @@
 using System;
 using Rhino.ServiceBus;
 using Rhino.ServiceBus.Hosting;
+using Rhino.ServiceBus.Msmq;
 using Starbucks.Barista;
 using Starbucks.Cashier;
 using Starbucks.Customer;
@@ -12,10 +13,10 @@ namespace Starbucks
     {
         public static void Main()
         {
-            PrepareQueues.Prepare("msmq://localhost/starbucks.barista");
-            PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer");
-            PrepareQueues.Prepare("msmq://localhost/starbucks.cashier");
-            PrepareQueues.Prepare("msmq://localhost/starbucks.customer");
+            PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer", QueueType.LoadBalancer);
+            PrepareQueues.Prepare("msmq://localhost/starbucks.barista", QueueType.Standard);
+            PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
+            PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
             var baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof(RemoteAppDomainHost).Assembly, "LoadBalancer.config");
             baristaLoadBalancer.Start();
