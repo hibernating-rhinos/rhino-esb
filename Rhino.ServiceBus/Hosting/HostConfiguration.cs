@@ -11,7 +11,7 @@ namespace Rhino.ServiceBus.Hosting
         private string LoadBalancerEndpoint { get; set; }
         private IDictionary<string, string> Messages { get; set; }
 
-        internal HostConfiguration()
+        public HostConfiguration()
         {
             ThreadCount = 1;
             NumberOfRetries = 5;
@@ -48,7 +48,7 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
-        internal IConfiguration ToIConfiguration()
+        public IConfiguration ToIConfiguration()
         {
             var config = new MutableConfiguration("rhino.esb");
 
