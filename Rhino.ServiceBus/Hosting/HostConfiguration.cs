@@ -9,6 +9,7 @@ namespace Rhino.ServiceBus.Hosting
         private int ThreadCount { get; set; }
         private int NumberOfRetries { get; set; }
         private string LoadBalancerEndpoint { get; set; }
+        protected string LogEndpoint { get; set; }
         private IDictionary<string, string> Messages { get; set; }
 
         public HostConfiguration()
@@ -42,6 +43,12 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
+        public HostConfiguration Logging(string endpoint)
+        {
+            LogEndpoint = endpoint;
+            return this;
+        }
+
         public HostConfiguration Receive(string messageName, string endpoint)
         {
             Messages.Add(messageName, endpoint);
@@ -59,6 +66,9 @@ namespace Rhino.ServiceBus.Hosting
 
             if (string.IsNullOrEmpty(LoadBalancerEndpoint) == false)
                 busConfig.Attribute("loadBalancerEndpoint", LoadBalancerEndpoint);
+
+            if (string.IsNullOrEmpty(LogEndpoint) == false)
+                busConfig.Attribute("logEndpoint", LogEndpoint);
 
             var messagesConfig = config.CreateChild("messages");
 
