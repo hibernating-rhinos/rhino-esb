@@ -137,6 +137,11 @@ namespace Rhino.ServiceBus.Impl
             get { return transport.Endpoint; }
         }
 
+	    public CurrentMessageInformation CurrentMessageInformation
+	    {
+	        get { return transport.CurrentMessageInformation; }
+	    }
+
         public void Dispose()
         {
 			FireServiceBusAware(aware => aware.BusDisposing(this));

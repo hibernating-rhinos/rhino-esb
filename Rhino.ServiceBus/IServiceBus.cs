@@ -1,4 +1,5 @@
 using System;
+using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 
@@ -52,6 +53,11 @@ namespace Rhino.ServiceBus
         /// Get the endpoint of the bus
         /// </summary>
         Endpoint Endpoint { get; }
+
+        /// <summary>
+        /// Get information on the current message being handled by the service bus.
+        /// </summary>
+        CurrentMessageInformation CurrentMessageInformation { get; }
 
         /// <summary>
         /// Create a weak reference subscription for all the registered consumers 

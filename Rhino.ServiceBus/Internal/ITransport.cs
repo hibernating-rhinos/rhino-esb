@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Internal
@@ -10,6 +9,11 @@ namespace Rhino.ServiceBus.Internal
 
         Endpoint Endpoint { get; }
         int ThreadCount { get; }
+
+        /// <summary>
+        /// The information for the message currently being received and handled by the transport.
+        /// </summary>
+        CurrentMessageInformation CurrentMessageInformation { get; }
 
         void Send(Endpoint destination, object[] msgs);
         void Send(Endpoint endpoint, DateTime processAgainAt, object[] msgs);

@@ -318,7 +318,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
             public void Consume(string message)
             {
-                Message = MsmqTransport.CurrentMessageInformation.MsmqMessage;
+                Message = MsmqTransport.MsmqCurrentMessageInformation.MsmqMessage;
                 Value = message;
                 ResetEvent.Set();
             }

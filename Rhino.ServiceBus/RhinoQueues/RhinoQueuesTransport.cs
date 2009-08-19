@@ -365,6 +365,11 @@ namespace Rhino.ServiceBus.RhinoQueues
             get { return threadCount; }
         }
 
+        public CurrentMessageInformation CurrentMessageInformation
+        {
+            get { return currentMessageInformation; }
+        }
+
         public void Send(Endpoint destination, object[] msgs)
         {
             SendInternal(msgs, destination, nv => { });

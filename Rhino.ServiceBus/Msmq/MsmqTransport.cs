@@ -18,7 +18,12 @@ namespace Rhino.ServiceBus.Msmq
 		[ThreadStatic]
 		private static MsmqCurrentMessageInformation currentMessageInformation;
 
-        public static MsmqCurrentMessageInformation CurrentMessageInformation
+        public static MsmqCurrentMessageInformation MsmqCurrentMessageInformation
+        {
+            get { return currentMessageInformation; }
+        }
+
+        public CurrentMessageInformation CurrentMessageInformation
         {
             get { return currentMessageInformation; }
         }
