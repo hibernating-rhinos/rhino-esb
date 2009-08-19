@@ -29,20 +29,20 @@ namespace Rhino.ServiceBus.Impl
             wellKnownTypeNameToType = new Dictionary<string, Type>();
             typeToWellKnownTypeName = new Dictionary<Type, string>
             {
-                {typeof (string), "string"},
-                {typeof (int), "int"},
-                {typeof (byte), "byte"},
-                {typeof (bool), "bool"},
-                {typeof (DateTime), "datetime"},
-                {typeof (TimeSpan), "timespan"},
-                {typeof (decimal), "decimal"},
-                {typeof (float), "float"},
-                {typeof (double), "double"},
-                {typeof (char), "char"},
-                {typeof (Guid), "guid"},
-                {typeof (Uri), "uri"},
-                {typeof (short), "short"},
-                {typeof (long), "long"},
+                {typeof (string), typeof (string).FullName},
+                {typeof (int), typeof (int).FullName},
+                {typeof (byte), typeof (byte).FullName},
+                {typeof (bool), typeof (bool).FullName},
+                {typeof (DateTime), typeof (DateTime).FullName},
+                {typeof (TimeSpan), typeof (TimeSpan).FullName},
+                {typeof (decimal), typeof (decimal).FullName},
+                {typeof (float), typeof (float).FullName},
+                {typeof (double), typeof (double).FullName},
+                {typeof (char), typeof (char).FullName},
+                {typeof (Guid), typeof (Guid).FullName},
+                {typeof (Uri), typeof (Uri).FullName},
+                {typeof (short), typeof (short).FullName},
+                {typeof (long), typeof (long).FullName},
 				{typeof(byte[]), "binary"}
             };
             foreach (var pair in typeToWellKnownTypeName)

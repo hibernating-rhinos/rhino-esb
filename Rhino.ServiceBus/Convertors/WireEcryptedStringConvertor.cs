@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Convertors
 
         public WireEcryptedString FromElement(XElement element)
         {
-            var value = element.Element(XName.Get("Value","string"));
+            var value = element.Element(XName.Get("Value","System.String"));
             if(value==null)
                 throw new ArgumentException("element must contain <value> element");
             

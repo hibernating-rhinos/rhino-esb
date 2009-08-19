@@ -54,7 +54,7 @@ namespace Rhino.ServiceBus.Tests
 
         public const string encryptedMessage =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-<esb:messages xmlns:esb=""http://servicebus.hibernatingrhinos.com/2008/12/20/esb"" xmlns:tests.classwithsecretfield=""Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"" xmlns:datastructures.wireecryptedstring=""Rhino.ServiceBus.DataStructures.WireEcryptedString, Rhino.ServiceBus"" xmlns:string=""string"">
+<esb:messages xmlns:esb=""http://servicebus.hibernatingrhinos.com/2008/12/20/esb"" xmlns:tests.classwithsecretfield=""Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"" xmlns:datastructures.wireecryptedstring=""Rhino.ServiceBus.DataStructures.WireEcryptedString, Rhino.ServiceBus"" xmlns:string=""System.String"">
   <tests.classwithsecretfield:ClassWithSecretField>
     <datastructures.wireecryptedstring:ShouldBeEncrypted>
       <string:Value iv=""0yL9+t0uyDy9NeP7CU1Wow=="">q9a10IFuRxrzFoZewfdOyg==</string:Value>
@@ -84,7 +84,7 @@ namespace Rhino.ServiceBus.Tests
                 .Element(XName.Get("messages", "http://servicebus.hibernatingrhinos.com/2008/12/20/esb"))
                 .Element(XName.Get("ClassWithSecretField","Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"))
                 .Element(XName.Get("ShouldBeEncrypted","Rhino.ServiceBus.DataStructures.WireEcryptedString, Rhino.ServiceBus"))
-                .Element(XName.Get("Value","string"))
+                .Element(XName.Get("Value","System.String"))
                 .Value;
 
             Assert.NotEqual("abc", actual);

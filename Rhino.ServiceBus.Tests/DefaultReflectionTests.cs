@@ -78,6 +78,7 @@ namespace Rhino.ServiceBus.Tests
 			var output = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(GenericConsumer<SomeMsg>));
 		
 			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
+		   Assert.NotNull(Type.GetType(output));  // still fail!!!
 		}
 		[Fact]
 		public void Gets_assembly_name_with_more_than_one_type_parameter()
@@ -86,7 +87,18 @@ namespace Rhino.ServiceBus.Tests
 			Assert.Equal(
 				typeof(Dictionary<object, object>).AssemblyQualifiedName,
 				name);
+         var type = Type.GetType(name);
 		}
+
+      [Fact]
+      public void Gets_assembly_name_without_version_for_generic_types_with_more_than_one_type_parameter_in_local_assemblies()
+      {
+         string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(TestDictionary<string, string>));
+         var type = Type.GetType(name);
+         Assert.NotNull(type);   // fail if not apply my fix!!!
+      }
+
+
 		public class SomeMsg{}
 		public class SomeMsgConsumer:GenericConsumer<SomeMsg>{}
 		public class GenericConsumer<T>:ConsumerOf<T>
@@ -147,6 +159,10 @@ namespace Rhino.ServiceBus.Tests
                 throw new System.NotImplementedException();
             }
         }
+    }
+    public class TestDictionary<T, TK> : Dictionary<T, TK>
+    {
+
     }
 
     
