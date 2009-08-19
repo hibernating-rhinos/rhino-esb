@@ -175,7 +175,40 @@ namespace Rhino.ServiceBus.Impl
             return type.MakeGenericType(paramType);
         }
 
-        public void InvokeConsume(object consumer, object msg)
+    	public Type GetGenericTypeOf(Type type, params Type[] paramTypes)
+    	{
+    		return type.MakeGenericType(paramTypes);
+    	}
+
+    	public ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, object msg)
+    	{
+			return GetGenericTypesOfWithBaseTypes(type, ProxyUtil.GetUnproxiedType(msg));
+    	}
+
+		public ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, Type paramType)
+    	{
+    		var constructedTypes = new List<Type>();
+
+			//loop through all interfaces of the paramType, constructing a generic type for each.
+			foreach (var interfaceType in paramType.GetInterfaces())
+			{
+				var constructedTypeWithInterfaceArg = GetGenericTypeOf(type, interfaceType);
+				constructedTypes.Add(constructedTypeWithInterfaceArg);
+			}
+
+			//travel up the chain of base types, constructing a generic type for each.
+    		Type currentParamType = paramType;
+			while (currentParamType != null)
+			{
+				var constructedType = GetGenericTypeOf(type, currentParamType);
+				constructedTypes.Add(constructedType);
+				currentParamType = currentParamType.BaseType;
+			}
+
+    		return constructedTypes;
+    	}
+
+    	public void InvokeConsume(object consumer, object msg)
         {
             try
             {
@@ -232,7 +265,21 @@ namespace Rhino.ServiceBus.Impl
             }
         }
 
-        public string GetNameForXml(Type type)
+    	public object InvokeSagaFinderFindBy(object sagaFinder, object msg)
+    	{
+			try
+			{
+				Type type = sagaFinder.GetType();
+				MethodInfo method = type.GetMethod("FindBy");
+				return method.Invoke(sagaFinder, new object[] { msg });
+			}
+			catch (TargetInvocationException e)
+			{
+				throw InnerExceptionWhilePreservingStackTrace(e);
+			}
+    	}
+
+    	public string GetNameForXml(Type type)
         {
             var typeName = type.Name;
         	typeName = typeName.Replace('[', '_').Replace(']', '_');

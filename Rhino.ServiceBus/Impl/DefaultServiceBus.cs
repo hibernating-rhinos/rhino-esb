@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Castle.MicroKernel;
+using Castle.MicroKernel.Proxy;
 using log4net;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
@@ -437,16 +438,16 @@ namespace Rhino.ServiceBus.Impl
 
         public object[] GatherConsumers(CurrentMessageInformation msg)
         {
+            object[] sagas = GetSagasFor(msg.Message);
             var sagaMessage = msg.Message as ISagaMessage;
-            object[] sagas = GetSagasFor(sagaMessage);
 
             var msgType = msg.Message.GetType();
             object[] instanceConsumers = subscriptionStorage
                 .GetInstanceSubscriptions(msgType);
 
-            Type consumerType = reflection.GetGenericTypeOf(typeof(ConsumerOf<>), msg.Message);
-        	Type occasionalConsumerType = reflection.GetGenericTypeOf(typeof (OccasionalConsumerOf<>), msg.Message);
-            var consumers = GetAllNonOccasionalConsumers(consumerType, occasionalConsumerType, sagas);
+            var consumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), msg.Message);
+            var occasionalConsumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(OccasionalConsumerOf<>), msg.Message);
+            var consumers = GetAllNonOccasionalConsumers(consumerTypes, occasionalConsumerTypes, sagas);
             for (var i = 0; i < consumers.Length; i++)
             {
                 var saga = consumers[i] as IAccessibleSaga;
@@ -481,44 +482,82 @@ namespace Rhino.ServiceBus.Impl
                 .ToArray();
         }
 
-		/// <summary>
-		/// Here we don't use ResolveAll from Windsor because we want to get an error
-		/// if a component exists which isn't valid
-		/// </summary>
-    	private object[] GetAllNonOccasionalConsumers(Type consumerType, Type occasionalConsumerType, IEnumerable<object> instanceOfTypesToSkipResolving)
-    	{
-			var handlers = kernel.GetAssignableHandlers(consumerType);
-			var consumers = new List<object>(handlers.Length);
-			foreach (var handler in handlers)
-			{
-			    var implementation = handler.ComponentModel.Implementation;
-				if(occasionalConsumerType.IsAssignableFrom(implementation))
-					continue;
+        /// <summary>
+        /// Here we don't use ResolveAll from Windsor because we want to get an error
+        /// if a component exists which isn't valid
+        /// </summary>
+        private object[] GetAllNonOccasionalConsumers(ICollection<Type> consumerTypes, ICollection<Type> occasionalConsumerTypes, IEnumerable<object> instanceOfTypesToSkipResolving)
+        {
+            var allHandlers = new List<IHandler>();
+            foreach (var consumerType in consumerTypes)
+            {
+                var handlers = kernel.GetAssignableHandlers(consumerType);
+                allHandlers.AddRange(handlers);
+            }
+
+            var consumers = new List<object>(allHandlers.Count);
+            foreach (var handler in allHandlers)
+            {
+                var implementation = handler.ComponentModel.Implementation;
+                var occasionalConsumerFound = false;
+                foreach (var occasionalConsumerType in occasionalConsumerTypes)
+                {
+                    if (occasionalConsumerType.IsAssignableFrom(implementation))
+                    {
+                        occasionalConsumerFound = true;
+                        break;
+                    }
+                }
+                if (occasionalConsumerFound)
+                    continue;
+                
                 if (instanceOfTypesToSkipResolving.Any(x => x.GetType() == implementation))
                     continue;
 
-				consumers.Add(handler.Resolve(CreationContext.Empty));
-			}
-			return consumers.ToArray();
-    	}
+                consumers.Add(handler.Resolve(CreationContext.Empty));
+            }
+            return consumers.ToArray();
+        }
 
-    	private object[] GetSagasFor(ISagaMessage sagaMessage)
+        private object[] GetSagasFor(object message)
         {
-            if (sagaMessage == null)
-                return new object[0];
-
             var instances = new List<object>();
 
-            Type orchestratesType = reflection.GetGenericTypeOf(typeof(Orchestrates<>), sagaMessage);
-            Type initiatedByType = reflection.GetGenericTypeOf(typeof(InitiatedBy<>), sagaMessage);
+            Type orchestratesType = reflection.GetGenericTypeOf(typeof(Orchestrates<>), message);
+            Type initiatedByType = reflection.GetGenericTypeOf(typeof(InitiatedBy<>), message);
 
             var handlers = kernel.GetAssignableHandlers(orchestratesType)
                                                    .Union(kernel.GetAssignableHandlers(initiatedByType));
 
-            foreach (IHandler sagaPersisterHandler in handlers)
+            foreach (IHandler sagaHandler in handlers)
             {
+                Type sagaType = sagaHandler.ComponentModel.Implementation;
+                
+                //first try to execute any saga finders.
+                Type sagaFinderType = reflection.GetGenericTypeOf(typeof (ISagaFinder<,>), sagaType, ProxyUtil.GetUnproxiedType(message));
+                var sagaFinderHandlers = kernel.GetAssignableHandlers(sagaFinderType);
+                foreach (var sagaFinderHandler in sagaFinderHandlers)
+                {
+                    try
+                    {
+                        var sagaFinder = kernel.Resolve(sagaFinderHandler.Service);
+                        var saga = reflection.InvokeSagaFinderFindBy(sagaFinder, message);
+                        if (saga != null)
+                            instances.Add(saga);
+                    }
+                    finally
+                    {
+                        kernel.ReleaseComponent(sagaFinderHandler);
+                    }
+                }
+
+                //we will try to use an ISagaMessage's Correlation id next.
+                var sagaMessage = message as ISagaMessage;
+                if (sagaMessage == null)
+                    continue;
+
                 Type sagaPersisterType = reflection.GetGenericTypeOf(typeof(ISagaPersister<>),
-                                                                     sagaPersisterHandler.ComponentModel.Implementation);
+                                                                     sagaType);
 
                 object sagaPersister = kernel.Resolve(sagaPersisterType);
                 try

@@ -89,6 +89,7 @@ namespace Rhino.ServiceBus.Tests
 				name);
          var type = Type.GetType(name);
 		}
+<<<<<<< .mine
 
       [Fact]
       public void Gets_assembly_name_without_version_for_generic_types_with_more_than_one_type_parameter_in_local_assemblies()
@@ -99,6 +100,20 @@ namespace Rhino.ServiceBus.Tests
       }
 
 
+
+=======
+		[Fact]
+		public void Gets_all_consumers_for_message_type_with_interface_and_base_class()
+		{
+			var consumers = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), new SomeMsg2());
+			Assert.Equal(4, consumers.Count);
+			Assert.Contains(typeof(ConsumerOf<SomeMsg2>), consumers);
+			Assert.Contains(typeof(ConsumerOf<SomeMsg>), consumers);
+			Assert.Contains(typeof(ConsumerOf<IAmASpecialMessage>), consumers);
+			Assert.Contains(typeof(ConsumerOf<object>), consumers);
+		}
+
+>>>>>>> .theirs
 		public class SomeMsg{}
 		public class SomeMsgConsumer:GenericConsumer<SomeMsg>{}
 		public class GenericConsumer<T>:ConsumerOf<T>
@@ -107,6 +122,13 @@ namespace Rhino.ServiceBus.Tests
 			{
 			}
 		}
+
+		public interface IAmASpecialMessage{}
+
+		public class SomeMsg2 : SomeMsg, IAmASpecialMessage{}
+
+		public class SomeMsg2Consumer : GenericConsumer<SomeMsg2> { }
+		public class IAmASpecialMessageConsumer : GenericConsumer<IAmASpecialMessage> { }
 
         public class ThrowingConsumer : ConsumerOf<string>
         {

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -53,6 +53,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Extensions">
@@ -182,6 +183,7 @@
     <Compile Include="Internal\ICustomElementSerializer.cs" />
     <Compile Include="Internal\IElementSerializationBehavior.cs" />
     <Compile Include="Internal\IEncryptionService.cs" />
+    <Compile Include="ISagaFinder.cs" />
     <Compile Include="LoadBalancer\LoadBalancerFacility.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
     <Compile Include="Messages\Heartbeat.cs" />

@@ -14,6 +14,12 @@ namespace Rhino.ServiceBus.Internal
 
         Type GetGenericTypeOf(Type type, Type paramType);
 
+		Type GetGenericTypeOf(Type type, params Type[] paramTypes);
+
+		ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, object msg);
+
+		ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, Type paramType);
+
         void InvokeConsume(object consumer, object msg);
 
         Type[] GetMessagesConsumed(IMessageConsumer consumer);
@@ -25,6 +31,8 @@ namespace Rhino.ServiceBus.Internal
         void InvokeSagaPersisterSave(object persister, object saga);
 
         void InvokeSagaPersisterComplete(object persister, object saga);
+
+		object InvokeSagaFinderFindBy(object sagaFinder, object msg);
 
         string GetNamespaceForXml(Type type);
 
