@@ -20,20 +20,20 @@ namespace Rhino.ServiceBus.Tests
             Assert.NotNull(type);
         }
 
-		[Fact]
-		public void Message_type_harvesting_returns_consumers()
-		{
-			var types = reflection.GetMessagesConsumed(typeof(SomeMsgConsumer), t => false);
-			Assert.Equal(1,types.Length);
-			Assert.Equal(types[0],typeof(SomeMsg));
-		}
+        [Fact]
+        public void Message_type_harvesting_returns_consumers()
+        {
+            var types = reflection.GetMessagesConsumed(typeof(SomeMsgConsumer), t => false);
+            Assert.Equal(1, types.Length);
+            Assert.Equal(types[0], typeof(SomeMsg));
+        }
 
-		[Fact]
-		public void Message_type_harvesting_ignores_open_generic_consumers()
-		{
-			var types = reflection.GetMessagesConsumed(typeof(GenericConsumer<>), t => false);
-			Assert.Empty(types);
-		}
+        [Fact]
+        public void Message_type_harvesting_ignores_open_generic_consumers()
+        {
+            var types = reflection.GetMessagesConsumed(typeof(GenericConsumer<>), t => false);
+            Assert.Empty(types);
+        }
 
         [Fact]
         public void Will_throw_inner_exception_for_add()
@@ -64,71 +64,69 @@ namespace Rhino.ServiceBus.Tests
         {
             Assert.Throws<NotImplementedException>(() => reflection.InvokeSagaPersisterSave(new ThrowingPersister(), new ThrowingList()));
         }
-		[Fact]
-		public void Gets_assembly_name_without_version_for_generic_lists()
-		{
-			var list = new List<SomeMsg>();
-			var output = reflection.GetAssemblyQualifiedNameWithoutVersion(list.GetType());
-			
-			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=",output.Replace(" ",""));
-		}
-		[Fact]
-		public void Gets_assembly_name_without_version_for_generic_types_in_local_assemblies()
-		{
-			var output = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(GenericConsumer<SomeMsg>));
-		
-			Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
-		   Assert.NotNull(Type.GetType(output));  // still fail!!!
-		}
-		[Fact]
-		public void Gets_assembly_name_with_more_than_one_type_parameter()
-		{
-			string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(Dictionary<object, object>));
-			Assert.Equal(
-				typeof(Dictionary<object, object>).AssemblyQualifiedName,
-				name);
-         var type = Type.GetType(name);
-		}
-<<<<<<< .mine
+        [Fact]
+        public void Gets_assembly_name_without_version_for_generic_lists()
+        {
+            var list = new List<SomeMsg>();
+            var output = reflection.GetAssemblyQualifiedNameWithoutVersion(list.GetType());
 
-      [Fact]
-      public void Gets_assembly_name_without_version_for_generic_types_with_more_than_one_type_parameter_in_local_assemblies()
-      {
-         string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(TestDictionary<string, string>));
-         var type = Type.GetType(name);
-         Assert.NotNull(type);   // fail if not apply my fix!!!
-      }
+            Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
+        }
+        [Fact]
+        public void Gets_assembly_name_without_version_for_generic_types_in_local_assemblies()
+        {
+            var output = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(GenericConsumer<SomeMsg>));
+
+            Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
+            Assert.NotNull(Type.GetType(output));  // still fail!!!
+        }
+
+        [Fact]
+        public void Gets_assembly_name_with_more_than_one_type_parameter()
+        {
+            string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(Dictionary<object, object>));
+            Assert.Equal(
+                typeof(Dictionary<object, object>).AssemblyQualifiedName,
+                name);
+            var type = Type.GetType(name);
+        }
+
+        [Fact]
+        public void Gets_assembly_name_without_version_for_generic_types_with_more_than_one_type_parameter_in_local_assemblies()
+        {
+            string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(TestDictionary<string, string>));
+            var type = Type.GetType(name);
+            Assert.NotNull(type);   // fail if not apply my fix!!!
+        }
 
 
 
-=======
-		[Fact]
-		public void Gets_all_consumers_for_message_type_with_interface_and_base_class()
-		{
-			var consumers = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), new SomeMsg2());
-			Assert.Equal(4, consumers.Count);
-			Assert.Contains(typeof(ConsumerOf<SomeMsg2>), consumers);
-			Assert.Contains(typeof(ConsumerOf<SomeMsg>), consumers);
-			Assert.Contains(typeof(ConsumerOf<IAmASpecialMessage>), consumers);
-			Assert.Contains(typeof(ConsumerOf<object>), consumers);
-		}
+        [Fact]
+        public void Gets_all_consumers_for_message_type_with_interface_and_base_class()
+        {
+            var consumers = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), new SomeMsg2());
+            Assert.Equal(4, consumers.Count);
+            Assert.Contains(typeof(ConsumerOf<SomeMsg2>), consumers);
+            Assert.Contains(typeof(ConsumerOf<SomeMsg>), consumers);
+            Assert.Contains(typeof(ConsumerOf<IAmASpecialMessage>), consumers);
+            Assert.Contains(typeof(ConsumerOf<object>), consumers);
+        }
 
->>>>>>> .theirs
-		public class SomeMsg{}
-		public class SomeMsgConsumer:GenericConsumer<SomeMsg>{}
-		public class GenericConsumer<T>:ConsumerOf<T>
-		{
-			public void Consume(T message)
-			{
-			}
-		}
+        public class SomeMsg { }
+        public class SomeMsgConsumer : GenericConsumer<SomeMsg> { }
+        public class GenericConsumer<T> : ConsumerOf<T>
+        {
+            public void Consume(T message)
+            {
+            }
+        }
 
-		public interface IAmASpecialMessage{}
+        public interface IAmASpecialMessage { }
 
-		public class SomeMsg2 : SomeMsg, IAmASpecialMessage{}
+        public class SomeMsg2 : SomeMsg, IAmASpecialMessage { }
 
-		public class SomeMsg2Consumer : GenericConsumer<SomeMsg2> { }
-		public class IAmASpecialMessageConsumer : GenericConsumer<IAmASpecialMessage> { }
+        public class SomeMsg2Consumer : GenericConsumer<SomeMsg2> { }
+        public class IAmASpecialMessageConsumer : GenericConsumer<IAmASpecialMessage> { }
 
         public class ThrowingConsumer : ConsumerOf<string>
         {
@@ -163,7 +161,7 @@ namespace Rhino.ServiceBus.Tests
                 set { throw new System.NotImplementedException(); }
             }
         }
-    
+
         public class ThrowingPersister : ISagaPersister<DefaultReflectionTests.ThrowingList>
         {
             public ThrowingList Get(Guid id)
@@ -187,5 +185,5 @@ namespace Rhino.ServiceBus.Tests
 
     }
 
-    
+
 }

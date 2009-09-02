@@ -21,10 +21,15 @@ namespace Rhino.ServiceBus.Hosting
         {
         }
 
-        public RemoteAppDomainHost(Type boosterType)
-            : this(boosterType.Assembly.Location, null)
+        public RemoteAppDomainHost(string assemblyPath, Type boosterType)
+            : this(assemblyPath, (string)null)
         {
             this.boosterType = boosterType.FullName;
+        }
+
+        public RemoteAppDomainHost(Type boosterType)
+            : this(boosterType.Assembly.Location, boosterType)
+        {
         }
 
         public RemoteAppDomainHost(string assemblyPath, string configuration)

@@ -323,41 +323,43 @@ namespace Rhino.ServiceBus.Impl
             return typeName.Substring(0,typeName.Length-1);
         }
 
-	   public string GetAssemblyQualifiedNameWithoutVersion(Type type)
-	   {
-		   string value;
-		   if (typeToWellKnownTypeName.TryGetValue(type, out value))
-			   return value;
 
-		   Assembly assembly = type.Assembly;
-		   string fullName = assembly.FullName ?? assembly.GetName().Name;
-		   if (type.IsGenericType)
-		   {
-			   var builder = new StringBuilder();
-			   builder.Append(type.Namespace).Append(".")
-				   .Append(type.Name).Append("[")
-				   .Append(String.Join(",",
-								   type.GetGenericArguments()
-									   .Select(t => "[" + GetAssemblyQualifiedNameWithoutVersion(t) + "]")
-									   .ToArray()))
-				   .Append("], ");
-			   if (assembly.GlobalAssemblyCache)
-			   {
-				   builder.Append(fullName);
-			   }
-			   else
-			   {
-				   builder.Append(fullName.Split(',')[0]);
-			   }
-			   return builder.ToString();
-		   }
+        public string GetAssemblyQualifiedNameWithoutVersion(Type type)
+        {
+            string value;
+            if (typeToWellKnownTypeName.TryGetValue(type, out value))
+                return value;
 
-		   if (assembly.GlobalAssemblyCache == false)
-		   {
-			   return type.FullName + ", " + fullName.Split(',')[0];
-		   }
-		   return type.AssemblyQualifiedName;
-	   }
+            Assembly assembly = type.Assembly;
+            string fullName = assembly.FullName ?? assembly.GetName().Name;
+            if (type.IsGenericType)
+            {
+                var builder = new StringBuilder();
+                int startOfGenericName = type.FullName.IndexOf('[');
+                builder.Append(type.FullName.Substring(0, startOfGenericName))
+                    .Append("[")
+                    .Append(String.Join(",",
+                                    type.GetGenericArguments()
+                                        .Select(t => "[" + GetAssemblyQualifiedNameWithoutVersion(t) + "]")
+                                        .ToArray()))
+                    .Append("], ");
+                if (assembly.GlobalAssemblyCache)
+                {
+                    builder.Append(fullName);
+                }
+                else
+                {
+                    builder.Append(fullName.Split(',')[0]);
+                }
+                return builder.ToString();
+            }
+
+            if (assembly.GlobalAssemblyCache == false)
+            {
+                return type.FullName + ", " + fullName.Split(',')[0];
+            }
+            return type.AssemblyQualifiedName;
+        }
 
         public IEnumerable<string> GetProperties(object value)
         {

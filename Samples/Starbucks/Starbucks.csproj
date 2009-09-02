@@ -31,21 +31,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SharedLibs\Castle\Castle.Core.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.DynamicProxy2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SharedLibs\Castle\Castle.MicroKernel.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Castle.DynamicProxy2.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Castle.MicroKernel, Version=2.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SharedLibs\Castle\Castle.Windsor.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Castle.MicroKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SharedLibs\NHibernate\log4net.dll</HintPath>
+      <HintPath>..\..\SharedLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -82,10 +90,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\queues\Rhino.Queues\Rhino.Queues.csproj">
-      <Project>{398BF580-41F5-418E-A017-19D19B289A97}</Project>
-      <Name>Rhino.Queues</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>

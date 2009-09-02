@@ -85,6 +85,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             }
         }
 
+        [CLSCompliant(false)]
         public IQueue Queue
         {
             get { return queue; }

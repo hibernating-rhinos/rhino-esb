@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 {
     public class PhtSubscriptionStorage : ISubscriptionStorage, IDisposable, IMessageModule
     {
-        private const string subscriptionsKey = "subscriptions";
+        private const string SubscriptionsKey = "subscriptions";
 
         private readonly Hashtable<string, List<WeakReference>> localInstanceSubscriptions =
             new Hashtable<string, List<WeakReference>>();
@@ -82,7 +82,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             {
                 var items = actions.GetItems(new GetItemsRequest
                 {
-                    Key = subscriptionsKey
+                    Key = SubscriptionsKey
                 });
                 foreach (var item in items)
                 {
@@ -287,7 +287,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                         actions.RemoveItem(new RemoveItemRequest
                         {
                             Id = msgId,
-                            Key = subscriptionsKey
+                            Key = SubscriptionsKey
                         });
                     }
 
@@ -332,7 +332,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                     actions.RemoveItem(new RemoveItemRequest
                     {
                         Id = msgId,
-                        Key = subscriptionsKey
+                        Key = SubscriptionsKey
                     });
 
                     actions.Commit();
@@ -351,7 +351,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 messageSerializer.Serialize(new[] {subscription}, message);
                 var itemId = actions.AddItem(new AddItemRequest
                 {
-                    Key = subscriptionsKey,
+                    Key = SubscriptionsKey,
                     Data = message.ToArray()
                 });
 
@@ -388,7 +388,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                     messageSerializer.Serialize(new[] {addSubscription}, stream);
                     itemId = actions.AddItem(new AddItemRequest
                     {
-                        Key = subscriptionsKey,
+                        Key = SubscriptionsKey,
                         Data = stream.ToArray()
                     });
 

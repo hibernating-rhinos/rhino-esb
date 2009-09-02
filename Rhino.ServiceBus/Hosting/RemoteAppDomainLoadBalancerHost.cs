@@ -6,10 +6,6 @@ namespace Rhino.ServiceBus.Hosting
 {
     public class RemoteAppDomainLoadBalancerHost : RemoteAppDomainHost
     {
-        public RemoteAppDomainLoadBalancerHost(Type boosterType) : base(boosterType)
-        {
-        }
-
         public RemoteAppDomainLoadBalancerHost(string assemblyPath, string configuration)
             : base(assemblyPath, configuration)
         {

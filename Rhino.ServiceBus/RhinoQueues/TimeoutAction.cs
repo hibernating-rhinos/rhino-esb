@@ -20,6 +20,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         private readonly OrderedList<DateTime, MessageId> timeoutMessageIds =
             new OrderedList<DateTime, MessageId>();
 
+        [CLSCompliant(false)]
         public TimeoutAction(IQueue queue)
         {
             this.queue = queue;
@@ -101,6 +102,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 timeoutTimer.Dispose();
         }
 
+        [CLSCompliant(false)]
         public void Register(Message message)
         {
             timeoutMessageIds.Write(writer =>

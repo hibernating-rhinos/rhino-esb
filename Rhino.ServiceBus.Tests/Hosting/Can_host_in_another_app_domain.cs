@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -13,7 +14,8 @@ namespace Rhino.ServiceBus.Tests.Hosting
 {
     public class Can_host_in_another_app_domain : MsmqTestBase, OccasionalConsumerOf<StringMsg>
     {
-        readonly RemoteAppDomainHost host = new RemoteAppDomainHost(typeof(TestBootStrapper));
+        readonly RemoteAppDomainHost host = new RemoteAppDomainHost(
+            Path.Combine(Environment.CurrentDirectory, "Rhino.ServiceBus.Tests.dll"), typeof(TestBootStrapper));
         private string reply;
 
         private readonly ManualResetEvent resetEvent = new ManualResetEvent(false);
