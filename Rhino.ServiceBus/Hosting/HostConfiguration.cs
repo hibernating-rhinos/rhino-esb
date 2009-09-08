@@ -5,6 +5,7 @@ namespace Rhino.ServiceBus.Hosting
 {
     public class HostConfiguration
     {
+        private string Name { get; set; }
         private string Endpoint { get; set; }
         private int ThreadCount { get; set; }
         private int NumberOfRetries { get; set; }
@@ -22,6 +23,13 @@ namespace Rhino.ServiceBus.Hosting
         public HostConfiguration Bus(string endpoint)
         {
             Endpoint = endpoint;
+            return this;
+        }
+
+        public HostConfiguration Bus(string endpoint, string name)
+        {
+            Bus(endpoint);
+            Name = name;
             return this;
         }
 
@@ -63,6 +71,9 @@ namespace Rhino.ServiceBus.Hosting
                 .Attribute("endpoint", Endpoint)
                 .Attribute("threadCount", ThreadCount.ToString())
                 .Attribute("numberOfRetries", NumberOfRetries.ToString());
+
+            if (string.IsNullOrEmpty(Name) == false)
+                busConfig.Attribute("name", Name);
 
             if (string.IsNullOrEmpty(LoadBalancerEndpoint) == false)
                 busConfig.Attribute("loadBalancerEndpoint", LoadBalancerEndpoint);
