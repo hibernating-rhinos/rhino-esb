@@ -100,10 +100,25 @@ namespace Rhino.ServiceBus.Msmq
         /// <returns></returns>
         public IEnumerable<TimeoutInfo> GetTimeoutMessages(OpenedQueue queue)
         {
-            yield break;
+        	using (var timeoutQueue = queue.OpenSiblngQueue(SubQueue.Timeout, QueueAccessMode.Receive))
+        	{
+        		var enumerator2 = timeoutQueue.GetMessageEnumerator2();
+        		while (enumerator2.MoveNext())
+        		{
+        			var message = enumerator2.Current;
+        			if (message == null)
+        				continue;
+
+        			yield return new TimeoutInfo
+        			             	{
+        			             		Id = message.Id,
+        			             		Time = DateTime.FromBinary(BitConverter.ToInt64(message.Extension, 0))
+        			             	};
+        		}
+        	}
         }
 
-        /// <summary>
+    	/// <summary>
         /// Moves the message from the timeout queue to the main queue.
         /// </summary>
         /// <param name="queue">The queue.</param>
