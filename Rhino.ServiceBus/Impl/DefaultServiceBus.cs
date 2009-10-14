@@ -335,7 +335,8 @@ namespace Rhino.ServiceBus.Impl
             foreach (var handler in handlers)
             {
                 var msgs = reflection.GetMessagesConsumed(handler.ComponentModel.Implementation,
-                                                          type => type == typeof(OccasionalConsumerOf<>));
+                                                          type => type == typeof(OccasionalConsumerOf<>)
+														  || type == typeof(Consumer<>.SkipAutomaticSubscription));
                 foreach (var msg in msgs)
                 {
                     Subscribe(msg);

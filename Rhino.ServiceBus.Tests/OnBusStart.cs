@@ -78,6 +78,36 @@ namespace Rhino.ServiceBus.Tests
             }
         }
 
+		[Fact]
+		public void Would_not_automatically_subscribe_consumer_SkipAutomaticSubscription()
+		{
+			using (var bus = container.Resolve<IStartableServiceBus>())
+			{
+				var wait = new ManualResetEvent(false);
+				var subscriptionStorage = container.Resolve<ISubscriptionStorage>();
+
+				subscriptionStorage.SubscriptionChanged += () => wait.Set();
+				bus.Start();
+				wait.WaitOne(TimeSpan.FromSeconds(30), false);
+
+				var serializer = container.Resolve<IMessageSerializer>();
+				subscriptions.Peek(TimeSpan.FromSeconds(30));
+				var messages = subscriptions.GetAllMessages();
+				foreach (var message in messages)
+				{
+					var subscription = (AddSubscription)serializer.Deserialize(message.BodyStream)[0];
+					Assert.NotEqual(typeof(NotAutomaticallySubscribed).FullName, subscription.Type);
+				}
+			}
+		}
+
+		public class NotAutomaticallySubscribed : Consumer<TestMessage>.SkipAutomaticSubscription
+		{
+			public void Consume(TestMessage message)
+			{
+			}
+		}
+
         public class TestMessage { }
         public class AnotherTestMessage { }
         public class TestHandler : ConsumerOf<TestMessage>
