@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommandLine;
+using log4net;
 using Rhino.ServiceBus.Host.Actions;
 
 namespace Rhino.ServiceBus.Host
@@ -16,6 +17,8 @@ namespace Rhino.ServiceBus.Host
             {Action.Uninstall, new UninstallAction()},
             {Action.Deploy, new DeployAction()}
         };
+
+    	private static ILog log = LogManager.GetLogger(typeof (Program));
 
         public static void Main(string[] args)
         {
@@ -36,7 +39,10 @@ namespace Rhino.ServiceBus.Host
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                log.Fatal("Host has crashed because of an error",e);
+				// want to put the error in the error log
+				if(executingOptions.Action == Action.Server)
+					throw;
             }
         }
     }
