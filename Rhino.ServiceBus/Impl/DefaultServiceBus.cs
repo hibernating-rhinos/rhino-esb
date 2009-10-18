@@ -103,15 +103,16 @@ namespace Rhino.ServiceBus.Impl
             if (messages.Length == 0)
                 throw new MessagePublicationException("Cannot send empty message batch");
 
-            var endpoint = messageOwners
+            var messageOwner = messageOwners
                 .Where(x=>x.IsOwner(messages[0].GetType()))
-                .Select(x=>x.Endpoint)
                 .FirstOrDefault();
             
-            if (endpoint == null)
+            if (messageOwner == null)
                 throw new MessagePublicationException("Could not find no message owner for " + messages[0]);
 
-            return endpointRouter.GetRoutedEndpoint(endpoint);
+        	var endpoint = endpointRouter.GetRoutedEndpoint(messageOwner.Endpoint);
+        	endpoint.Transactional = messageOwner.Transactional;
+        	return endpoint;
         }
 
         public IDisposable AddInstanceSubscription(IMessageConsumer consumer)
@@ -219,8 +220,10 @@ namespace Rhino.ServiceBus.Impl
                     continue;
 
                 logger.InfoFormat("Subscribing {0} on {1}", type.FullName, owner.Endpoint);
-                
-                Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new AddSubscription
+
+            	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
+            	endpoint.Transactional = owner.Transactional;
+            	Send(endpoint, new AddSubscription
                 {
                     Endpoint = Endpoint,
                     Type = type.FullName
@@ -245,7 +248,9 @@ namespace Rhino.ServiceBus.Impl
                 if (owner.IsOwner(type) == false)
                     continue;
 
-                Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new RemoveSubscription
+            	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
+            	endpoint.Transactional = owner.Transactional;
+            	Send(endpoint, new RemoveSubscription
                 {
                     Endpoint = Endpoint,
                     Type = type.FullName
@@ -268,7 +273,9 @@ namespace Rhino.ServiceBus.Impl
                         owner.Endpoint);
 
                     subscribed = true;
-                    Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new AddInstanceSubscription
+                	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
+                	endpoint.Transactional = owner.Transactional;
+                	Send(endpoint, new AddInstanceSubscription
                     {
                         Endpoint = Endpoint.Uri.ToString(),
                         Type = message.FullName,
@@ -290,7 +297,9 @@ namespace Rhino.ServiceBus.Impl
                     if (owner.IsOwner(message))
                         continue;
 
-                    Send(endpointRouter.GetRoutedEndpoint(owner.Endpoint), new RemoveInstanceSubscription
+                	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
+                	endpoint.Transactional = owner.Transactional;
+                	Send(endpoint, new RemoveInstanceSubscription
                     {
                         Endpoint = Endpoint.Uri.ToString(),
                         Type = message.FullName,

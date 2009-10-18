@@ -7,6 +7,7 @@ namespace Rhino.ServiceBus.Impl
     {
         public string Name;
         public Uri Endpoint;
+    	public bool? Transactional;
 
         public bool IsOwner(Type msg)
         {

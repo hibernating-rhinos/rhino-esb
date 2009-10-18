@@ -5,6 +5,9 @@ namespace Rhino.ServiceBus
     public class Endpoint
     {
         private Uri uri;
+
+    	public bool? Transactional;
+
         public Uri Uri
         {
             get { return uri; }

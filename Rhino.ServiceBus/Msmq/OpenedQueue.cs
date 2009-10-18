@@ -66,14 +66,34 @@ namespace Rhino.ServiceBus.Msmq
 
 		public void Send(Message msg)
 		{
-		    var responsePath = "no response queue";
-            if (msg.ResponseQueue != null)
-                responsePath = msg.ResponseQueue.Path;
-		    logger.DebugFormat("Sending message {0} to {1}, reply: {2}",
-                    msg.Label,
-                    queue.Path,
-                    responsePath);
-            queue.Send(msg, GetTransactionType());
+			Send(msg, null);
+		}
+
+		public void Send(Message msg, bool? transactional)
+		{
+			var responsePath = "no response queue";
+			if (msg.ResponseQueue != null)
+				responsePath = msg.ResponseQueue.Path;
+			logger.DebugFormat("Sending message {0} to {1}, reply: {2}",
+					msg.Label,
+					queue.Path,
+					responsePath);
+			queue.Send(msg, GetTransactionType(transactional));
+		}
+
+		private MessageQueueTransactionType GetTransactionType(bool? transactional)
+		{
+			if (transactional == null)
+				return GetTransactionType();
+			if (transactional.Value)
+			{
+				if (Transaction.Current == null)
+				{
+					return MessageQueueTransactionType.Single;
+				}
+				return MessageQueueTransactionType.Automatic;
+			}
+			return MessageQueueTransactionType.None;
 		}
 
 		public MessageQueueTransactionType GetTransactionType()

@@ -75,10 +75,21 @@ namespace Rhino.ServiceBus.Impl
                     throw new ConfigurationErrorsException("Invalid endpoint url: " + uriString, e);
                 }
 
-                messageOwners.Add(new MessageOwner
+            	bool? transactional = null;
+				string transactionalString = configuration.Attributes["transactional"];
+				if (string.IsNullOrEmpty(transactionalString) == false)
+				{
+					bool temp;
+					if(bool.TryParse(transactionalString, out temp)==false)
+						throw new ConfigurationErrorsException("Invalid transactional settings: " + transactionalString);
+					transactional = temp;
+				}
+
+            	messageOwners.Add(new MessageOwner
                 {
                     Name = msgName,
-                    Endpoint = ownerEndpoint
+                    Endpoint = ownerEndpoint,
+                    Transactional = transactional
                 });
             }
         }
