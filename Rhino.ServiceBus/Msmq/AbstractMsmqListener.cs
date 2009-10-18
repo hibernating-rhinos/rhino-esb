@@ -270,7 +270,8 @@ namespace Rhino.ServiceBus.Msmq
         {
             var message = new Message();
 
-        	try
+			var isAdmin = msgs.Any(x => x is AdministrativeMessage);
+			try
         	{
         		messageSerializer.Serialize(msgs, message.BodyStream);
         	}
@@ -279,7 +280,7 @@ namespace Rhino.ServiceBus.Msmq
         		logger.Error("Error when trying to serialize message.", ex);
         		throw;
         	}
-
+			message.Priority = isAdmin ? MessagePriority.High :  MessagePriority.Normal;
             message.ResponseQueue = InitalizeQueue(Endpoint).ToResponseQueue();
 
             message.Extension = Guid.NewGuid().ToByteArray();

@@ -1,4 +1,5 @@
 using System;
+using System.Messaging;
 using System.Threading;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
@@ -57,6 +58,46 @@ namespace Rhino.ServiceBus.Tests.Bugs
             }
         }
 
+		[Fact]
+		public void add_subscription_is_sent_at_high_priority()
+		{
+			var container = CreateContainer();
 
+			using (var bus = container.Resolve<IStartableServiceBus>())
+			{
+				bus.Start();
+				bus.Send(TestQueueUri2, new AddSubscription
+				{
+					Endpoint = bus.Endpoint,
+					Type = typeof(int).FullName
+				});
+			}
+
+			testQueue2.MessageReadPropertyFilter.SetAll();
+			var message = testQueue2.Peek(TimeSpan.FromMilliseconds(250));
+			Assert.Equal("Rhino.ServiceBus.Messages.AddSubscription", message.Label);
+			Assert.Equal(MessagePriority.High, message.Priority);
+		}
+
+		[Fact]
+		public void remove_subscription_is_sent_at_high_priority()
+		{
+			var container = CreateContainer();
+
+			using (var bus = container.Resolve<IStartableServiceBus>())
+			{
+				bus.Start();
+				bus.Send(TestQueueUri2, new RemoveSubscription
+				{
+					Endpoint = bus.Endpoint,
+					Type = typeof(int).FullName
+				});
+			}
+
+			testQueue2.MessageReadPropertyFilter.SetAll();
+			var message = testQueue2.Peek(TimeSpan.FromMilliseconds(250));
+			Assert.Equal("Rhino.ServiceBus.Messages.RemoveSubscription", message.Label);
+			Assert.Equal(MessagePriority.High, message.Priority);
+		}
     }
 }
