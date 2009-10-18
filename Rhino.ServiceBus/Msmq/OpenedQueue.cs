@@ -92,7 +92,7 @@ namespace Rhino.ServiceBus.Msmq
 			return MessageQueueTransactionType.None;
 		}
 
-		private MessageQueueTransactionType GetSingleTransactionType()
+		public MessageQueueTransactionType GetSingleTransactionType()
 		{
 			if (parent != null)
 				return parent.GetSingleTransactionType();

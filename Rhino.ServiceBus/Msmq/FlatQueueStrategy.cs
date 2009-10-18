@@ -160,7 +160,17 @@ namespace Rhino.ServiceBus.Msmq
             }
         }
 
-        /// <summary>
+    	public void SendToErrorQueue(OpenedQueue queue, Message message)
+    	{
+    		using(var errQueue = new MessageQueue(GetErrorsQueuePath()))
+    		{
+				// here we assume that the queue transactionalibilty is the same for the error sibling queue
+				// and the main queue!
+    			errQueue.Send(message, queue.GetSingleTransactionType());
+    		}
+    	}
+
+    	/// <summary>
         /// Gets the errors queue path.
         /// </summary>
         /// <returns></returns>

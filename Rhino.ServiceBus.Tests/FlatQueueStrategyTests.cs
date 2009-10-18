@@ -34,6 +34,22 @@ namespace Rhino.ServiceBus.Tests
             Assert.Equal(0, openedQueue.GetMessageCount());
         }
 
+		[Fact]
+		public void Moving_to_errors_queue_directly_move_message_to_errors()
+		{
+			var queueStrategy = new FlatQueueStrategy(new EndpointRouter(), testQueueEndPoint.Uri);
+			openedQueue.Send(new Message(new TestMessage { Name = "ayende" }));
+			Message msg = openedQueue.Receive();
+			queueStrategy.SendToErrorQueue(openedQueue, msg);
+
+			using(var errQueue = new MessageQueue(testQueuePath +"#errors"))
+			{
+				var message = errQueue.Peek(TimeSpan.FromMilliseconds(250));
+				Assert.NotNull(message);
+			}
+		}
+
+
         [Fact]
         public void Moving_to_discarded_queue_removes_message_from_subscriptions_queue()
         {

@@ -84,5 +84,10 @@ namespace Rhino.ServiceBus.Msmq
 	            return false;
 	        }
 	    }
+
+		public void SendToErrorQueue(OpenedQueue queue, Message message)
+		{
+			queue.Send(message);
+		}
 	}
 }

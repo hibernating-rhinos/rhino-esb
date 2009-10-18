@@ -118,7 +118,7 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 				Body = exceptionText,
                 CorrelationId = msgId
 			}.SetSubQueueToSendTo(SubQueue.Errors);
-			queue.Send(desc);
+			queueStrategy.SendToErrorQueue(queue, desc);
 
         	logger.WarnFormat("Moving message {0} to errors subqueue because: {1}", message.Id,
                               exceptionText);

@@ -34,5 +34,7 @@ namespace Rhino.ServiceBus.Msmq
 		void MoveTimeoutToMainQueue(OpenedQueue queue, string messageId);
 
 		bool TryMoveMessage(OpenedQueue queue, Message message, SubQueue subQueue, out string msgId);
+
+		void SendToErrorQueue(OpenedQueue queue, Message message);
     }
 }
