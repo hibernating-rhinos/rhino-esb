@@ -81,13 +81,21 @@ namespace Rhino.ServiceBus.Msmq
 
 		public MessageQueueTransactionType GetTransactionType()
 		{
-			if(transactional)
+			try
 			{
-				return Transaction.Current == null ? 
-					MessageQueueTransactionType.Single : 
-					MessageQueueTransactionType.Automatic;
+				if(transactional)
+				{
+					return Transaction.Current == null ? 
+					                                   	MessageQueueTransactionType.Single : 
+					                                   	                                   	MessageQueueTransactionType.Automatic;
+				}
+				return MessageQueueTransactionType.None;
 			}
-			return MessageQueueTransactionType.None;
+			catch(Exception e)
+			{
+				logger.Error("Could not access the ambient transaction", e);
+				throw;
+			}
 		}
 
 		public MessageQueueTransactionType GetSingleTransactionType()
