@@ -21,11 +21,15 @@ namespace Rhino.ServiceBus.Serializers
         private readonly IReflection reflection;
         private readonly IKernel kernel;
         private readonly Hashtable<Type, bool> typeHasConvertorCache = new Hashtable<Type, bool>();
+    	private ICustomElementSerializer[] customElementSerializers;
+    	private IElementSerializationBehavior[] elementSerializationBehaviors;
 
-        public XmlMessageSerializer(IReflection reflection, IKernel kernel )
+    	public XmlMessageSerializer(IReflection reflection, IKernel kernel )
         {
             this.reflection = reflection;
             this.kernel = kernel;
+        	customElementSerializers = this.kernel.ResolveAll<ICustomElementSerializer>();
+    		elementSerializationBehaviors = this.kernel.ResolveAll<IElementSerializationBehavior>();
         }
 
         public void Serialize(object[] messages, Stream messageStream)
@@ -87,7 +91,7 @@ namespace Rhino.ServiceBus.Serializers
             }
 			else if(HaveCustomSerializer(value.GetType()))
 			{
-				var customSerializer = kernel.ResolveAll<ICustomElementSerializer>().First(s => s.CanSerialize(value.GetType()));
+				var customSerializer = customElementSerializers.First(s => s.CanSerialize(value.GetType()));
 				var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
 				var element = customSerializer.ToElement(value, v => GetXmlNamespace(namespaces, v));
 				var customElement = new XElement(elementName, element);
@@ -137,7 +141,7 @@ namespace Rhino.ServiceBus.Serializers
 
 		private XElement ApplyMessageSerializationBehaviorIfNecessary(Type messageType, XElement element)
 		{
-			foreach (var afterSerializedBehavior in kernel.ResolveAll<IElementSerializationBehavior>())
+			foreach (var afterSerializedBehavior in elementSerializationBehaviors)
 			{
 				if (afterSerializedBehavior.ShouldApplyBehavior(messageType))
 					return afterSerializedBehavior.ApplyElementBehavior(element);
@@ -147,7 +151,7 @@ namespace Rhino.ServiceBus.Serializers
 
 		private XElement ApplyMessageDeserializationBehaviorIfNecessary(Type messageType, XElement element)
 		{
-			foreach (var afterSerializedBehavior in kernel.ResolveAll<IElementSerializationBehavior>())
+			foreach (var afterSerializedBehavior in elementSerializationBehaviors)
 			{
 				if (afterSerializedBehavior.ShouldApplyBehavior(messageType))
 					return afterSerializedBehavior.RemoveElementBehavior(element);
@@ -168,7 +172,7 @@ namespace Rhino.ServiceBus.Serializers
 
 		private bool HaveCustomSerializer(Type type)
 		{
-			return kernel.ResolveAll<ICustomElementSerializer>()
+			return customElementSerializers
 				.Any(s => s.CanSerialize(type));
 		}
 
@@ -327,7 +331,7 @@ namespace Rhino.ServiceBus.Serializers
             }
 			if(HaveCustomSerializer(type))
 			{
-				var customSerializer = kernel.ResolveAll<ICustomElementSerializer>().First(s => s.CanSerialize(type));
+				var customSerializer = customElementSerializers.First(s => s.CanSerialize(type));
 				return customSerializer.FromElement(type, element);
 			}
 			if(type == typeof(byte[]))
