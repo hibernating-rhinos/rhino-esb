@@ -32,8 +32,8 @@ namespace Rhino.ServiceBus.Msmq
         private readonly IMsmqTransportAction[] transportActions;
     	private readonly IsolationLevel queueIsolationLevel;
 
-    	public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel)
-            :base(queueStrategy,endpoint, threadCount, serializer,endpointRouter)
+		public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel, TransactionalOptions transactional)
+			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional)
         {
         	this.transportActions = transportActions;
         	this.queueIsolationLevel = queueIsolationLevel;

@@ -42,7 +42,8 @@ namespace Rhino.ServiceBus.Msmq
                 {
                     IsLocal = true,
                     QueuePath = Environment.MachineName + @"\private$\" + queuePathWithFlatSubQueue,
-                    QueueUri = uri
+                    QueueUri = uri,
+                    Transactional = endpoint.Transactional
                 };
             }
 
@@ -53,7 +54,8 @@ namespace Rhino.ServiceBus.Msmq
                 {
                     IsLocal = false,
                     QueuePath = "FormatName:DIRECT=TCP:" + hostName + @"\private$\" + queuePathWithFlatSubQueue,
-                    QueueUri = uri
+					QueueUri = uri,
+					Transactional = endpoint.Transactional
                 };
             }
             if (guidRegEx.IsMatch(hostName))
@@ -62,14 +64,16 @@ namespace Rhino.ServiceBus.Msmq
                 {
                     IsLocal = false,
                     QueuePath = "FormatName:PRIVATE=" + hostName + @"\" + queuePathWithFlatSubQueue,
-                    QueueUri = uri
+					QueueUri = uri,
+					Transactional = endpoint.Transactional
                 };  
             }
             return new QueueInfo
             {
                 IsLocal = false,
                 QueuePath = "FormatName:DIRECT=OS:" + hostName + @"\private$\" + queuePathWithFlatSubQueue,
-                QueueUri = uri
+				QueueUri = uri,
+				Transactional = endpoint.Transactional
             };
         }
 
@@ -94,7 +98,7 @@ namespace Rhino.ServiceBus.Msmq
             throw new ArgumentException("Could not understand queue format: " + queue.Path);
         }
 
-        public static MessageQueue OpenOrCreateQueue(string newQueuePath, QueueAccessMode accessMode)
+        public static MessageQueue OpenOrCreateQueue(string newQueuePath, QueueAccessMode accessMode, MessageQueue parentQueue)
         {
             try
             {
@@ -111,7 +115,7 @@ namespace Rhino.ServiceBus.Msmq
                 {
                     try
                     {
-                        CreateQueue(newQueuePath);
+                        CreateQueue(newQueuePath, parentQueue.Transactional);
                     }
                     catch (Exception e)
                     {
@@ -127,9 +131,9 @@ namespace Rhino.ServiceBus.Msmq
             }
         }
 
-        public static MessageQueue CreateQueue(string newQueuePath)
+        public static MessageQueue CreateQueue(string newQueuePath, bool transactional)
         {
-            var queue = MessageQueue.Create(newQueuePath, true);
+			var queue = MessageQueue.Create(newQueuePath, transactional);
             var administratorsGroupName = new SecurityIdentifier("S-1-5-32-544")
                                                 .Translate(typeof(NTAccount))
                                                 .ToString();

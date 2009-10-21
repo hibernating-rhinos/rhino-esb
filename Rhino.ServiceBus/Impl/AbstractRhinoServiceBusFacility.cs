@@ -11,6 +11,7 @@ using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
+using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Sagas;
 using Rhino.ServiceBus.Serializers;
 using System.Transactions;
@@ -27,6 +28,7 @@ namespace Rhino.ServiceBus.Impl
         {
             ThreadCount = 1;
             NumberOfRetries = 5;
+			Transactional = TransactionalOptions.FigureItOut;
         }
 
         public Uri Endpoint { get; set; }
@@ -38,6 +40,8 @@ namespace Rhino.ServiceBus.Impl
         public bool UseFlatQueue { get; set; }
 
         public bool DisableAutoQueueCreation { get; set; }
+
+		public TransactionalOptions Transactional { get; set; }
 
         public IsolationLevel IsolationLevel
         {

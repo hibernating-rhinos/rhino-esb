@@ -67,7 +67,8 @@ namespace Rhino.ServiceBus.Config
                         threadCount = facility.ThreadCount,
                         endpoint = facility.Endpoint,
                         queueIsolationLevel = facility.IsolationLevel,
-                        numberOfRetries = facility.NumberOfRetries
+                        numberOfRetries = facility.NumberOfRetries,
+                        transactional = facility.Transactional
                     }),
                 AllTypes.Of<IMsmqTransportAction>()
                     .FromAssembly(typeof(IMsmqTransportAction).Assembly)

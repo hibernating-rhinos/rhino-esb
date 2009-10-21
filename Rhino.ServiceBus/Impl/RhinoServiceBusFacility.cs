@@ -7,6 +7,7 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Actions;
 using System.Transactions;
+using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -122,9 +123,21 @@ namespace Rhino.ServiceBus.Impl
                     "Attribute 'endpoint' on 'bus' has an invalid value '" + uriString + "'");
             }
             Endpoint = endpoint;
+
+			string transactionalString = busConfig.Attributes["transactional"];
+        	bool temp;
+			if (bool.TryParse(transactionalString, out temp))
+			{
+				Transactional = temp ? TransactionalOptions.Transactional : TransactionalOptions.NonTransactional;
+			}
+			else if(transactionalString != null)
+			{
+				throw new ConfigurationErrorsException(
+					"Attribute 'transactional' on 'bus' has an invalid value '" + uriString + "'");
+			}
         }
 
-	    public IFacility UseFlatQueueStructure()
+		public IFacility UseFlatQueueStructure()
 	    {
 	        UseFlatQueue = true;
 	        return this;

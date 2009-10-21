@@ -6,6 +6,7 @@ using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
+using Rhino.ServiceBus.Msmq;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests.LoadBalancer
@@ -26,14 +27,16 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                     {
                         threadCount = 1,
                         endpoint = new Uri(loadBalancerQueue),
-                        secondaryLoadBalancer = TestQueueUri2.Uri
-                    }),
+                        secondaryLoadBalancer = TestQueueUri2.Uri,
+                   		transactional = TransactionalOptions.FigureItOut
+				 }),
                 Component.For<MsmqSecondaryLoadBalancer>()
                     .DependsOn(new
                     {
                         threadCount = 1,
                         endpoint = TestQueueUri2.Uri,
                         primaryLoadBalancer = new Uri(loadBalancerQueue),
+						transactional = TransactionalOptions.FigureItOut
                     })
                 );
         }

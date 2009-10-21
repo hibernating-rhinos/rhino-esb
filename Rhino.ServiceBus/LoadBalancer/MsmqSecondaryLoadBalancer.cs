@@ -37,8 +37,9 @@ namespace Rhino.ServiceBus.LoadBalancer
             IEndpointRouter endpointRouter,
             Uri endpoint,
             Uri primaryLoadBalancer,
-            int threadCount)
-            : base(serializer, queueStrategy, endpointRouter, endpoint, threadCount)
+            int threadCount,
+			TransactionalOptions transactional)
+			: base(serializer, queueStrategy, endpointRouter, endpoint, threadCount, transactional)
         {
             TimeoutForHeartBeatFromPrimary = TimeSpan.FromSeconds(10);
             this.primaryLoadBalancer = primaryLoadBalancer;

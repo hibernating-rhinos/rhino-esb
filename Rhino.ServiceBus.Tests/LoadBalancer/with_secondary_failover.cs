@@ -9,6 +9,7 @@ using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Messages;
+using Rhino.ServiceBus.Msmq;
 using Xunit;
 using System.Linq;
 
@@ -33,7 +34,8 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         threadCount = 1,
                         endpoint = TestQueueUri2.Uri,
                         primaryLoadBalancer = new Uri(loadBalancerQueue),
-                    })
+						transactional = TransactionalOptions.FigureItOut
+					})
                 );
         }
 

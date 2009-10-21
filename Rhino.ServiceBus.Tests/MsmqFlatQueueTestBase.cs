@@ -128,7 +128,8 @@ namespace Rhino.ServiceBus.Tests
                             testQueueEndPoint.Uri, 1,
                         DefaultTransportActions(testQueueEndPoint.Uri),
                             new EndpointRouter(),
-							IsolationLevel.Serializable);
+							IsolationLevel.Serializable,
+							TransactionalOptions.FigureItOut);
                     transport.Start();
                 }
                 return transport;
@@ -158,7 +159,7 @@ namespace Rhino.ServiceBus.Tests
                         new FlatQueueStrategy(new EndpointRouter(),transactionalTestQueueEndpoint.Uri),
                         transactionalTestQueueEndpoint.Uri, 1, DefaultTransportActions(transactionalTestQueueEndpoint.Uri),
                             new EndpointRouter(),
-							IsolationLevel.Serializable);
+							IsolationLevel.Serializable, TransactionalOptions.FigureItOut);
                     transactionalTransport.Start();
                 }
                 return transactionalTransport;

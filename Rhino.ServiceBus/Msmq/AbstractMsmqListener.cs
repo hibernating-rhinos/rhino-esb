@@ -38,14 +38,31 @@ namespace Rhino.ServiceBus.Msmq
             Uri endpoint,
             int threadCount,
             IMessageSerializer messageSerializer,
-            IEndpointRouter endpointRouter)
+            IEndpointRouter endpointRouter, 
+			TransactionalOptions transactional)
         {
             this.queueStrategy = queueStrategy;
-            this.messageSerializer = messageSerializer;
+        	this.messageSerializer = messageSerializer;
             this.endpointRouter = endpointRouter;
             this.endpoint = endpoint;
+			
             this.threadCount = threadCount;
             threads = new Thread[threadCount];
+
+        	switch (transactional)
+        	{
+        		case TransactionalOptions.Transactional:
+        			this.transactional = true;
+        			break;
+        		case TransactionalOptions.NonTransactional:
+        			this.transactional = false;
+        			break;
+        		case TransactionalOptions.FigureItOut:
+        			this.transactional = null;
+        			break;
+        		default:
+        			throw new ArgumentOutOfRangeException("transactional");
+        	}
         }
 
         public event Action Started;
@@ -64,7 +81,9 @@ namespace Rhino.ServiceBus.Msmq
         {
             get
             {
-                return endpointRouter.GetRoutedEndpoint(endpoint);
+            	var routedEndpoint = endpointRouter.GetRoutedEndpoint(endpoint);
+            	routedEndpoint.Transactional = transactional;
+            	return routedEndpoint;
             }
         }
 
@@ -235,8 +254,9 @@ namespace Rhino.ServiceBus.Msmq
         }
 
         protected IEndpointRouter endpointRouter;
+    	private readonly bool? transactional;
 
-        public TransportState TransportState { get; set; }
+    	public TransportState TransportState { get; set; }
 
         protected abstract void HandlePeekedMessage(OpenedQueue queue, Message message);
 

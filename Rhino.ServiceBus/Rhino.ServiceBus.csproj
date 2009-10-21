@@ -205,6 +205,7 @@
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
+    <Compile Include="Msmq\TransactionalOptions.cs" />
     <Compile Include="RhinoQueues\ErrorAction.cs" />
     <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />
     <Compile Include="RhinoQueues\RhinoQueueCurrentMessageInformation.cs" />

@@ -33,7 +33,8 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                     .DependsOn(new
                     {
                         threadCount = 1,
-                        endpoint = new Uri(loadBalancerQueue)
+                        endpoint = new Uri(loadBalancerQueue),
+                        transactional = TransactionalOptions.FigureItOut
                     })
                 );
         }

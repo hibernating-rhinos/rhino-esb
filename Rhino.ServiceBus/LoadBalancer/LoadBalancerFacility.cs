@@ -25,25 +25,36 @@ namespace Rhino.ServiceBus.LoadBalancer
                 primaryLoadBalancer,
                 secondaryLoadBalancer);
 
-            var dependencies = new
+        	if (secondaryLoadBalancer!=null)
             {
-                endpoint=Endpoint,
-                threadCount = ThreadCount,
-                primaryLoadBalancer
-            };
-            var component = Component.For<MsmqLoadBalancer>()
-                .ImplementedBy(loadBalancerType)
-                .LifeStyle.Is(LifestyleType.Singleton)
-                .DependsOn(dependencies);
-
-            if (secondaryLoadBalancer!=null)
+				Kernel.Register(Component.For<MsmqLoadBalancer>()
+									.ImplementedBy(loadBalancerType)
+									.LifeStyle.Is(LifestyleType.Singleton)
+									.DependsOn(new
+									{
+										endpoint = Endpoint,
+										threadCount = ThreadCount,
+										primaryLoadBalancer,
+										transactional = Transactional,
+										secondaryLoadBalancer
+									}));
+            }
+			else
             {
-                component.DependsOn(new {secondaryLoadBalancer});
+            	Kernel.Register(Component.For<MsmqLoadBalancer>()
+            	                	.ImplementedBy(loadBalancerType)
+            	                	.LifeStyle.Is(LifestyleType.Singleton)
+            	                	.DependsOn(new
+            	                	{
+            	                		endpoint = Endpoint,
+            	                		threadCount = ThreadCount,
+            	                		primaryLoadBalancer,
+            	                		transactional = Transactional
+            	                	}));
             }
             Kernel.Register(
                 Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLoadBalancerQueuesAction>(),
-                component
+                    .ImplementedBy<CreateLoadBalancerQueuesAction>()
                 );
         }
 

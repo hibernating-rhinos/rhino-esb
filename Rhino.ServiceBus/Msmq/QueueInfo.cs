@@ -30,6 +30,7 @@ namespace Rhino.ServiceBus.Msmq
 
 		public SubQueue? SubQueue { get; set;}
 		public Uri QueueUri { get; set; }
+		public bool? Transactional { get; set; }
 		public bool IsLocal { get; set; }
 
 		public bool Exists
@@ -67,7 +68,7 @@ namespace Rhino.ServiceBus.Msmq
 			var messageQueue = new MessageQueue(QueuePath, access);
 			if (formatter != null)
 				messageQueue.Formatter = formatter;
-			var openedQueue = new OpenedQueue(this, messageQueue, QueueUri.ToString())
+			var openedQueue = new OpenedQueue(this, messageQueue, QueueUri.ToString(),Transactional)
 			{
 				Formatter = formatter
 			};
@@ -88,7 +89,7 @@ namespace Rhino.ServiceBus.Msmq
 			    return new MessageQueue(queuePath);
 			try
 			{
-                return MsmqUtil.CreateQueue(queuePath);
+                return MsmqUtil.CreateQueue(queuePath,Transactional ?? true);
 			}
 			catch (Exception e)
 			{
