@@ -1,9 +1,8 @@
-using Rhino.ServiceBus.Impl;
 using System.Linq;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 
-namespace Rhino.ServiceBus
+namespace Rhino.ServiceBus.Impl
 {
     public class OnewayBus : IOnewayBus
     {
