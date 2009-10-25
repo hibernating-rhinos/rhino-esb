@@ -189,10 +189,12 @@
     <Compile Include="Hosting\HostConfiguration.cs" />
     <Compile Include="Hosting\IApplicationHost.cs" />
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
+    <Compile Include="Impl\MessageOwnersSelector.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />
     <Compile Include="Internal\IElementSerializationBehavior.cs" />
     <Compile Include="Internal\IEncryptionService.cs" />
+    <Compile Include="IOnewayBus.cs" />
     <Compile Include="ISagaFinder.cs" />
     <Compile Include="LoadBalancer\LoadBalancerFacility.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
@@ -202,10 +204,13 @@
     <Compile Include="Messages\NewWorkerPersisted.cs" />
     <Compile Include="Messages\QueryForAllKnownWorkersAndEndpoints.cs" />
     <Compile Include="Messages\Reroute.cs" />
+    <Compile Include="Msmq\EndpointExtensions.cs" />
+    <Compile Include="Msmq\MessageBuilder.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
     <Compile Include="Msmq\TransactionalOptions.cs" />
+    <Compile Include="OnewayBus.cs" />
     <Compile Include="RhinoQueues\ErrorAction.cs" />
     <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />
     <Compile Include="RhinoQueues\RhinoQueueCurrentMessageInformation.cs" />

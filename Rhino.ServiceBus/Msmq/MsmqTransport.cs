@@ -167,7 +167,7 @@ namespace Rhino.ServiceBus.Msmq
 
         public OpenedQueue CreateQueue()
         {
-            return InitalizeQueue(Endpoint);
+            return Endpoint.InitalizeQueue();
         }
 
         private void HandleMessageCompletion(

@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Impl
         private readonly IReflection reflection;
         private readonly ISubscriptionStorage subscriptionStorage;
         private readonly ITransport transport;
-        private readonly MessageOwner[] messageOwners;
+        private readonly MessageOwnersSelector messageOwners;
     	[ThreadStatic] public static object currentMessage;
         private readonly IEndpointRouter endpointRouter;
 
@@ -34,11 +34,12 @@ namespace Rhino.ServiceBus.Impl
             ISubscriptionStorage subscriptionStorage,
             IReflection reflection,
             IMessageModule[] modules,
-            MessageOwner[] messageOwners, IEndpointRouter endpointRouter)
+            MessageOwner[] messageOwners, 
+            IEndpointRouter endpointRouter)
         {
             this.transport = transport;
             this.endpointRouter = endpointRouter;
-            this.messageOwners = messageOwners;
+            this.messageOwners = new MessageOwnersSelector(messageOwners, endpointRouter);
             this.subscriptionStorage = subscriptionStorage;
             this.reflection = reflection;
             this.modules = modules;
@@ -92,28 +93,10 @@ namespace Rhino.ServiceBus.Impl
 
         public void Send(params object[] messages)
         {
-            Send(GetEndpointForMessageBatch(messages), messages);
+            Send(messageOwners.GetEndpointForMessageBatch(messages), messages);
         }
 
-        private Endpoint GetEndpointForMessageBatch(object[] messages)
-        {
-            if (messages == null)
-                throw new ArgumentNullException("messages");
-
-            if (messages.Length == 0)
-                throw new MessagePublicationException("Cannot send empty message batch");
-
-            var messageOwner = messageOwners
-                .Where(x=>x.IsOwner(messages[0].GetType()))
-                .FirstOrDefault();
-            
-            if (messageOwner == null)
-                throw new MessagePublicationException("Could not find no message owner for " + messages[0]);
-
-        	var endpoint = endpointRouter.GetRoutedEndpoint(messageOwner.Endpoint);
-        	endpoint.Transactional = messageOwner.Transactional;
-        	return endpoint;
-        }
+        
 
         public IDisposable AddInstanceSubscription(IMessageConsumer consumer)
         {
@@ -214,11 +197,8 @@ namespace Rhino.ServiceBus.Impl
 
     	public void Subscribe(Type type)
         {
-            foreach (var owner in messageOwners)
+            foreach (var owner in messageOwners.Of(type))
             {
-                if (owner.IsOwner(type) == false)
-                    continue;
-
                 logger.InfoFormat("Subscribing {0} on {1}", type.FullName, owner.Endpoint);
 
             	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
@@ -243,11 +223,8 @@ namespace Rhino.ServiceBus.Impl
 
         public void Unsubscribe(Type type)
         {
-            foreach (var owner in messageOwners)
+            foreach (var owner in messageOwners.Of(type))
             {
-                if (owner.IsOwner(type) == false)
-                    continue;
-
             	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
             	endpoint.Transactional = owner.Transactional;
             	Send(endpoint, new RemoveSubscription
@@ -263,11 +240,8 @@ namespace Rhino.ServiceBus.Impl
             foreach (var message in information.ConsumedMessages)
             {
                 bool subscribed = false;
-                foreach (var owner in messageOwners)
+                foreach (var owner in messageOwners.Of(message))
                 {
-                    if (owner.IsOwner(message) == false)
-                        continue;
-
                     logger.DebugFormat("Instance subscribition for {0} on {1}",
                         message.FullName,
                         owner.Endpoint);
@@ -292,11 +266,8 @@ namespace Rhino.ServiceBus.Impl
         {
             foreach (var message in information.ConsumedMessages)
             {
-                foreach (var owner in messageOwners)
+                foreach (var owner in messageOwners.NotOf(message))
                 {
-                    if (owner.IsOwner(message))
-                        continue;
-
                 	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
                 	endpoint.Transactional = owner.Transactional;
                 	Send(endpoint, new RemoveInstanceSubscription
@@ -335,7 +306,7 @@ namespace Rhino.ServiceBus.Impl
         /// <param name="msgs">The messages.</param>
         public void DelaySend(DateTime time, params object[] msgs)
         {
-            DelaySend(GetEndpointForMessageBatch(msgs), time, msgs);
+            DelaySend(messageOwners.GetEndpointForMessageBatch(msgs), time, msgs);
         }
         
         private void AutomaticallySubscribeConsumerMessages()

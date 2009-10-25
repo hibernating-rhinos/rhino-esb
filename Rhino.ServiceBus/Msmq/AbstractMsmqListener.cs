@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
 using log4net;
-using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
@@ -63,6 +62,7 @@ namespace Rhino.ServiceBus.Msmq
         		default:
         			throw new ArgumentOutOfRangeException("transactional");
         	}
+            builder = new MessageBuilder(this.messageSerializer, Endpoint);
         }
 
         public event Action Started;
@@ -97,7 +97,7 @@ namespace Rhino.ServiceBus.Msmq
             if (haveStarted)
                 return;
             logger.DebugFormat("Starting msmq transport on: {0}", Endpoint);
-            using (var queue = InitalizeQueue(Endpoint))
+            using (var queue = Endpoint.InitalizeQueue())
             {
                 BeforeStart(queue);
 
@@ -139,7 +139,7 @@ namespace Rhino.ServiceBus.Msmq
         {
             shouldStop = true;
             OnStop();
-            using (var queue = InitalizeQueue(Endpoint))
+            using (var queue = Endpoint.InitalizeQueue())
             {
                 queue.SendInSingleTransaction(new Message
                 {
@@ -171,25 +171,9 @@ namespace Rhino.ServiceBus.Msmq
             }
         }
 
-        protected static OpenedQueue InitalizeQueue(Endpoint endpoint)
-        {
-            try
-            {
-                return MsmqUtil.GetQueuePath(endpoint).Open(QueueAccessMode.SendAndReceive);
-            }
-            catch (Exception e)
-            {
-                throw new TransportException(
-                    "Could not open queue: " + endpoint + Environment.NewLine +
-                    "Queue path: " + MsmqUtil.GetQueuePath(endpoint) + Environment.NewLine +
-                    "Did you forget to create the queue or disable the queue initialization module?", e);
-            }
-
-        }
-
         protected void PeekMessageOnBackgroundThread(object state)
         {
-            using(var queue = InitalizeQueue(Endpoint))
+            using(var queue = Endpoint.InitalizeQueue())
             while (shouldStop == false)
             {
                 try
@@ -255,8 +239,9 @@ namespace Rhino.ServiceBus.Msmq
 
         protected IEndpointRouter endpointRouter;
     	private readonly bool? transactional;
+        private readonly MessageBuilder builder;
 
-    	public TransportState TransportState { get; set; }
+        public TransportState TransportState { get; set; }
 
         protected abstract void HandlePeekedMessage(OpenedQueue queue, Message message);
 
@@ -288,46 +273,7 @@ namespace Rhino.ServiceBus.Msmq
 
         protected Message GenerateMsmqMessageFromMessageBatch(params object[] msgs)
         {
-            var message = new Message();
-
-			var isAdmin = msgs.Any(x => x is AdministrativeMessage);
-			try
-        	{
-        		messageSerializer.Serialize(msgs, message.BodyStream);
-        	}
-        	catch (SerializationException ex)
-        	{
-        		logger.Error("Error when trying to serialize message.", ex);
-        		throw;
-        	}
-			message.Priority = isAdmin ? MessagePriority.High :  MessagePriority.Normal;
-            message.ResponseQueue = InitalizeQueue(Endpoint).ToResponseQueue();
-
-            message.Extension = Guid.NewGuid().ToByteArray();
-
-            message.AppSpecific = GetAppSpecificMarker(msgs);
-
-            message.Label = msgs
-                .Where(msg => msg != null)
-                .Select(msg =>
-                {
-                    string s = msg.ToString();
-                    if (s.Length > 249)
-                        return s.Substring(0, 246) + "...";
-                    return s;
-                })
-                .FirstOrDefault();
-            return message;
-        }
-
-        protected static int GetAppSpecificMarker(object[] msgs)
-        {
-            var msg = msgs[0];
-            if (msg is AdministrativeMessage)
-                return (int)MessageType.AdministrativeMessageMarker;
-            if (msg is LoadBalancerMessage)
-                return (int)MessageType.LoadBalancerMessageMarker;
-            return 0;
+            return builder.GenerateMsmqMessageFromMessageBatch(msgs);
         }
 
         protected object[] DeserializeMessages(OpenedQueue messageQueue, Message transportMessage, Action<CurrentMessageInformation, Exception> messageSerializationException)
