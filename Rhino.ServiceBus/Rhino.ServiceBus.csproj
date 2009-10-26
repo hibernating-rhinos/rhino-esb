@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -189,7 +189,10 @@
     <Compile Include="Hosting\HostConfiguration.cs" />
     <Compile Include="Hosting\IApplicationHost.cs" />
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
+    <Compile Include="Impl\MessageOwnersConfigReader.cs" />
     <Compile Include="Impl\MessageOwnersSelector.cs" />
+    <Compile Include="Impl\OnewayBus.cs" />
+    <Compile Include="Impl\OnewayRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />
     <Compile Include="Internal\IElementSerializationBehavior.cs" />
@@ -205,12 +208,12 @@
     <Compile Include="Messages\QueryForAllKnownWorkersAndEndpoints.cs" />
     <Compile Include="Messages\Reroute.cs" />
     <Compile Include="Msmq\EndpointExtensions.cs" />
+    <Compile Include="Msmq\IMessageBuilder.cs" />
     <Compile Include="Msmq\MessageBuilder.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
     <Compile Include="Msmq\TransactionalOptions.cs" />
-    <Compile Include="OnewayBus.cs" />
     <Compile Include="RhinoQueues\ErrorAction.cs" />
     <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />
     <Compile Include="RhinoQueues\RhinoQueueCurrentMessageInformation.cs" />

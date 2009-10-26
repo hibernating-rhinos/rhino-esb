@@ -18,7 +18,7 @@ namespace Rhino.ServiceBus.Impl
         protected override void ReadConfiguration()
 	    {
 	        ReadBusConfiguration();
-	        ReadMessageOwners();
+	        new MessageOwnersConfigReader(FacilityConfig, messageOwners).ReadMessageOwners();
 	    }
 
         protected override void RegisterComponents()
@@ -48,51 +48,6 @@ namespace Rhino.ServiceBus.Impl
                 config.CreateChild("item", "${" + type.FullName + "}");
             }
             return config;
-        }
-
-        protected void ReadMessageOwners()
-        {
-            IConfiguration messageConfig = FacilityConfig.Children["messages"];
-            if (messageConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'messages' node in configuration");
-
-            foreach (IConfiguration configuration in messageConfig.Children)
-            {
-                if (configuration.Name != "add")
-                    throw new ConfigurationErrorsException("Unknown node 'messages/" + configuration.Name + "'");
-
-                string msgName = configuration.Attributes["name"];
-                if (string.IsNullOrEmpty(msgName))
-                    throw new ConfigurationErrorsException("Invalid name element in the <messages/> element");
-
-                string uriString = configuration.Attributes["endpoint"];
-                Uri ownerEndpoint;
-                try
-                {
-                    ownerEndpoint = new Uri(uriString);
-                }
-                catch (Exception e)
-                {
-                    throw new ConfigurationErrorsException("Invalid endpoint url: " + uriString, e);
-                }
-
-            	bool? transactional = null;
-				string transactionalString = configuration.Attributes["transactional"];
-				if (string.IsNullOrEmpty(transactionalString) == false)
-				{
-					bool temp;
-					if(bool.TryParse(transactionalString, out temp)==false)
-						throw new ConfigurationErrorsException("Invalid transactional settings: " + transactionalString);
-					transactional = temp;
-				}
-
-            	messageOwners.Add(new MessageOwner
-                {
-                    Name = msgName,
-                    Endpoint = ownerEndpoint,
-                    Transactional = transactional
-                });
-            }
         }
 
         protected void ReadBusConfiguration()

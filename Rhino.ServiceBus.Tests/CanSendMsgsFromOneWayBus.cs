@@ -46,6 +46,26 @@ namespace Rhino.ServiceBus.Tests
 
         }
 
+        [Fact]
+        public void SendMessageToRemoteBusFromConfigDrivenOneWayBus()
+        {
+            using (var bus = container.Resolve<IStartableServiceBus>())
+            {           
+                bus.Start();
+
+                using(var c = new WindsorContainer(new XmlInterpreter("OneWayBus.config")))
+                {
+                    c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
+                    c.Resolve<IOnewayBus>().Send("hello there, one way");
+                }
+
+                StringConsumer.Event.WaitOne();
+
+                Assert.Equal("hello there, one way", StringConsumer.Value);
+            }
+
+        }
+
         public class StringConsumer : ConsumerOf<string>
         {
             public static ManualResetEvent Event;

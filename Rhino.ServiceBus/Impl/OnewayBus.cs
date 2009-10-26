@@ -1,5 +1,3 @@
-using System.Linq;
-using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Impl
@@ -7,9 +5,9 @@ namespace Rhino.ServiceBus.Impl
     public class OnewayBus : IOnewayBus
     {
         private readonly MessageOwnersSelector messageOwners;
-        private readonly MessageBuilder messageBuilder;
+        private readonly IMessageBuilder messageBuilder;
 
-        public OnewayBus(MessageOwner[] messageOwners, MessageBuilder messageBuilder)
+        public OnewayBus(MessageOwner[] messageOwners, IMessageBuilder messageBuilder)
         {
             this.messageOwners = new MessageOwnersSelector(messageOwners, new EndpointRouter());
             this.messageBuilder = messageBuilder;

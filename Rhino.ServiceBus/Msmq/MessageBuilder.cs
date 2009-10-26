@@ -8,11 +8,16 @@ using Rhino.ServiceBus.Messages;
 
 namespace Rhino.ServiceBus.Msmq
 {
-    public class MessageBuilder
+    public class MessageBuilder : IMessageBuilder
     {
-        private ILog logger = LogManager.GetLogger(typeof (MessageBuilder));
+        private readonly ILog logger = LogManager.GetLogger(typeof (MessageBuilder));
         private readonly IMessageSerializer messageSerializer;
         private readonly Endpoint endpoint;
+
+        public MessageBuilder(IMessageSerializer messageSerializer)
+            :this(messageSerializer, null)
+        {
+        }
 
         public MessageBuilder(IMessageSerializer messageSerializer, Endpoint endpoint)
         {
