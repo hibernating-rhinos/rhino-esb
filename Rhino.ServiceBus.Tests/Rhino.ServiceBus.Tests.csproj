@@ -68,6 +68,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -100,6 +101,8 @@
     <Compile Include="Bugs\When_handler_consumes_two_messages.cs" />
     <Compile Include="Bugs\When_running_on_MTA_thread.cs" />
     <Compile Include="Bugs\Will_send_invalid_admin_message_to_error_queue.cs" />
+    <Compile Include="Bugs\Wrong_time_on_delay_messages.cs">
+    </Compile>
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
