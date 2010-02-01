@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Castle.Core;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Rhino.ServiceBus.Actions;
@@ -42,7 +43,11 @@ namespace Rhino.ServiceBus.Hosting
                         typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) == false &&
 						IsTypeAcceptableForThisBootStrapper(type)
 					)
-					.Configure((Action<ComponentRegistration>)ConfigureConsumer)
+					.Configure(registration =>
+					{
+						registration.LifeStyle.Is(LifestyleType.Transient);
+						ConfigureConsumer(registration);
+					})
                 );
         }
 
