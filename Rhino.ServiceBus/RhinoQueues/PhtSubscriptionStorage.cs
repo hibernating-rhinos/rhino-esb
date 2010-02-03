@@ -59,12 +59,12 @@ namespace Rhino.ServiceBus.RhinoQueues
 
         #region IMessageModule Members
 
-        void IMessageModule.Init(ITransport transport)
+		void IMessageModule.Init(ITransport transport, IServiceBus bus)
         {
             transport.AdministrativeMessageArrived += HandleAdministrativeMessage;
         }
 
-        void IMessageModule.Stop(ITransport transport)
+		void IMessageModule.Stop(ITransport transport, IServiceBus bus)
         {
             transport.AdministrativeMessageArrived -= HandleAdministrativeMessage;
         }

@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.MessageModules
             this.endpointRouter = endpointRouter;
         }
 
-        public void Init(ITransport transport)
+		public void Init(ITransport transport, IServiceBus bus)
         {
             transport.MessageProcessingCompleted += Transport_OnMessageProcessingCompleted;
             theTransport = transport;
@@ -82,7 +82,7 @@ namespace Rhino.ServiceBus.MessageModules
             });
         }
 
-        public void Stop(ITransport transport)
+		public void Stop(ITransport transport, IServiceBus bus)
         {
             transport.MessageProcessingCompleted -= Transport_OnMessageProcessingCompleted;
             theTransport = null;

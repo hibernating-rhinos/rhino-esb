@@ -32,7 +32,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_serialization_failure()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+            module.Init(transport, null);
 
             transport.Raise(x => x.MessageSerializationException += null,
                 new CurrentMessageInformation { MessageId = Guid.NewGuid() },
@@ -49,7 +49,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_message_arrived()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+			module.Init(transport, null);
 
             transport.Raise(x => x.MessageArrived += null,
                 new CurrentMessageInformation
@@ -69,7 +69,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_message_processing_completed()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+			module.Init(transport, null);
 
             transport.Raise(x => x.MessageProcessingCompleted += null,
                             new CurrentMessageInformation
@@ -89,7 +89,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_message_processing_failed()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+			module.Init(transport, null);
 
             transport.Raise(x => x.MessageProcessingFailure += null,
                 new CurrentMessageInformation
@@ -111,7 +111,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_message_sent()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+			module.Init(transport, null);
 
             transport.Raise(x => x.MessageSent += null,
                 new CurrentMessageInformation
@@ -131,7 +131,7 @@ namespace Rhino.ServiceBus.Tests
         public void Will_send_message_about_message_processing_failed_even_when_rolling_back_tx()
         {
             var module = container.Resolve<MessageLoggingModule>(new { logQueue = TestQueueUri.Uri });
-            module.Init(transport);
+			module.Init(transport, null);
 
             using(new TransactionScope())
             {

@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Actions
         public void Execute(string user)
         {
             // will create the queues if they are not already there
-            messageLoggingModule.Init(transport);
+            messageLoggingModule.Init(transport, null);
             var queuePath = MsmqUtil.GetQueuePath(new Endpoint
             {
                 Uri = messageLoggingModule.LogQueue

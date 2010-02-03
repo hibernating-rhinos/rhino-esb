@@ -28,7 +28,7 @@ namespace Rhino.ServiceBus.MessageModules
             this.logQueue = logQueue;
         }
 
-        public void Init(ITransport transport)
+		public void Init(ITransport transport, IServiceBus bus)
         {
         	var endpoint = endpointRouter.GetRoutedEndpoint(logQueue);
         	var queueInfo = MsmqUtil.GetQueuePath(endpoint);
@@ -42,7 +42,7 @@ namespace Rhino.ServiceBus.MessageModules
             transport.MessageSent+=Transport_OnMessageSent;
         }
 
-        public void Stop(ITransport transport)
+		public void Stop(ITransport transport, IServiceBus bus)
         {
             transport.MessageArrived -= Transport_OnMessageArrived;
             transport.MessageProcessingFailure -= Transport_OnMessageProcessingFailure;

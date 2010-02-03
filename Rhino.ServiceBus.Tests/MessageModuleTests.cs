@@ -137,7 +137,7 @@ namespace Rhino.ServiceBus.Tests
             public static ManualResetEvent CompletionResetEvent;
             public static bool Completion = true;
 
-            public void Init(ITransport transport)
+			public void Init(ITransport transport, IServiceBus bus)
             {
                 transport.MessageProcessingFailure+=Transport_OnMessageProcessingFailure;
                 transport.MessageProcessingCompleted+=Transport_OnMessageProcessingCompleted;
@@ -155,7 +155,7 @@ namespace Rhino.ServiceBus.Tests
                 ErrorResetEvent.Set();
             }
 
-            public void Stop(ITransport transport)
+			public void Stop(ITransport transport, IServiceBus bus)
             {
             }
         }
@@ -164,12 +164,12 @@ namespace Rhino.ServiceBus.Tests
         {
             public static bool Started, Stopped;
 
-            public void Init(ITransport transport)
+			public void Init(ITransport transport, IServiceBus bus)
             {
                 Started = true;
             }
 
-            public void Stop(ITransport transport)
+			public void Stop(ITransport transport, IServiceBus bus)
             {
                 Stopped = true;
             }
