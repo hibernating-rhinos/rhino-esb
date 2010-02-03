@@ -96,9 +96,24 @@ namespace Rhino.ServiceBus.Impl
             Send(messageOwners.GetEndpointForMessageBatch(messages), messages);
         }
 
-        
+		public void ConsumeMessages(params object[] messages)
+		{
+			foreach (var message in messages)
+			{
+				var currentMessageInfo = new CurrentMessageInformation
+				{
+					AllMessages = messages,
+					Message = message,
+					MessageId = Guid.NewGuid(),
+					Destination = transport.Endpoint.Uri,
+					Source = transport.Endpoint.Uri,
+					TransportMessageId = "ConsumeMessages"
+				};
+				Transport_OnMessageArrived(currentMessageInfo);
+			}
+		}
 
-        public IDisposable AddInstanceSubscription(IMessageConsumer consumer)
+		public IDisposable AddInstanceSubscription(IMessageConsumer consumer)
         {
             var information = new InstanceSubscriptionInformation
             {
@@ -135,12 +150,12 @@ namespace Rhino.ServiceBus.Impl
 
             foreach (IMessageModule module in modules)
             {
-                module.Stop(transport);
+                module.Stop(transport, this);
             }
 
             var subscriptionAsModule = subscriptionStorage as IMessageModule;
             if (subscriptionAsModule != null)
-                subscriptionAsModule.Stop(transport);
+                subscriptionAsModule.Stop(transport, this);
         	FireServiceBusAware(aware => aware.BusDisposed(this));
         }
 
@@ -153,12 +168,12 @@ namespace Rhino.ServiceBus.Impl
             if (subscriptionAsModule != null)
             {
                 logger.DebugFormat("Initating subscription storage as message module: {0}", subscriptionAsModule);
-                subscriptionAsModule.Init(transport);
+                subscriptionAsModule.Init(transport, this);
             }
             foreach (var module in modules)
             {
                 logger.DebugFormat("Initating message module: {0}", module);
-                module.Init(transport);
+                module.Init(transport, this);
             }
             transport.MessageArrived += Transport_OnMessageArrived;
 

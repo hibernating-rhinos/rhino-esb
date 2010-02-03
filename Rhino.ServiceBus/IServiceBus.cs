@@ -49,6 +49,14 @@ namespace Rhino.ServiceBus
         /// </summary>
         void Send(params object[] messages);
 
+		/// <summary>
+		/// Invoke consumers for the relevant messages managed by the current
+		/// service bus instance. This happens immediately and on the current thread.
+		/// Error actions will not be executed and the message consumers will not be retried
+		/// if an error happens.
+		/// </summary>
+    	void ConsumeMessages(params object[] messages);
+
         /// <summary>
         /// Get the endpoint of the bus
         /// </summary>
