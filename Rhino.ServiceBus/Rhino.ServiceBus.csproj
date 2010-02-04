@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -65,6 +65,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -220,6 +221,7 @@
     <Compile Include="RhinoQueues\RhinoQueuesTransport.cs" />
     <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
+    <Compile Include="Util\CurrentMessage.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />
   </ItemGroup>

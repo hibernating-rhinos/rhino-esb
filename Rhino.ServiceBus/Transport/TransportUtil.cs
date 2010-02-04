@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Transport
 {
@@ -21,6 +22,7 @@ namespace Rhino.ServiceBus.Transport
                 return false;
             foreach (Func<CurrentMessageInformation, bool> func in messageRecieved.GetInvocationList())
             {
+				using(CurrentMessage.Track(currentMessageInformation))
                 if (func(currentMessageInformation))
                 {
                     return true;

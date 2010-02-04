@@ -254,7 +254,8 @@ namespace Rhino.ServiceBus.Msmq
 						{
 							currentMessageInformation = CreateMessageInformation(messageQueue, message, messages, msg);
 
-							if (TransportUtil.ProcessSingleMessage(currentMessageInformation, messageRecieved) == false) Discard(currentMessageInformation.Message);
+							if (TransportUtil.ProcessSingleMessage(currentMessageInformation, messageRecieved) == false) 
+								Discard(currentMessageInformation.Message);
 						}
 					}
 					catch (Exception e)
@@ -329,7 +330,6 @@ namespace Rhino.ServiceBus.Msmq
                     queue.ConsumeMessage(message.Id);
                 }
             }
-
             ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted);
         }
 	}
