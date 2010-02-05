@@ -36,6 +36,8 @@ namespace Rhino.ServiceBus.RhinoQueues
         private readonly string subscriptionPath;
         private readonly Hashtable<string, HashSet<Uri>> subscriptions = new Hashtable<string, HashSet<Uri>>();
 
+    	private bool currentlyLoadingPersistentData;
+
         public PhtSubscriptionStorage(
             string subscriptionPath, 
             IMessageSerializer messageSerializer,
@@ -98,6 +100,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 
                     try
                     {
+                    	currentlyLoadingPersistentData = true;
                         foreach (var msg in msgs)
                         {
                             HandleAdministrativeMessage(new CurrentMessageInformation
@@ -110,6 +113,10 @@ namespace Rhino.ServiceBus.RhinoQueues
                     catch (Exception e)
                     {
                         throw new SubscriptionException("Failed to process subscription records", e);
+                    }
+					finally
+                    {
+                    	currentlyLoadingPersistentData = false;
                     }
                 }
                 actions.Commit();
@@ -379,7 +386,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             var newSubscription = AddSubscription(addSubscription.Type, addSubscription.Endpoint.Uri.ToString());
 
 
-            if (newSubscription)
+			if (newSubscription && currentlyLoadingPersistentData == false)
             {
                 var itemId = 0;
                 pht.Batch(actions =>
