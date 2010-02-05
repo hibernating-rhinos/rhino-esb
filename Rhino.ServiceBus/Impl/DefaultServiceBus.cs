@@ -179,8 +179,8 @@ namespace Rhino.ServiceBus.Impl
 
             transport.AdministrativeMessageArrived += Transport_OnAdministrativeMessageArrived;
 
-            transport.Start();
             subscriptionStorage.Initialize();
+			transport.Start();
 
             AutomaticallySubscribeConsumerMessages();
 
