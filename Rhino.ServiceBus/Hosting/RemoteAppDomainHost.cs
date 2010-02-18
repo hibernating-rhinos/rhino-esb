@@ -40,6 +40,8 @@ namespace Rhino.ServiceBus.Hosting
             assemblyLocation = Path.GetDirectoryName(assemblyPath);
         }
 
+		public IApplicationHost ApplicationHost { get { return current.ApplicationHost; } }
+
         public void Start()
         {
             HostedService service = CreateNewAppDomain();
@@ -112,6 +114,8 @@ namespace Rhino.ServiceBus.Hosting
             private readonly AppDomain appDomain;
         	private readonly ILog log = LogManager.GetLogger(typeof (HostedService));
 
+			public IApplicationHost ApplicationHost { get { return hoster; } }
+			
             public HostedService(IApplicationHost hoster, string assembly, AppDomain appDomain)
             {
                 this.hoster = hoster;
