@@ -33,35 +33,61 @@ namespace Rhino.ServiceBus.Transport
 		public void HandleMessageCompletion()
 		{
 			var txDisposed = false;
-			if (exception == null)
+
+			try
 			{
-				try
-				{
-					if (tx != null)
-					{
-						if (beforeTransactionCommit != null)
-							beforeTransactionCommit(currentMessageInformation);
-						tx.Complete();
-						tx.Dispose();
-						txDisposed = true;
-					}
-					try
-					{
-						if (messageCompleted != null)
-							messageCompleted(currentMessageInformation, exception);
-					}
-					catch (Exception e)
-					{
-						logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
-					}
+				if (SuccessfulCompletion(out txDisposed))
 					return;
-				}
-				catch (Exception e)
-				{
-					logger.Warn("Failed to complete transaction, moving to error mode", e);
-					exception = e;
-				}
 			}
+			finally
+			{
+				DisposeTransactionIfNotAlreadyDisposed(txDisposed);				
+			}
+
+			//error
+
+			NotifyMessageCompleted();
+
+			NotifyAboutMessageProcessingFailure();
+
+			SendMessageBackToQueue();
+		}
+
+		private void SendMessageBackToQueue()
+		{
+			if (sendMessageBackToQueue != null)
+				sendMessageBackToQueue();
+		}
+
+		private void NotifyMessageCompleted()
+		{
+			try
+			{
+				if (messageCompleted != null)
+					messageCompleted(currentMessageInformation, exception);
+			}
+			catch (Exception e)
+			{
+				logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+			}
+		}
+
+		private void NotifyAboutMessageProcessingFailure()
+		{
+			try
+			{
+				if (messageProcessingFailure != null)
+					messageProcessingFailure(currentMessageInformation, exception);
+			}
+			catch (Exception moduleException)
+			{
+				logger.Error("Module failed to process message failure: " + exception.Message,
+				             moduleException);
+			}
+		}
+
+		private void DisposeTransactionIfNotAlreadyDisposed(bool txDisposed)
+		{
 			try
 			{
 				if (txDisposed == false && tx != null)
@@ -74,31 +100,32 @@ namespace Rhino.ServiceBus.Transport
 			{
 				logger.Warn("Failed to dispose of transaction in error mode.", e);
 			}
+		}
 
+		private bool SuccessfulCompletion(out bool txDisposed)
+		{
+			txDisposed = false;
+			if (exception != null)
+				return false;
 			try
 			{
-				if (messageCompleted != null)
-					messageCompleted(currentMessageInformation, exception);
+				if (tx != null)
+				{
+					if (beforeTransactionCommit != null)
+						beforeTransactionCommit(currentMessageInformation);
+					tx.Complete();
+					tx.Dispose();
+					txDisposed = true;
+				}
+				NotifyMessageCompleted();
+				return true;
 			}
 			catch (Exception e)
 			{
-				logger.Error("An error occured when raising the MessageCompleted event, the error will NOT affect the message processing", e);
+				logger.Warn("Failed to complete transaction, moving to error mode", e);
+				exception = e;
 			}
-
-			try
-			{
-				if (messageProcessingFailure != null)
-					messageProcessingFailure(currentMessageInformation, exception);
-			}
-			catch (Exception moduleException)
-			{
-				logger.Error("Module failed to process message failure: " + exception.Message,
-				             moduleException);
-			}
-
-			if (sendMessageBackToQueue != null)
-				sendMessageBackToQueue();
+			return false;
 		}
-
 	}
 }
