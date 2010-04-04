@@ -172,13 +172,14 @@ namespace Rhino.ServiceBus.Msmq
             return Endpoint.InitalizeQueue();
         }
 
-        private void HandleMessageCompletion(
+        private static void HandleMessageCompletion(
 			Message message,
 			TransactionScope tx,
             OpenedQueue messageQueue,
 			Exception exception,
 			Action<CurrentMessageInformation, Exception> messageCompleted,
-			Action<CurrentMessageInformation> beforeTransactionCommit)
+			Action<CurrentMessageInformation> beforeTransactionCommit,
+			ILog logger, Action<CurrentMessageInformation, Exception> messageProcessingFailure)
 		{
         	var txDisposed = false;
 			if (exception == null)
@@ -238,9 +239,8 @@ namespace Rhino.ServiceBus.Msmq
 			
 			try
             {
-                var copy = MessageProcessingFailure;
-                if (copy != null)
-                    copy(currentMessageInformation, exception);
+            	if (messageProcessingFailure != null)
+                    messageProcessingFailure(currentMessageInformation, exception);
             }
             catch (Exception moduleException)
             {
@@ -291,7 +291,7 @@ namespace Rhino.ServiceBus.Msmq
 			}
 			finally
 			{
-				HandleMessageCompletion(message, tx, messageQueue, ex, messageCompleted, beforeMessageTransactionCommit);
+				HandleMessageCompletion(message, tx, messageQueue, ex, messageCompleted, beforeMessageTransactionCommit, logger, MessageProcessingFailure);
 				currentMessageInformation = null;
 			}
 
