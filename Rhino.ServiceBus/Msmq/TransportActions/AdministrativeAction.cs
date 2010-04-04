@@ -31,8 +31,9 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
             transport.ReceiveMessageInTransaction(
                 queue, message.Id,
-                messageRecieved,
-                transport.RaiseAdministrativeMessageProcessingCompleted);
+				messageRecieved, 
+				transport.RaiseAdministrativeMessageProcessingCompleted,
+				null);
 
             return true;
         }

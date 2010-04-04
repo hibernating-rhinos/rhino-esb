@@ -232,7 +232,8 @@ namespace Rhino.ServiceBus.RhinoQueues
 							case MessageType.AdministrativeMessageMarker:
 								ProcessMessage(message, tx,
 									   AdministrativeMessageArrived,
-									   AdministrativeMessageProcessingCompleted);
+									   AdministrativeMessageProcessingCompleted,
+									   null);
 								break;
 							case MessageType.ShutDownMessageMarker:
 								//ignoring this one
@@ -250,13 +251,15 @@ namespace Rhino.ServiceBus.RhinoQueues
 								{
 									ProcessMessage(message, tx,
 												   MessageArrived,
-												   MessageProcessingCompleted);
+												   MessageProcessingCompleted,
+												   null);
 								}
 								break;
 							default:
 								ProcessMessage(message, tx,
 									   MessageArrived,
-									   MessageProcessingCompleted);
+									   MessageProcessingCompleted,
+									   BeforeMessageTransactionCommit);
 								break;
 						}
 					}
@@ -273,7 +276,8 @@ namespace Rhino.ServiceBus.RhinoQueues
 			Message message,
 			TransactionScope tx,
 			Func<CurrentMessageInformation, bool> messageRecieved,
-			Action<CurrentMessageInformation, Exception> messageCompleted)
+			Action<CurrentMessageInformation, Exception> messageCompleted,
+			Action<CurrentMessageInformation> beforeTransactionCommit)
 		{
 			Exception ex = null;
 			try
@@ -315,25 +319,25 @@ namespace Rhino.ServiceBus.RhinoQueues
 			}
 			finally
 			{
-				HandleMessageCompletion(message, tx, ex, messageCompleted);
+				HandleMessageCompletion(message, tx, ex, messageCompleted, beforeTransactionCommit);
 				currentMessageInformation = null;
 			}
 		}
 
-		private void HandleMessageCompletion(
-			Message message,
-			TransactionScope tx,
-			Exception exception,
-			Action<CurrentMessageInformation, Exception> messageCompleted)
+		private void HandleMessageCompletion(Message message, TransactionScope tx, Exception exception, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit)
 		{
+			var txDisposed = false;
 			if (exception == null)
 			{
 				try
 				{
 					if (tx != null)
 					{
+						if(beforeTransactionCommit!=null)
+							beforeTransactionCommit(currentMessageInformation);
 						tx.Complete();
 						tx.Dispose();
+						txDisposed = true;
 					}
 					try
 					{
@@ -351,6 +355,18 @@ namespace Rhino.ServiceBus.RhinoQueues
 					logger.Warn("Failed to complete transaction, moving to error mode", e);
 					exception = e;
 				}
+			}
+			try
+			{
+				if (txDisposed == false && tx != null)
+				{
+					logger.Warn("Disposing transaction in error mode");
+					tx.Dispose();
+				}
+			}
+			catch (Exception e)
+			{
+				logger.Warn("Failed to dispose of transaction in error mode.", e);
 			}
 			if (message == null)
 				return;
@@ -517,6 +533,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 		public event Action<CurrentMessageInformation, Exception> MessageSerializationException;
 		public event Action<CurrentMessageInformation, Exception> MessageProcessingFailure;
 		public event Action<CurrentMessageInformation, Exception> MessageProcessingCompleted;
+		public event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
 		public event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
 		public event Action Started;
 	}

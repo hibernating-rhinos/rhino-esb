@@ -66,8 +66,10 @@ namespace Rhino.ServiceBus.Msmq
         public event Action<CurrentMessageInformation, Exception> MessageProcessingFailure;
         
         public event Action<CurrentMessageInformation, Exception> MessageProcessingCompleted;
-        
-        public event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
+
+    	public event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
+
+    	public event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
 
 		public void Discard(object msg)
 		{
@@ -131,7 +133,7 @@ namespace Rhino.ServiceBus.Msmq
 
 		#endregion
 
-        public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted)
+        public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted, Action<CurrentMessageInformation> beforeMessageTransactionCommit)
 		{
         	var transactionOptions = new TransactionOptions
         	{
@@ -145,7 +147,7 @@ namespace Rhino.ServiceBus.Msmq
                 if (message == null)
                     return;// someone else got our message, better luck next time
 
-                ProcessMessage(message, queue, tx, messageArrived, messageProcessingCompleted);
+                ProcessMessage(message, queue, tx, messageArrived, beforeMessageTransactionCommit, messageProcessingCompleted);
 			}
 		}
 
@@ -175,16 +177,21 @@ namespace Rhino.ServiceBus.Msmq
 			TransactionScope tx,
             OpenedQueue messageQueue,
 			Exception exception,
-			Action<CurrentMessageInformation, Exception> messageCompleted)
+			Action<CurrentMessageInformation, Exception> messageCompleted,
+			Action<CurrentMessageInformation> beforeTransactionCommit)
 		{
+        	var txDisposed = false;
 			if (exception == null)
 			{
 				try
 				{
 					if (tx != null)
 					{
+						if (beforeTransactionCommit!=null)
+							beforeTransactionCommit(currentMessageInformation);
 						tx.Complete();
 						tx.Dispose();
+						txDisposed = true;
 					}
 					try
 					{
@@ -203,6 +210,18 @@ namespace Rhino.ServiceBus.Msmq
 					exception = e;
 				}
 			}
+        	try
+        	{
+        		if (txDisposed == false && tx != null)
+        		{
+					logger.Warn("Disposing transaction in error mode");
+        			tx.Dispose();
+        		}
+        	}
+        	catch (Exception e)
+        	{
+        		logger.Warn("Failed to dispose of transaction in error mode.", e);
+        	}
 			if (message == null)
 				return;
 
@@ -240,41 +259,42 @@ namespace Rhino.ServiceBus.Msmq
             OpenedQueue messageQueue, 
             TransactionScope tx,
             Func<CurrentMessageInformation, bool> messageRecieved,
+			Action<CurrentMessageInformation> beforeMessageTransactionCommit,
             Action<CurrentMessageInformation, Exception> messageCompleted)
 		{
-			Exception ex = null;
-				currentMessageInformation = CreateMessageInformation(messageQueue, message, null, null);
+        	Exception ex = null;
+        	currentMessageInformation = CreateMessageInformation(messageQueue, message, null, null);
+			try
+			{
+				//deserialization errors do not count for module events
+				object[] messages = DeserializeMessages(messageQueue, message, MessageSerializationException);
 				try
 				{
-					//deserialization errors do not count for module events
-					object[] messages = DeserializeMessages(messageQueue, message, MessageSerializationException);
-					try
+					foreach (object msg in messages)
 					{
-						foreach (object msg in messages)
-						{
-							currentMessageInformation = CreateMessageInformation(messageQueue, message, messages, msg);
+						currentMessageInformation = CreateMessageInformation(messageQueue, message, messages, msg);
 
-							if (TransportUtil.ProcessSingleMessage(currentMessageInformation, messageRecieved) == false) 
-								Discard(currentMessageInformation.Message);
-						}
-					}
-					catch (Exception e)
-					{
-						ex = e;
-						logger.Error("Failed to process message", e);
+						if (TransportUtil.ProcessSingleMessage(currentMessageInformation, messageRecieved) == false)
+							Discard(currentMessageInformation.Message);
 					}
 				}
 				catch (Exception e)
 				{
 					ex = e;
-					logger.Error("Failed to deserialize message", e);
+					logger.Error("Failed to process message", e);
 				}
-				finally
-				{
-					HandleMessageCompletion(message, tx, messageQueue, ex, messageCompleted);
-					currentMessageInformation = null;
-				}
-		
+			}
+			catch (Exception e)
+			{
+				ex = e;
+				logger.Error("Failed to deserialize message", e);
+			}
+			finally
+			{
+				HandleMessageCompletion(message, tx, messageQueue, ex, messageCompleted, beforeMessageTransactionCommit);
+				currentMessageInformation = null;
+			}
+
 		}
 
 	    private MsmqCurrentMessageInformation CreateMessageInformation(OpenedQueue queue,Message message, object[] messages, object msg)
@@ -330,7 +350,7 @@ namespace Rhino.ServiceBus.Msmq
                     queue.ConsumeMessage(message.Id);
                 }
             }
-            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted);
+            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted, BeforeMessageTransactionCommit);
         }
 	}
 }
