@@ -215,6 +215,7 @@
     <Compile Include="Msmq\EndpointExtensions.cs" />
     <Compile Include="Msmq\IMessageBuilder.cs" />
     <Compile Include="Msmq\MessageBuilder.cs" />
+    <Compile Include="Transport\MessageHandlingCompletion.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
