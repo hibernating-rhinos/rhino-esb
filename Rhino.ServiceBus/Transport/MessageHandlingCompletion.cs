@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Messaging;
 using System.Transactions;
 using log4net;
 using Rhino.ServiceBus.Impl;
 
-namespace Rhino.ServiceBus.Msmq
+namespace Rhino.ServiceBus.Transport
 {
 	public class MessageHandlingCompletion
 	{
-		private readonly Message message;
 		private readonly TransactionScope tx;
-		private readonly OpenedQueue messageQueue;
+		private readonly Action sendMessageBackToQueue;
 		private readonly Action<CurrentMessageInformation, Exception> messageCompleted;
 		private readonly Action<CurrentMessageInformation> beforeTransactionCommit;
 		private readonly ILog logger;
@@ -19,11 +17,10 @@ namespace Rhino.ServiceBus.Msmq
 
 		private Exception exception;
 
-		public MessageHandlingCompletion(Message message, TransactionScope tx, OpenedQueue messageQueue, Exception exception, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit, ILog logger, Action<CurrentMessageInformation, Exception> messageProcessingFailure, CurrentMessageInformation currentMessageInformation)
+		public MessageHandlingCompletion(TransactionScope tx, Action sendMessageBackToQueue, Exception exception, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit, ILog logger, Action<CurrentMessageInformation, Exception> messageProcessingFailure, CurrentMessageInformation currentMessageInformation)
 		{
-			this.message = message;
 			this.tx = tx;
-			this.messageQueue = messageQueue;
+			this.sendMessageBackToQueue = sendMessageBackToQueue;
 			this.exception = exception;
 			this.messageCompleted = messageCompleted;
 			this.beforeTransactionCommit = beforeTransactionCommit;
@@ -77,9 +74,6 @@ namespace Rhino.ServiceBus.Msmq
 			{
 				logger.Warn("Failed to dispose of transaction in error mode.", e);
 			}
-			if (message == null)
-				return;
-
 
 			try
 			{
@@ -102,10 +96,8 @@ namespace Rhino.ServiceBus.Msmq
 				             moduleException);
 			}
 
-			if (messageQueue.IsTransactional == false)// put the item back in the queue
-			{
-				messageQueue.Send(message);
-			}
+			if (sendMessageBackToQueue != null)
+				sendMessageBackToQueue();
 		}
 
 	}

@@ -209,7 +209,10 @@ namespace Rhino.ServiceBus.Msmq
 			}
 			finally
 			{
-				var messageHandlingCompletion = new MessageHandlingCompletion(message, tx, messageQueue, ex, messageCompleted, beforeMessageTransactionCommit, logger, MessageProcessingFailure, currentMessageInformation);
+				Action sendMessageBackToQueue = null;
+				if (message != null && messageQueue.IsTransactional == false)
+					sendMessageBackToQueue = () => messageQueue.Send(message);
+				var messageHandlingCompletion = new MessageHandlingCompletion(tx, sendMessageBackToQueue, ex, messageCompleted, beforeMessageTransactionCommit, logger, MessageProcessingFailure, currentMessageInformation);
 				messageHandlingCompletion.HandleMessageCompletion();
 				currentMessageInformation = null;
 			}
