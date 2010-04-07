@@ -29,10 +29,10 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Attribute 'loadBalancerEndpoint' on 'bus' has an invalid value '" + loadBalancerEndpointAsString + "'");
             }
-
+            var endpoint = new Endpoint {Uri = loadBalancerEndpoint};
             facility.Kernel.Register(
                 Component.For<LoadBalancerMessageModule>()
-                    .DependsOn(new { loadBalancerEndpoint })
+                    .DependsOn(new { loadBalancerEndpoint = endpoint.Uri })
                 );
 
             facility.AddMessageModule<LoadBalancerMessageModule>();

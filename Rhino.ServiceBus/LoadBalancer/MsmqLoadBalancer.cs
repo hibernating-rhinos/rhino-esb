@@ -160,6 +160,19 @@ namespace Rhino.ServiceBus.LoadBalancer
 		{
 			if (secondaryLoadBalancer != null)
 			{
+				foreach (var queueUri in KnownEndpoints.GetValues())
+				{
+					logger.InfoFormat("Notifying {0} that primary load balancer {1} is taking over from secondary",
+						queueUri,
+						Endpoint.Uri
+						);
+					SendToQueue(queueUri, new Reroute
+					{
+						NewEndPoint = Endpoint.Uri,
+						OriginalEndPoint = Endpoint.Uri
+					});
+				}
+
 				SendHeartBeatToSecondaryServer(null);
 				heartBeatTimer.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 

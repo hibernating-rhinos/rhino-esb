@@ -53,6 +53,41 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             }
         }
 
+        [Fact]
+        public void when_start_load_balancer_that_has_secondary_will_send_reroute_to_endpoints_to_relieve_secondary()
+        {
+            using (var loadBalancer = container.Resolve<MsmqLoadBalancer>())
+            {
+                loadBalancer.KnownEndpoints.Add(TestQueueUri.Uri);
+                loadBalancer.Start();
+
+                var message = queue.Receive(TimeSpan.FromSeconds(5));
+                var serializer = container.Resolve<IMessageSerializer>();
+                var reroute = serializer.Deserialize(message.BodyStream)
+                    .OfType<Reroute>().First();
+
+                Assert.Equal(loadBalancer.Endpoint.Uri, reroute.NewEndPoint);
+                Assert.Equal(loadBalancer.Endpoint.Uri, reroute.OriginalEndPoint);
+            }
+        }
+
+        [Fact]
+        public void when_start_load_balancer_that_has_secondary_will_send_reroute_to_workers_to_relieve_secondary()
+        {
+            using (var loadBalancer = container.Resolve<MsmqLoadBalancer>())
+            {
+                loadBalancer.KnownWorkers.Add(TestQueueUri.Uri);
+                loadBalancer.Start();
+
+                var message = queue.Receive(TimeSpan.FromSeconds(5));
+                var serializer = container.Resolve<IMessageSerializer>();
+                var reroute = serializer.Deserialize(message.BodyStream)
+                    .OfType<Reroute>().First();
+
+                Assert.Equal(loadBalancer.Endpoint.Uri, reroute.NewEndPoint);
+                Assert.Equal(loadBalancer.Endpoint.Uri, reroute.OriginalEndPoint);
+            }
+        }
 
         [Fact]
         public void When_Primary_loadBalacer_recieve_workers_it_sends_them_to_secondary_loadBalancer()

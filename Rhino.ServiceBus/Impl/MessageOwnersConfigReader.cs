@@ -51,11 +51,11 @@ namespace Rhino.ServiceBus.Impl
                         throw new ConfigurationErrorsException("Invalid transactional settings: " + transactionalString);
                     transactional = temp;
                 }
-
+                var endpoint = new Endpoint {Uri = ownerEndpoint};
                 messageOwners.Add(new MessageOwner
                                       {
                                           Name = msgName,
-                                          Endpoint = ownerEndpoint,
+                                          Endpoint = endpoint.Uri,
                                           Transactional = transactional
                                       });
             }

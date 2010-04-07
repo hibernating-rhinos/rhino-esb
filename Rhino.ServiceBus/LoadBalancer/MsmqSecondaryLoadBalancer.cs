@@ -67,6 +67,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 
             foreach (var queueUri in KnownEndpoints.GetValues())
             {
+                if (queueUri == primaryLoadBalancer) continue;
                 logger.InfoFormat("Notifying {0} that secondary load balancer {1} is taking over from {2}",
                     queueUri, 
                     Endpoint.Uri,
