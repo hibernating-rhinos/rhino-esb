@@ -5,7 +5,8 @@ using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
-    internal class RhinoQueueCurrentMessageInformation : CurrentMessageInformation
+    [CLSCompliant(false)]
+    public class RhinoQueueCurrentMessageInformation : CurrentMessageInformation
     {
         public Uri ListenUri { get; set; }
         public IQueue Queue { get; set; }
