@@ -23,12 +23,13 @@ namespace Rhino.ServiceBus.Impl
         protected readonly List<Type> messageModules = new List<Type>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
         protected IsolationLevel queueIsolationLevel = IsolationLevel.Serializable;
+        public bool consumeInTransaction = true;
 
         protected AbstractRhinoServiceBusFacility()
         {
             ThreadCount = 1;
             NumberOfRetries = 5;
-			Transactional = TransactionalOptions.FigureItOut;
+            Transactional = TransactionalOptions.FigureItOut;
         }
 
         public Uri Endpoint { get; set; }
@@ -46,6 +47,11 @@ namespace Rhino.ServiceBus.Impl
         public IsolationLevel IsolationLevel
         {
             get { return queueIsolationLevel; }
+        }
+
+        public bool ConsumeInTransaction
+        {
+            get { return consumeInTransaction; }
         }
 
         public AbstractRhinoServiceBusFacility AddMessageModule<TModule>()

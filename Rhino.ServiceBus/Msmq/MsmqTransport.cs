@@ -30,13 +30,15 @@ namespace Rhino.ServiceBus.Msmq
 
         private readonly ILog logger = LogManager.GetLogger(typeof(MsmqTransport));
         private readonly IMsmqTransportAction[] transportActions;
-    	private readonly IsolationLevel queueIsolationLevel;
+        private readonly IsolationLevel queueIsolationLevel;
+        private readonly bool consumeInTransaction;
 
-		public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel, TransactionalOptions transactional)
+        public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel, TransactionalOptions transactional, bool consumeInTransaction)
 			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional)
         {
-        	this.transportActions = transportActions;
-        	this.queueIsolationLevel = queueIsolationLevel;
+            this.transportActions = transportActions;
+            this.queueIsolationLevel = queueIsolationLevel;
+            this.consumeInTransaction = consumeInTransaction;
         }
 
     	#region ITransport Members
@@ -150,6 +152,16 @@ namespace Rhino.ServiceBus.Msmq
                 ProcessMessage(message, queue, tx, messageArrived, beforeMessageTransactionCommit, messageProcessingCompleted);
 			}
 		}
+
+        private void ReceiveMessage(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted)
+        {
+            var message = queue.TryGetMessageFromQueue(messageId);
+
+            if (message == null)
+                return;
+
+            ProcessMessage(message, queue, null, messageArrived, null, messageProcessingCompleted);
+        }
 
         public void RaiseMessageSerializationException(OpenedQueue queue, Message msg, string errorMessage)
         {
@@ -272,7 +284,11 @@ namespace Rhino.ServiceBus.Msmq
                     queue.ConsumeMessage(message.Id);
                 }
             }
-            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted, BeforeMessageTransactionCommit);
+
+            if (consumeInTransaction)
+	            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted, BeforeMessageTransactionCommit);
+            else
+	            ReceiveMessage(queue, message.Id, MessageArrived, MessageProcessingCompleted);
         }
-	}
+    }
 }

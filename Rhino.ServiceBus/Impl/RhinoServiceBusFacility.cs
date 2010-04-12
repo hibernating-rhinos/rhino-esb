@@ -68,7 +68,11 @@ namespace Rhino.ServiceBus.Impl
         	string isolationLevel = busConfig.Attributes["queueIsolationLevel"];
 			if (!string.IsNullOrEmpty(isolationLevel))
 				queueIsolationLevel = (IsolationLevel)Enum.Parse(typeof(IsolationLevel), isolationLevel);
-			
+
+            string inTransaction = busConfig.Attributes["consumeInTransaction"];
+            bool boolResult;
+            if (bool.TryParse(inTransaction, out boolResult))
+                consumeInTransaction = boolResult;
 
             string uriString = busConfig.Attributes["endpoint"];
             Uri endpoint;
