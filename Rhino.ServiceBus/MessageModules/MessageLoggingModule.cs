@@ -70,7 +70,8 @@ namespace Rhino.ServiceBus.MessageModules
         {
             var msg = new Message
             {
-            	Label = obj.ToString()
+            	Label = obj.ToString(),
+            	Extension = Guid.NewGuid().ToByteArray()
             };
             messageSerializer.Serialize(new[] { obj }, msg.BodyStream);
             queue.Send(msg);
