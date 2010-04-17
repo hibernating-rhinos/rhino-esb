@@ -335,9 +335,11 @@ namespace Rhino.ServiceBus.LoadBalancer
 		{
 			foreach (var msg in DeserializeMessages(queue, message, null))
 			{
+
 				var query = msg as QueryForAllKnownWorkersAndEndpoints;
 				if (query != null)
 				{
+                    
 					SendKnownWorkersAndKnownEndpoints(message.ResponseQueue);
 					continue;
 				}
@@ -367,6 +369,10 @@ namespace Rhino.ServiceBus.LoadBalancer
 				var endpoints = KnownEndpoints.GetValues();
 				var workers = KnownWorkers.GetValues();
 
+				var transactionType = MessageQueueTransactionType.None;
+				if (Endpoint.Transactional.GetValueOrDefault())
+					transactionType = Transaction.Current == null ? MessageQueueTransactionType.Single : MessageQueueTransactionType.Automatic;
+				
 				var index = 0;
 				while (index < endpoints.Length)
 				{
@@ -376,8 +382,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 						.Select(x => new NewEndpointPersisted { PersistedEndpoint = x })
 						.ToArray();
 					index += endpointsBatch.Length;
-
-					responseQueue.Send(GenerateMsmqMessageFromMessageBatch(endpointsBatch));
+					responseQueue.Send(GenerateMsmqMessageFromMessageBatch(endpointsBatch), transactionType);
 				}
 
 				index = 0;
@@ -389,8 +394,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 						.Select(x => new NewWorkerPersisted { Endpoint = x })
 						.ToArray();
 					index += workersBatch.Length;
-
-					responseQueue.Send(GenerateMsmqMessageFromMessageBatch(workersBatch));
+					responseQueue.Send(GenerateMsmqMessageFromMessageBatch(workersBatch), transactionType);
 				}
 			}
 			catch (Exception e)
