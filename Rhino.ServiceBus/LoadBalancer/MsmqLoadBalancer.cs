@@ -19,12 +19,11 @@ namespace Rhino.ServiceBus.LoadBalancer
 		private readonly Uri secondaryLoadBalancer;
 		private readonly IQueueStrategy queueStrategy;
 		private readonly ILog logger = LogManager.GetLogger(typeof(MsmqLoadBalancer));
-
 		private readonly Queue<Uri> readyForWork = new Queue<Uri>();
 		private readonly Set<Uri> knownWorkers = new Set<Uri>();
 		private readonly Timer heartBeatTimer;
 		private readonly Set<Uri> knownEndpoints = new Set<Uri>();
-
+		private MsmqReadyForWorkListener _readyForWorkListener;
 		public event Action<Message> MessageBatchSentToAllWorkers;
 		public event Action SentNewWorkerPersisted;
 		public event Action SentNewEndpointPersisted;
@@ -155,9 +154,15 @@ namespace Rhino.ServiceBus.LoadBalancer
 				tx.Complete();
 			}
 		}
-
+		
 		protected override void AfterStart(OpenedQueue queue)
 		{
+			if (_readyForWorkListener != null)
+			{
+				_readyForWorkListener.ReadyToWorkMessageArrived += readyForWorkMessage => HandleReadyForWork(queue, readyForWorkMessage);
+				_readyForWorkListener.Start();
+			}
+			
 			if (secondaryLoadBalancer != null)
 			{
 				foreach (var queueUri in KnownEndpoints.GetValues())
@@ -175,13 +180,22 @@ namespace Rhino.ServiceBus.LoadBalancer
 
 				SendHeartBeatToSecondaryServer(null);
 				heartBeatTimer.Change(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
-
-				SendToAllWorkers(
-					GenerateMsmqMessageFromMessageBatch(new Reroute
+				Reroute reroute;
+				if (_readyForWorkListener != null)
+					reroute = new Reroute
+					{
+						NewEndPoint = _readyForWorkListener.Endpoint.Uri,
+						OriginalEndPoint = _readyForWorkListener.Endpoint.Uri
+					};
+				else
+					reroute = new Reroute
 					{
 						NewEndPoint = Endpoint.Uri,
 						OriginalEndPoint = Endpoint.Uri
-					}),
+					};
+
+				SendToAllWorkers(
+					GenerateMsmqMessageFromMessageBatch(reroute),
 					"Rerouting {1} back to {0}"
 					);
 			}
@@ -197,7 +211,12 @@ namespace Rhino.ServiceBus.LoadBalancer
 				return true;
 			}
 		}
-
+		public MsmqReadyForWorkListener ReadyForWorkListener
+		{
+			get { return _readyForWorkListener; }
+			set { _readyForWorkListener = value; }
+		}
+		
 		protected void NotifyWorkersThatLoaderIsReadyToAcceptWork()
 		{
 			var acceptingWork = new AcceptingWork { Endpoint = Endpoint.Uri };
@@ -209,9 +228,11 @@ namespace Rhino.ServiceBus.LoadBalancer
 
 		protected override void OnStop()
 		{
+			if(_readyForWorkListener !=null)
+				_readyForWorkListener.Dispose();
 			heartBeatTimer.Dispose();
 		}
-
+		
 		protected override void HandlePeekedMessage(OpenedQueue queue, Message message)
 		{
 			try
@@ -339,24 +360,54 @@ namespace Rhino.ServiceBus.LoadBalancer
 				var query = msg as QueryForAllKnownWorkersAndEndpoints;
 				if (query != null)
 				{
-                    
 					SendKnownWorkersAndKnownEndpoints(message.ResponseQueue);
 					continue;
 				}
-
+				var queryReadyForWorkQueueUri = msg as QueryReadyForWorkQueueUri;
+				if (queryReadyForWorkQueueUri != null)
+				{
+					SendReadyForWorkQueueUri(message.ResponseQueue);
+					continue;
+				}
 				var work = msg as ReadyToWork;
 				if (work != null)
 				{
-					logger.DebugFormat("{0} is ready to work", work.Endpoint);
-					var needToAddToQueue = KnownWorkers.Add(work.Endpoint);
-
-					if (needToAddToQueue)
-						AddWorkerToQueue(queue, work);
-
-					readyForWork.Enqueue(work.Endpoint);
+					HandleReadyForWork(queue, work);
 				}
 
 				HandleLoadBalancerMessages(msg);
+			}
+		}
+
+		
+		private void HandleReadyForWork(OpenedQueue queue, ReadyToWork work)
+		{
+			logger.DebugFormat("{0} is ready to work", work.Endpoint);
+			var needToAddToQueue = KnownWorkers.Add(work.Endpoint);
+
+			if (needToAddToQueue)
+				AddWorkerToQueue(queue, work);
+
+			readyForWork.Enqueue(work.Endpoint);
+		}
+
+		private void SendReadyForWorkQueueUri(MessageQueue responseQueue)
+		{
+			if (responseQueue == null)
+				return;
+			try
+			{
+				var transactionType = MessageQueueTransactionType.None;
+				if (Endpoint.Transactional.GetValueOrDefault())
+					transactionType = Transaction.Current == null ? MessageQueueTransactionType.Single : MessageQueueTransactionType.Automatic;
+				
+				var newEndpoint = ReadyForWorkListener != null ? ReadyForWorkListener.Endpoint.Uri : Endpoint.Uri;
+				var message = new ReadyForWorkQueueUri {Endpoint = newEndpoint};
+				responseQueue.Send(GenerateMsmqMessageFromMessageBatch(message), transactionType);
+			}
+			catch (Exception e)
+			{
+				logger.Error("Failed to send known ready for work queue uri", e);
 			}
 		}
 

@@ -222,7 +222,7 @@ namespace Rhino.ServiceBus.Msmq
 			finally
 			{
 				Action sendMessageBackToQueue = null;
-				if (message != null && messageQueue.IsTransactional == false)
+				if (message != null && (messageQueue.IsTransactional == false|| consumeInTransaction==false))
 					sendMessageBackToQueue = () => messageQueue.Send(message);
 				var messageHandlingCompletion = new MessageHandlingCompletion(tx, sendMessageBackToQueue, ex, messageCompleted, beforeMessageTransactionCommit, logger, MessageProcessingFailure, currentMessageInformation);
 				messageHandlingCompletion.HandleMessageCompletion();

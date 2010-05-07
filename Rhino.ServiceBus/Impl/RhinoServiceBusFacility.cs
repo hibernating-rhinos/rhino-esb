@@ -72,7 +72,7 @@ namespace Rhino.ServiceBus.Impl
             string inTransaction = busConfig.Attributes["consumeInTransaction"];
             bool boolResult;
             if (bool.TryParse(inTransaction, out boolResult))
-                consumeInTransaction = boolResult;
+                consumeInTxn = boolResult;
 
             string uriString = busConfig.Attributes["endpoint"];
             Uri endpoint;

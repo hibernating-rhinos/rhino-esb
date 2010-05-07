@@ -16,6 +16,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         private Type loadBalancerType = typeof(MsmqLoadBalancer);
         private Uri secondaryLoadBalancer;
         private Uri primaryLoadBalancer;
+        private Uri readyForWork;
 
         protected override void RegisterComponents()
         {
@@ -56,6 +57,22 @@ namespace Rhino.ServiceBus.LoadBalancer
                 Component.For<IDeploymentAction>()
                     .ImplementedBy<CreateLoadBalancerQueuesAction>()
                 );
+
+            if (readyForWork != null)
+            {
+                Kernel.Register(Component.For<MsmqReadyForWorkListener>()
+                                    .LifeStyle.Is(LifestyleType.Singleton)
+                                    .DependsOn(new
+                                    {
+                                        endpoint = readyForWork,
+                                        threadCount = ThreadCount,
+                                        transactional = Transactional
+                                    }));
+                Kernel.Register(
+                Component.For<IDeploymentAction>()
+                    .ImplementedBy<CreateReadyForWorkQueuesAction>()
+                );
+            }
         }
 
         protected override void ReadConfiguration()
@@ -77,6 +94,14 @@ namespace Rhino.ServiceBus.LoadBalancer
                     "Attribute 'endpoint' on 'loadBalancer' has an invalid value '" + uriString + "'");
             }
             Endpoint = endpoint;
+
+            string readyForWorkEndPoint = busConfig.Attributes["readyForWorkEndPoint"];
+
+            if (Uri.TryCreate(uriString, UriKind.Absolute, out readyForWork) == false)
+            {
+                throw new ConfigurationErrorsException(
+                "Attribute 'readyForWorkEndPoint' on 'loadBalancer' has an invalid value '" + uriString + "'");
+            }
 
             var secondaryUri = busConfig.Attributes["secondaryLoadBalancerEndpoint"];
             if (secondaryUri != null)//primary with secondary

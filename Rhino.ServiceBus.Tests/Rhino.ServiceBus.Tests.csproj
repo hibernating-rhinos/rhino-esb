@@ -122,6 +122,7 @@
     <Compile Include="LoadBalancer\Full_test_of_load_balancer_and_failover.cs" />
     <Compile Include="LoadBalancer\Full_test_of_load_balancer_and_failover_and_recovery.cs" />
     <Compile Include="LoadBalancer\LoadBalancingTestBase.cs" />
+    <Compile Include="LoadBalancer\With_accepting_work_queue.cs" />
     <Compile Include="LoadBalancer\With_fail_over.cs" />
     <Compile Include="LoadBalancer\With_load_balancing.cs" />
     <Compile Include="LoadBalancer\with_secondary_failover.cs" />
@@ -173,6 +174,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="BusOnTransactionalQueue.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer\BusWithAcceptingWorkLoadBalancer.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="LoadBalancer\ReceivingBusWithLoadBalancer.config">

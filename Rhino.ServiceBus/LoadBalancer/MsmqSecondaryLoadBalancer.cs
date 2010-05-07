@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using log4net;
@@ -18,6 +19,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         private Timeout timeout;
         private Timer checkPrimaryHearteat;
         public TimeSpan TimeoutForHeartBeatFromPrimary { get; set; }
+        private Uri readyForWorkQueueUriFromPrimary;
 
         public Uri PrimaryLoadBalancer
         {
@@ -65,10 +67,10 @@ namespace Rhino.ServiceBus.LoadBalancer
             checkPrimaryHearteat.Dispose();
             checkPrimaryHearteat = null;
 
-            foreach (var queueUri in KnownEndpoints.GetValues())
+            foreach (var queueUri in KnownEndpoints.GetValues().Except(KnownWorkers.GetValues()))
             {
                 if (queueUri == primaryLoadBalancer) continue;
-                logger.InfoFormat("Notifying {0} that secondary load balancer {1} is taking over from {2}",
+                logger.InfoFormat("Notifying endpoints {0} that secondary load balancer {1} is taking over from {2}",
                     queueUri, 
                     Endpoint.Uri,
                     PrimaryLoadBalancer
@@ -79,7 +81,24 @@ namespace Rhino.ServiceBus.LoadBalancer
                     OriginalEndPoint = PrimaryLoadBalancer
                 });
             }
+            var newEndpoint = ReadyForWorkListener != null ? ReadyForWorkListener.Endpoint.Uri : Endpoint.Uri;
+            var originalEndPoint = readyForWorkQueueUriFromPrimary ?? primaryLoadBalancer;
+            foreach (var queueUri in KnownWorkers.GetValues())
+            {
+                logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work on awating listenerQueue",
+                   queueUri,
+                   newEndpoint,
+                   originalEndPoint
+                   );
 
+                SendToQueue(queueUri,
+                    new Reroute
+                    {
+                        NewEndPoint = newEndpoint,
+                        OriginalEndPoint = originalEndPoint
+                    });
+            }
+		
             foreach (var queueUri in KnownWorkers.GetValues())
             {
                 logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work",
@@ -109,6 +128,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         {
             base.AfterStart(queue);
             SendToQueue(primaryLoadBalancer, new QueryForAllKnownWorkersAndEndpoints());
+            SendToQueue(primaryLoadBalancer, new QueryReadyForWorkQueueUri());
             StartTrackingHeartbeats();
         }
 
@@ -149,7 +169,12 @@ namespace Rhino.ServiceBus.LoadBalancer
                     StartTrackingHeartbeats();
                 }
             }
-
+            var readyForWorkQueueUriMessage = msg as ReadyForWorkQueueUri;
+            if (readyForWorkQueueUriMessage != null)
+            {
+                logger.InfoFormat("Got ReadyForWork endpoint from primary : {0}", readyForWorkQueueUriMessage.Endpoint);
+                readyForWorkQueueUriFromPrimary = readyForWorkQueueUriMessage.Endpoint;
+            }
             var newEndpoint = msg as NewEndpointPersisted;
             if(newEndpoint != null)
             {
