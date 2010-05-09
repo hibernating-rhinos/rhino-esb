@@ -23,7 +23,7 @@ namespace Rhino.ServiceBus.Impl
         protected readonly List<Type> messageModules = new List<Type>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
         protected IsolationLevel queueIsolationLevel = IsolationLevel.Serializable;
-        public bool consumeInTransaction = true;
+        public bool consumeInTxn = true;
 
         protected AbstractRhinoServiceBusFacility()
         {
@@ -51,7 +51,7 @@ namespace Rhino.ServiceBus.Impl
 
         public bool ConsumeInTransaction
         {
-            get { return consumeInTransaction; }
+            get { return consumeInTxn; }
         }
 
         public AbstractRhinoServiceBusFacility AddMessageModule<TModule>()
