@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.Impl
             this.configuration = configuration;
             this.messageOwners = messageOwners;
         }
-
+        public string EndpointScheme { get; private set; }
         public void ReadMessageOwners()
         {
             IConfiguration messageConfig = configuration.Children["messages"];
@@ -36,6 +36,10 @@ namespace Rhino.ServiceBus.Impl
                 try
                 {
                     ownerEndpoint = new Uri(uriString);
+                    if(EndpointScheme==null)
+                    {
+                        EndpointScheme = ownerEndpoint.Scheme;
+                    }
                 }
                 catch (Exception e)
                 {

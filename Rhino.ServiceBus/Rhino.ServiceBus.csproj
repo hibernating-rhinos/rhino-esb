@@ -122,6 +122,7 @@
     <Compile Include="Messages\ReadyToWork.cs" />
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
+    <Compile Include="RhinoQueues\RhinoQueuesOneWayBus.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
     <Compile Include="Msmq\TransportState.cs" />
