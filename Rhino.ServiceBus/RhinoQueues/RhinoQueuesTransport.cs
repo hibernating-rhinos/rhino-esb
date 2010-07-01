@@ -128,6 +128,9 @@ namespace Rhino.ServiceBus.RhinoQueues
 
 		public void Start()
 		{
+            if (haveStarted)
+                return;
+
 			shouldContinue = true;
 
 			var port = endpoint.Port;

@@ -1,3 +1,5 @@
+using System;
+
 namespace Rhino.ServiceBus
 {
     public interface IOnewayBus
