@@ -69,6 +69,12 @@ namespace Rhino.ServiceBus.Hosting
         private void InitializeContainer()
         {
             bootStrapper.InitializeContainer(container);
+            if (hostConfiguration != null)
+                container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
+
+            var facility = new RhinoServiceBusFacility();
+            bootStrapper.ConfigureBusFacility(facility);
+            container.Kernel.AddFacility("rhino.esb", facility);
         }
 
         private void CreateContainer()
@@ -81,13 +87,6 @@ namespace Rhino.ServiceBus.Hosting
                         : new WindsorContainer() 
 					: new WindsorContainer(new XmlInterpreter(standaloneCastleConfigurationFileName));
 			}
-
-            if(hostConfiguration != null)
-                container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
-
-        	var facility = new RhinoServiceBusFacility();
-            bootStrapper.ConfigureBusFacility(facility);
-            container.Kernel.AddFacility("rhino.esb", facility);
         }
 
         private void CreateBootStrapper()
