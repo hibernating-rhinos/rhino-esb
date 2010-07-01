@@ -7,7 +7,11 @@ properties {
   $version = "1.8.0.0"
   $tools_dir = "$base_dir\Tools"
   $release_dir = "$base_dir\Release"
-} 
+  $config = "Debug"
+  $target_framework_version = "3.5"
+}
+
+$framework = '4.0'
 
 include .\psake_ext.ps1
 	
@@ -39,15 +43,6 @@ task Init -depends Clean {
     
     Generate-Assembly-Info `
 		-file "$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs" `
-		-title "Rhino DistributedHashTable $version" `
-		-description "Distributed Hash Table for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino DHT $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-	   
-    Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.DistributedHashTableIntegration\Properties\AssemblyInfo.cs" `
 		-title "Rhino Service Bus $version" `
 		-description "Developer friendly service bus for .NET" `
 		-company "Hibernating Rhinos" `
@@ -59,14 +54,19 @@ task Init -depends Clean {
 	new-item $buildartifacts_dir -itemType directory 
 } 
 
-task Compile -depends Init { 
-  exec msbuild "/p:OutDir=""$buildartifacts_dir "" $sln_file"
+task Compile -depends Init {
+  $build_properties = "OutDir=$buildartifacts_dir;Configuration=$config"
+  if($target_framework_version -eq '4.0')
+  {
+    $build_properties = "$build_properties;TargetFrameworkVersion=$target_framework_version"
+  }
+  msbuild $sln_file /p:$build_properties
 } 
 
 task Test -depends Compile {
   $old = pwd
   cd $build_dir
-  exec "$tools_dir\xUnit\xunit.console.exe" "$build_dir\Rhino.ServiceBus.Tests.dll"
+  & $tools_dir\xUnit\xunit.console.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
   cd $old		
 }
 

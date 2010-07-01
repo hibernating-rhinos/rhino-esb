@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Castle.MicroKernel;
+using Castle.MicroKernel.Context;
 using Castle.MicroKernel.Proxy;
 using log4net;
 using Rhino.ServiceBus.Exceptions;

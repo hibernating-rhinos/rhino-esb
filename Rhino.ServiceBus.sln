@@ -1,11 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Starbucks", "Starbucks", "{64DC50EF-F634-4E75-8375-ACC6D42E2DB4}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus", "Rhino.ServiceBus\Rhino.ServiceBus.csproj", "{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Tests", "Rhino.ServiceBus.Tests\Rhino.ServiceBus.Tests.csproj", "{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Starbucks", "Starbucks", "{64DC50EF-F634-4E75-8375-ACC6D42E2DB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starbucks", "Samples\Starbucks\Starbucks.csproj", "{0FC43226-8030-46FC-A2AB-D064207FF364}"
 EndProject
