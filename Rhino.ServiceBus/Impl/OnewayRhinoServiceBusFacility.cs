@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Transactions;
@@ -54,7 +54,7 @@ namespace Rhino.ServiceBus.Impl
                 Kernel.Register(
                     Component.For<IMessageBuilder>()
                         .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy<MessageBuilder>(),
+                        .ImplementedBy<MsmqMessageBuilder>(),
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy<OnewayBus>()

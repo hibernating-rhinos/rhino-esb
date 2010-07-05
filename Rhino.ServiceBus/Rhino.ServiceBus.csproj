@@ -218,7 +218,7 @@
     <Compile Include="Messages\Reroute.cs" />
     <Compile Include="Msmq\EndpointExtensions.cs" />
     <Compile Include="IMessageBuilder.cs" />
-    <Compile Include="Msmq\MessageBuilder.cs" />
+    <Compile Include="Msmq\MsmqMessageBuilder.cs" />
     <Compile Include="Transport\MessageHandlingCompletion.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />

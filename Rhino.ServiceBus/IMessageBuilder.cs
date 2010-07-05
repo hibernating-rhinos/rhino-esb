@@ -1,6 +1,6 @@
 ﻿using System.Messaging;
 
-namespace Rhino.ServiceBus.Msmq
+namespace Rhino.ServiceBus
 {
     public interface IMessageBuilder
     {

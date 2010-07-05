@@ -39,7 +39,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
             t.AdministrativeMessageArrived +=
                 subscriptionStorage.HandleAdministrativeMessage;
 
-            Message msg = new MessageBuilder
+            Message msg = new MsmqMessageBuilder
                 (serializer).GenerateMsmqMessageFromMessageBatch(new
                                                                      AddInstanceSubscription
                 {
@@ -51,7 +51,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
 
             wait.WaitOne();
 
-            msg = new MessageBuilder
+            msg = new MsmqMessageBuilder
                 (serializer).GenerateMsmqMessageFromMessageBatch(new
                                                                      RemoveInstanceSubscription
                 {
