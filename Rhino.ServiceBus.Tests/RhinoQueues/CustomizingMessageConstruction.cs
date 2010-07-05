@@ -8,11 +8,11 @@ using Xunit;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
-    public class CanCustomizeMessageConstruction:IDisposable
+    public class CustomizingMessageConstruction:IDisposable
     {
         private WindsorContainer container;
 
-        public CanCustomizeMessageConstruction()
+        public CustomizingMessageConstruction()
         {
             container = new WindsorContainer("RhinoQueues/RhinoQueues.config");
 
