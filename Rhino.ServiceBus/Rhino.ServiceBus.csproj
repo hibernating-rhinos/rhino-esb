@@ -198,7 +198,7 @@
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\MessageOwnersConfigReader.cs" />
     <Compile Include="Impl\MessageOwnersSelector.cs" />
-    <Compile Include="Msmq\OnewayBus.cs" />
+    <Compile Include="Msmq\MsmqOnewayBus.cs" />
     <Compile Include="Impl\OnewayRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />

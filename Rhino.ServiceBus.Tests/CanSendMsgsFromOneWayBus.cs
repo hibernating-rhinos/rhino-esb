@@ -28,7 +28,7 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                var oneWay = new OnewayBus(new[]
+                var oneWay = new MsmqOnewayBus(new[]
                 {
                     new MessageOwner
                     {

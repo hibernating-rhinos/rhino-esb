@@ -31,7 +31,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 1,
                 "test.esent",
                 IsolationLevel.Serializable, 
-                5
+                5,
+                new RhinoQueuesMessageBuilder(messageSerializer)
                 );
             transport.Start();
         }

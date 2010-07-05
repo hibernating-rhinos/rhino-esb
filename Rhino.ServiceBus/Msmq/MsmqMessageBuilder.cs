@@ -12,7 +12,7 @@ namespace Rhino.ServiceBus.Msmq
     {
         private readonly ILog logger = LogManager.GetLogger(typeof (MsmqMessageBuilder));
         private readonly IMessageSerializer messageSerializer;
-        private readonly Endpoint endpoint;
+        private Endpoint endpoint;
 
         public MsmqMessageBuilder(IMessageSerializer messageSerializer)
             :this(messageSerializer, null)
@@ -60,6 +60,16 @@ namespace Rhino.ServiceBus.Msmq
                 })
                 .FirstOrDefault();
             return message;
+        }
+
+        public void Initialize(Endpoint source)
+        {
+            this.endpoint = source;
+        }
+
+        public void Contextualize(Message message)
+        {
+            
         }
 
         protected static int GetAppSpecificMarker(object[] msgs)

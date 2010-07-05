@@ -41,18 +41,12 @@ namespace Rhino.ServiceBus.RhinoQueues
 		private readonly ILog logger = LogManager.GetLogger(typeof(RhinoQueuesTransport));
 		private TimeoutAction timeout;
 		private IQueue queue;
+	    private RhinoQueuesMessageBuilder messageBuilder;
+        private static readonly Uri NullEndpoint = new Uri("null://nowhere:24689/middle") ;
 
-
-		public RhinoQueuesTransport(
-			Uri endpoint,
-			IEndpointRouter endpointRouter,
-			IMessageSerializer messageSerializer,
-			int threadCount,
-			string path,
-			IsolationLevel queueIsolationLevel,
-			int numberOfRetries)
+	    public RhinoQueuesTransport(Uri endpoint, IEndpointRouter endpointRouter, IMessageSerializer messageSerializer, int threadCount, string path, IsolationLevel queueIsolationLevel, int numberOfRetries, IMessageBuilder<MessagePayload> messageBuilder1)
 		{
-			this.endpoint = endpoint;
+			this.endpoint = endpoint??NullEndpoint;
 			this.queueIsolationLevel = queueIsolationLevel;
 			this.numberOfRetries = numberOfRetries;
 			this.endpointRouter = endpointRouter;
@@ -67,6 +61,8 @@ namespace Rhino.ServiceBus.RhinoQueues
 			// This has to be the first subscriber to the transport events
 			// in order to successfuly handle the errors semantics
 			new ErrorAction(numberOfRetries).Init(this);
+
+		    messageBuilder = new RhinoQueuesMessageBuilder(this.messageSerializer);
 		}
 
 		public void Dispose()

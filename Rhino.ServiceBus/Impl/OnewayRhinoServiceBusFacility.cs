@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Messaging;
 using System.Transactions;
 using Castle.Core;
 using Castle.MicroKernel.Facilities;
@@ -37,7 +38,7 @@ namespace Rhino.ServiceBus.Impl
                         .DependsOn(new
                                        {
                                            threadCount = 1,
-                                           endpoint = new Uri("null://nowhere:24689/middle"),
+//                                           endpoint = new Uri("null://nowhere:24689/middle"),
                                            queueIsolationLevel = IsolationLevel.ReadCommitted,
                                            numberOfRetries = 5,
                                            path = Path.Combine(path,"one_way.esent")
@@ -52,12 +53,12 @@ namespace Rhino.ServiceBus.Impl
             else
             {
                 Kernel.Register(
-                    Component.For<IMessageBuilder>()
+                    Component.For<IMessageBuilder<Message>>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy<MsmqMessageBuilder>(),
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy<OnewayBus>()
+                        .ImplementedBy<MsmqOnewayBus>()
                         .DependsOn(new {messageOwners = messageOwners.ToArray()}));
                     
             }

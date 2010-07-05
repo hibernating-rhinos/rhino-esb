@@ -1,14 +1,14 @@
 using System.Messaging;
-using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Impl;
 
-namespace Rhino.ServiceBus.Impl
+namespace Rhino.ServiceBus.Msmq
 {
-    public class OnewayBus : IOnewayBus
+    public class MsmqOnewayBus : IOnewayBus
     {
         private readonly MessageOwnersSelector messageOwners;
-        private readonly IMessageBuilder messageBuilder;
+        private readonly IMessageBuilder<Message> messageBuilder;
 
-        public OnewayBus(MessageOwner[] messageOwners, IMessageBuilder messageBuilder)
+        public MsmqOnewayBus(MessageOwner[] messageOwners, IMessageBuilder<Message> messageBuilder)
         {
             this.messageOwners = new MessageOwnersSelector(messageOwners, new EndpointRouter());
             this.messageBuilder = messageBuilder;
@@ -19,7 +19,7 @@ namespace Rhino.ServiceBus.Impl
             var endpoint = messageOwners.GetEndpointForMessageBatch(msgs);
             using(var queue = endpoint.InitalizeQueue())
             {
-                var message = messageBuilder.BuildFromMessageBatch<Message>(msgs);
+                var message = messageBuilder.BuildFromMessageBatch(msgs);
                 queue.SendInSingleTransaction(message);
             }
         }
