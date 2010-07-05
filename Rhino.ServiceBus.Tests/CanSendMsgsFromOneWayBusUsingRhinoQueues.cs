@@ -39,9 +39,7 @@ namespace Rhino.ServiceBus.Tests
             using (var bus = container.Resolve<IStartableServiceBus>())
             {
                 bus.Start();
-                var transport = new RhinoQueuesTransport(new Uri("null://nowhere:24689/middle"),
-                                                         new EndpointRouter(), container.Resolve<IMessageSerializer>(),
-                                                         1, "one_way.esent", IsolationLevel.ReadCommitted, 5);
+
                 var oneWay = new RhinoQueuesOneWayBus(new[]
                                                  {
                                                      new MessageOwner
@@ -49,7 +47,7 @@ namespace Rhino.ServiceBus.Tests
                                                              Endpoint = bus.Endpoint.Uri,
                                                              Name = "System",
                                                          },
-                                                 }, transport);
+                                                 }, container.Resolve<IMessageSerializer>(),new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>()));
 
                 oneWay.Send("hello there, one way");
 
@@ -69,7 +67,8 @@ namespace Rhino.ServiceBus.Tests
                 using (var c = new WindsorContainer(new XmlInterpreter("OneWayBusRhinoQueues.config")))
                 {
                     c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
-                    c.Resolve<IOnewayBus>().Send("hello there, one way");
+                    var oneway = c.Resolve<IOnewayBus>();
+                    oneway.Send("hello there, one way");
                     StringConsumer.Event.WaitOne();
                     Assert.Equal("hello there, one way", StringConsumer.Value);
                 }

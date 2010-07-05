@@ -1,23 +1,30 @@
+using System;
+using System.IO;
+using System.Transactions;
+using Rhino.Queues;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
-    public class RhinoQueuesOneWayBus : IOnewayBus
+    [CLSCompliant(false)]
+    public class RhinoQueuesOneWayBus : RhinoQueuesTransport,IOnewayBus
     {
         private MessageOwnersSelector messageOwners;
-        private ITransport transport;
+        public static readonly Uri NullEndpoint = new Uri("null://nowhere:24689/middle");
+        public RhinoQueuesOneWayBus(MessageOwner[] messageOwners, IMessageSerializer messageSerializer,IMessageBuilder<MessagePayload> messageBuilder)
+            : base(NullEndpoint, new EndpointRouter(), messageSerializer, 1, Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"), IsolationLevel.ReadCommitted,5,messageBuilder)
 
-        public RhinoQueuesOneWayBus(MessageOwner[] messageOwners, ITransport transport)
         {
             this.messageOwners = new MessageOwnersSelector(messageOwners, new EndpointRouter());
-            this.transport = transport;
-            this.transport.Start();
+            Start();
         }
 
         public void Send(params object[] msgs)
         {
-            transport.Send(messageOwners.GetEndpointForMessageBatch(msgs), msgs);
+            base.Send(messageOwners.GetEndpointForMessageBatch(msgs), msgs);
         }
+
+       
     }
 }

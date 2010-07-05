@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Messaging;
 using System.Transactions;
 using Castle.Core;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
+using Rhino.Queues;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.RhinoQueues;
@@ -29,35 +31,28 @@ namespace Rhino.ServiceBus.Impl
             messageOwnersReader.ReadMessageOwners();
             if (IsRhinoQueues(messageOwnersReader.EndpointScheme))
             {
-                var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
                 Kernel.Register(
-                    Component.For<ITransport>()
-                        .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy(typeof (RhinoQueuesTransport))
-                        .DependsOn(new
-                                       {
-                                           threadCount = 1,
-                                           endpoint = new Uri("null://nowhere:24689/middle"),
-                                           queueIsolationLevel = IsolationLevel.ReadCommitted,
-                                           numberOfRetries = 5,
-                                           path = Path.Combine(path,"one_way.esent")
-                                       }),
+                     Component.For<IMessageBuilder<MessagePayload>>()
+                        .ImplementedBy<RhinoQueuesMessageBuilder>()
+                        .LifeStyle.Is(LifestyleType.Singleton),   
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy<RhinoQueuesOneWayBus>()
-                        .DependsOn(new {messageOwners = messageOwners.ToArray()})
+                        .DependsOn(new
+                                       {
+                                           messageOwners = messageOwners.ToArray(),
+                                       })
                     );
-
             }
             else
             {
                 Kernel.Register(
-                    Component.For<IMessageBuilder>()
+                    Component.For<IMessageBuilder<Message>>()
                         .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy<MessageBuilder>(),
+                        .ImplementedBy<MsmqMessageBuilder>(),
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy<OnewayBus>()
+                        .ImplementedBy<MsmqOnewayBus>()
                         .DependsOn(new {messageOwners = messageOwners.ToArray()}));
                     
             }

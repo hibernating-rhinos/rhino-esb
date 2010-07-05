@@ -118,6 +118,7 @@
     <Compile Include="Messages\ReadyToWork.cs" />
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
+    <Compile Include="RhinoQueues\RhinoQueuesMessageBuilder.cs" />
     <Compile Include="RhinoQueues\RhinoQueuesOneWayBus.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
@@ -196,7 +197,7 @@
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\MessageOwnersConfigReader.cs" />
     <Compile Include="Impl\MessageOwnersSelector.cs" />
-    <Compile Include="Impl\OnewayBus.cs" />
+    <Compile Include="Msmq\MsmqOnewayBus.cs" />
     <Compile Include="Impl\OnewayRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />
@@ -216,8 +217,8 @@
     <Compile Include="Messages\QueryReadyForWorkQueueUri.cs" />
     <Compile Include="Messages\Reroute.cs" />
     <Compile Include="Msmq\EndpointExtensions.cs" />
-    <Compile Include="Msmq\IMessageBuilder.cs" />
-    <Compile Include="Msmq\MessageBuilder.cs" />
+    <Compile Include="IMessageBuilder.cs" />
+    <Compile Include="Msmq\MsmqMessageBuilder.cs" />
     <Compile Include="Transport\MessageHandlingCompletion.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
     <Compile Include="Msmq\QueueInfo.cs" />

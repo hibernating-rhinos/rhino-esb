@@ -106,6 +106,7 @@
     </Compile>
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
+    <Compile Include="RhinoQueues\CanAddHeadersToMessage.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
     <Compile Include="CanSendMsgsFromOneWayBusUsingRhinoQueues.cs" />

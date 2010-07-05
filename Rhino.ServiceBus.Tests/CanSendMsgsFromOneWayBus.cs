@@ -28,14 +28,14 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                var oneWay = new OnewayBus(new[]
+                var oneWay = new MsmqOnewayBus(new[]
                 {
                     new MessageOwner
                     {
                         Endpoint = bus.Endpoint.Uri,
                         Name = "System",
                     },
-                }, new MessageBuilder(container.Resolve<IMessageSerializer>(), null));
+                }, new MsmqMessageBuilder(container.Resolve<IMessageSerializer>()));
 
                 oneWay.Send("hello there, one way");
 

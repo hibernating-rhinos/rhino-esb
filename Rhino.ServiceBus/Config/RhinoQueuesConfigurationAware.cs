@@ -4,6 +4,7 @@ using System.IO;
 using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
+using Rhino.Queues;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
@@ -44,7 +45,11 @@ namespace Rhino.ServiceBus.Config
                         queueIsolationLevel = facility.IsolationLevel,
                         numberOfRetries = facility.NumberOfRetries,
                         path = Path.Combine(path, name + ".esent")
-                    })
+                    }),
+                Component.For<IMessageBuilder<MessagePayload>>()
+                    .ImplementedBy<RhinoQueuesMessageBuilder>()
+                    .LifeStyle.Is(LifestyleType.Singleton)
+
                 );
         }
     }

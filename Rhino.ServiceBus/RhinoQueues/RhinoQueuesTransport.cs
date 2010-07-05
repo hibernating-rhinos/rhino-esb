@@ -20,6 +20,7 @@ using Transaction = System.Transactions.Transaction;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
+    [CLSCompliant(false)]
 	public class RhinoQueuesTransport : ITransport
 	{
 		private readonly Uri endpoint;
@@ -34,28 +35,30 @@ namespace Rhino.ServiceBus.RhinoQueues
 		private bool haveStarted;
 		private readonly IsolationLevel queueIsolationLevel;
 		private readonly int numberOfRetries;
+	    private readonly IMessageBuilder<MessagePayload> messageBuilder;
 
-		[ThreadStatic]
+	    [ThreadStatic]
 		private static RhinoQueueCurrentMessageInformation currentMessageInformation;
 
 		private readonly ILog logger = LogManager.GetLogger(typeof(RhinoQueuesTransport));
 		private TimeoutAction timeout;
 		private IQueue queue;
+        
 
-
-		public RhinoQueuesTransport(
-			Uri endpoint,
-			IEndpointRouter endpointRouter,
-			IMessageSerializer messageSerializer,
-			int threadCount,
-			string path,
-			IsolationLevel queueIsolationLevel,
-			int numberOfRetries)
+	    public RhinoQueuesTransport(Uri endpoint, 
+            IEndpointRouter endpointRouter, 
+            IMessageSerializer messageSerializer, 
+            int threadCount, 
+            string path, 
+            IsolationLevel queueIsolationLevel, 
+            int numberOfRetries, 
+            IMessageBuilder<MessagePayload> messageBuilder)
 		{
-			this.endpoint = endpoint;
+	        this.endpoint = endpoint;
 			this.queueIsolationLevel = queueIsolationLevel;
 			this.numberOfRetries = numberOfRetries;
-			this.endpointRouter = endpointRouter;
+	        this.messageBuilder = messageBuilder;
+	        this.endpointRouter = endpointRouter;
 			this.messageSerializer = messageSerializer;
 			this.threadCount = threadCount;
 			this.path = path;
@@ -67,6 +70,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 			// This has to be the first subscriber to the transport events
 			// in order to successfuly handle the errors semantics
 			new ErrorAction(numberOfRetries).Init(this);
+            messageBuilder.Initialize(this.Endpoint);
 		}
 
 		public void Dispose()
@@ -390,29 +394,15 @@ namespace Rhino.ServiceBus.RhinoQueues
 		private void SendInternal(object[] msgs, Endpoint destination, Action<NameValueCollection> customizeHeaders)
 		{
 			var messageId = Guid.NewGuid();
-			using (var memoryStream = new MemoryStream())
-			{
-				messageSerializer.Serialize(msgs, memoryStream);
-
-				var payload = new MessagePayload
-				{
-					Data = memoryStream.ToArray(),
-					Headers =
-                        {
-                            {"id", messageId.ToString()},
-                            {"type", GetAppSpecificMarker(msgs).ToString()},
-                            {"source", Endpoint.Uri.ToString()},
-                        }
-				};
-				logger.DebugFormat("Sending a message with id '{0}' to '{1}'", messageId, destination.Uri);
-				customizeHeaders(payload.Headers);
-				var transactionOptions = GetTransactionOptions();
-				using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
-				{
-					queueManager.Send(destination.Uri, payload);
-					tx.Complete();
-				}
-			}
+		    var payload = messageBuilder.BuildFromMessageBatch(msgs);
+            logger.DebugFormat("Sending a message with id '{0}' to '{1}'", messageId, destination.Uri);
+            customizeHeaders(payload.Headers);
+            var transactionOptions = GetTransactionOptions();
+            using (var tx = new TransactionScope(TransactionScopeOption.Required, transactionOptions))
+            {
+                queueManager.Send(destination.Uri, payload);
+                tx.Complete();
+            }
 
 			var copy = MessageSent;
 			if (copy == null)
@@ -434,16 +424,6 @@ namespace Rhino.ServiceBus.RhinoQueues
 				IsolationLevel = Transaction.Current == null ? queueIsolationLevel : Transaction.Current.IsolationLevel,
 				Timeout = TransportUtil.GetTransactionTimeout(),
 			};
-		}
-
-		protected static MessageType GetAppSpecificMarker(object[] msgs)
-		{
-			var msg = msgs[0];
-			if (msg is AdministrativeMessage)
-				return MessageType.AdministrativeMessageMarker;
-			if (msg is LoadBalancerMessage)
-				return MessageType.LoadBalancerMessageMarker;
-			return 0;
 		}
 
 		public void Send(Endpoint endpoint, DateTime processAgainAt, object[] msgs)

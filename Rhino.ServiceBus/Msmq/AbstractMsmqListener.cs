@@ -62,7 +62,8 @@ namespace Rhino.ServiceBus.Msmq
         		default:
         			throw new ArgumentOutOfRangeException("transactional");
         	}
-            builder = new MessageBuilder(this.messageSerializer, Endpoint);
+            messageBuilder = new MsmqMessageBuilder(this.messageSerializer);
+            this.messageBuilder.Initialize(Endpoint);
         }
 
         public event Action Started;
@@ -239,7 +240,7 @@ namespace Rhino.ServiceBus.Msmq
 
         protected IEndpointRouter endpointRouter;
     	private readonly bool? transactional;
-        private readonly MessageBuilder builder;
+        private readonly MsmqMessageBuilder messageBuilder;
 
         public TransportState TransportState { get; set; }
 
@@ -273,7 +274,7 @@ namespace Rhino.ServiceBus.Msmq
 
         protected Message GenerateMsmqMessageFromMessageBatch(params object[] msgs)
         {
-            return builder.GenerateMsmqMessageFromMessageBatch(msgs);
+            return messageBuilder.BuildFromMessageBatch(msgs);
         }
 
         protected object[] DeserializeMessages(OpenedQueue messageQueue, Message transportMessage, Action<CurrentMessageInformation, Exception> messageSerializationException)
