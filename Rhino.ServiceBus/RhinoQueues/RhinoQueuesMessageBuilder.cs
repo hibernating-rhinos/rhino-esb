@@ -30,8 +30,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 data = memoryStream.ToArray();
                 
             }
-
-            return  new MessagePayload
+            var payload=new MessagePayload
             {
                 Data = data,
                 Headers =
@@ -41,8 +40,9 @@ namespace Rhino.ServiceBus.RhinoQueues
                             {"source", endpoint.Uri.ToString()},
                         }
             };
+            return payload;
         }
-
+      
         public void Initialize(Endpoint source)
         {
             endpoint = source;

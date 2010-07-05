@@ -67,11 +67,7 @@ namespace Rhino.ServiceBus.Msmq
             this.endpoint = source;
         }
 
-        public void Contextualize(Message message)
-        {
-            
-        }
-
+        
         protected static int GetAppSpecificMarker(object[] msgs)
         {
             var msg = msgs[0];
