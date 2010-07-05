@@ -97,7 +97,6 @@
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainLoadBalancerHost.cs" />
-    <Compile Include="IMessage.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />
     <Compile Include="Endpoint.cs" />
     <Compile Include="Internal\IEndpointRouter.cs" />
