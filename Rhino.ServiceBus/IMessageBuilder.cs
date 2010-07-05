@@ -2,8 +2,8 @@
 
 namespace Rhino.ServiceBus
 {
-    public interface IMessageBuilder
+    public interface IMessageBuilder<T>
     {
-        Message GenerateMsmqMessageFromMessageBatch(params object[] msgs);
+        T BuildFromMessageBatch(params object[] msgs);
     }
 }

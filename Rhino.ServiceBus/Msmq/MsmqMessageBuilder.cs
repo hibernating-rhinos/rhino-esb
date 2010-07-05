@@ -8,7 +8,7 @@ using Rhino.ServiceBus.Messages;
 
 namespace Rhino.ServiceBus.Msmq
 {
-    public class MsmqMessageBuilder : IMessageBuilder
+    public class MsmqMessageBuilder : IMessageBuilder<Message>
     {
         private readonly ILog logger = LogManager.GetLogger(typeof (MsmqMessageBuilder));
         private readonly IMessageSerializer messageSerializer;
@@ -25,7 +25,7 @@ namespace Rhino.ServiceBus.Msmq
             this.endpoint = endpoint;
         }
 
-        public Message GenerateMsmqMessageFromMessageBatch(params object[] msgs)
+        public Message BuildFromMessageBatch(params object[] msgs)
         {
             var message = new Message();
 

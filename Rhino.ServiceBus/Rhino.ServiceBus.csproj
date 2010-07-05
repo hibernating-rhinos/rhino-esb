@@ -119,6 +119,7 @@
     <Compile Include="Messages\ReadyToWork.cs" />
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
+    <Compile Include="RhinoQueues\RhinoQueuesMessageBuilder.cs" />
     <Compile Include="RhinoQueues\RhinoQueuesOneWayBus.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
@@ -197,7 +198,7 @@
     <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\MessageOwnersConfigReader.cs" />
     <Compile Include="Impl\MessageOwnersSelector.cs" />
-    <Compile Include="Impl\OnewayBus.cs" />
+    <Compile Include="Msmq\OnewayBus.cs" />
     <Compile Include="Impl\OnewayRhinoServiceBusFacility.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />
