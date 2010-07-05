@@ -97,6 +97,7 @@
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainLoadBalancerHost.cs" />
+    <Compile Include="IMessage.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />
     <Compile Include="Endpoint.cs" />
     <Compile Include="Internal\IEndpointRouter.cs" />
@@ -216,7 +217,7 @@
     <Compile Include="Messages\QueryReadyForWorkQueueUri.cs" />
     <Compile Include="Messages\Reroute.cs" />
     <Compile Include="Msmq\EndpointExtensions.cs" />
-    <Compile Include="Msmq\IMessageBuilder.cs" />
+    <Compile Include="IMessageBuilder.cs" />
     <Compile Include="Msmq\MessageBuilder.cs" />
     <Compile Include="Transport\MessageHandlingCompletion.cs" />
     <Compile Include="Msmq\OpenedQueue.cs" />
