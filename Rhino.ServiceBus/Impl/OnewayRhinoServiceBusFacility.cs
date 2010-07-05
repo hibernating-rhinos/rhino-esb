@@ -6,6 +6,7 @@ using System.Transactions;
 using Castle.Core;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
+using Rhino.Queues;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.RhinoQueues;
@@ -32,6 +33,9 @@ namespace Rhino.ServiceBus.Impl
             {
                 var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
                 Kernel.Register(
+                     Component.For<IMessageBuilder<MessagePayload>>()
+                        .ImplementedBy<RhinoQueuesMessageBuilder>()
+                        .LifeStyle.Is(LifestyleType.Singleton),   
                     Component.For<ITransport>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy(typeof (RhinoQueuesTransport))
@@ -43,12 +47,12 @@ namespace Rhino.ServiceBus.Impl
                                            numberOfRetries = 5,
                                            path = Path.Combine(path,"one_way.esent")
                                        }),
+                    
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy<RhinoQueuesOneWayBus>()
                         .DependsOn(new {messageOwners = messageOwners.ToArray()})
                     );
-
             }
             else
             {

@@ -7,6 +7,7 @@ using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
+    [CLSCompliant(false)]
     public class RhinoQueuesMessageBuilder : IMessageBuilder<MessagePayload>
     {
         private readonly IMessageSerializer messageSerializer;

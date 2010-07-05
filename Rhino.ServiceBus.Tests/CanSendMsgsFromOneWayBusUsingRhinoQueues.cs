@@ -41,7 +41,7 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
                 var transport = new RhinoQueuesTransport(new Uri("null://nowhere:24689/middle"),
                                                          new EndpointRouter(), container.Resolve<IMessageSerializer>(),
-                                                         1, "one_way.esent", IsolationLevel.ReadCommitted, 5, TODO);
+                                                         1, "one_way.esent", IsolationLevel.ReadCommitted, 5, new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>()));
                 var oneWay = new RhinoQueuesOneWayBus(new[]
                                                  {
                                                      new MessageOwner
