@@ -1,4 +1,4 @@
-﻿namespace Rhino.ServiceBus
+﻿namespace Rhino.ServiceBus.Internal
 {
     public interface IMessageBuilder<T>
     {

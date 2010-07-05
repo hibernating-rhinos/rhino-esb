@@ -5,6 +5,7 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Rhino.Queues;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
 using Xunit;
 
