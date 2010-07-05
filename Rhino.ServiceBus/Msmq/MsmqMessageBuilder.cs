@@ -14,15 +14,10 @@ namespace Rhino.ServiceBus.Msmq
         private readonly IMessageSerializer messageSerializer;
         private Endpoint endpoint;
 
+        
         public MsmqMessageBuilder(IMessageSerializer messageSerializer)
-            :this(messageSerializer, null)
-        {
-        }
-
-        public MsmqMessageBuilder(IMessageSerializer messageSerializer, Endpoint endpoint)
         {
             this.messageSerializer = messageSerializer;
-            this.endpoint = endpoint;
         }
 
         public Message BuildFromMessageBatch(params object[] msgs)
