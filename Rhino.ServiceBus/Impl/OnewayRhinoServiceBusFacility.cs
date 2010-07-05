@@ -31,27 +31,17 @@ namespace Rhino.ServiceBus.Impl
             messageOwnersReader.ReadMessageOwners();
             if (IsRhinoQueues(messageOwnersReader.EndpointScheme))
             {
-                var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
                 Kernel.Register(
                      Component.For<IMessageBuilder<MessagePayload>>()
                         .ImplementedBy<RhinoQueuesMessageBuilder>()
                         .LifeStyle.Is(LifestyleType.Singleton),   
-                    Component.For<ITransport>()
-                        .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy(typeof (RhinoQueuesTransport))
-                        .DependsOn(new
-                                       {
-                                           threadCount = 1,
-//                                           endpoint = new Uri("null://nowhere:24689/middle"),
-                                           queueIsolationLevel = IsolationLevel.ReadCommitted,
-                                           numberOfRetries = 5,
-                                           path = Path.Combine(path,"one_way.esent")
-                                       }),
-                    
                     Component.For<IOnewayBus>()
                         .LifeStyle.Is(LifestyleType.Singleton)
                         .ImplementedBy<RhinoQueuesOneWayBus>()
-                        .DependsOn(new {messageOwners = messageOwners.ToArray()})
+                        .DependsOn(new
+                                       {
+                                           messageOwners = messageOwners.ToArray(),
+                                       })
                     );
             }
             else

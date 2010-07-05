@@ -7,7 +7,7 @@ using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
-    [CLSCompliant(false)]
+    
     public class RhinoQueuesMessageBuilder : IMessageBuilder<MessagePayload>
     {
         private readonly IMessageSerializer messageSerializer;
@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         {
             this.messageSerializer = messageSerializer;
         }
-
+        [CLSCompliant(false)]
         public MessagePayload BuildFromMessageBatch(params object[] msgs)
         {
             if (endpoint == null)
@@ -48,10 +48,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             endpoint = source;
         }
 
-        public void Contextualize(MessagePayload message)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         private static MessageType GetAppSpecificMarker(object[] msgs)
         {

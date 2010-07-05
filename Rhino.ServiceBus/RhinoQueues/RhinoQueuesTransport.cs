@@ -43,7 +43,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 		private readonly ILog logger = LogManager.GetLogger(typeof(RhinoQueuesTransport));
 		private TimeoutAction timeout;
 		private IQueue queue;
-        private static readonly Uri NullEndpoint = new Uri("null://nowhere:24689/middle") ;
+        
 
 	    public RhinoQueuesTransport(Uri endpoint, 
             IEndpointRouter endpointRouter, 
@@ -54,7 +54,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             int numberOfRetries, 
             IMessageBuilder<MessagePayload> messageBuilder)
 		{
-			this.endpoint = endpoint??NullEndpoint;
+	        this.endpoint = endpoint;
 			this.queueIsolationLevel = queueIsolationLevel;
 			this.numberOfRetries = numberOfRetries;
 	        this.messageBuilder = messageBuilder;
