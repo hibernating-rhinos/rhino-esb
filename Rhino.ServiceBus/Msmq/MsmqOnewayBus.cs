@@ -1,5 +1,6 @@
 using System.Messaging;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Msmq
 {
