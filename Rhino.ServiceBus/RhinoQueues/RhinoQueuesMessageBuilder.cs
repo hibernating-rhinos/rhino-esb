@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using Rhino.Queues;
 using Rhino.ServiceBus.Internal;
@@ -40,9 +41,19 @@ namespace Rhino.ServiceBus.RhinoQueues
                             {"source", endpoint.Uri.ToString()},
                         }
             };
+
+            TryCustomizeHeaders(payload.Headers);
             return payload;
         }
-      
+
+        private void TryCustomizeHeaders(NameValueCollection headers)
+        {
+            if (MessageHeaders == null)
+                return;
+            MessageHeaders.Customize(headers);
+        }
+
+        public ICustomizeMessageHeaders MessageHeaders { get; set; }
         public void Initialize(Endpoint source)
         {
             endpoint = source;

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Specialized;
+using Castle.Core;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Rhino.Queues;
@@ -8,30 +10,42 @@ using Xunit;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
-    public class CustomizingMessageConstruction:IDisposable
+    public class CustomizingMessageConstruction
     {
-        private WindsorContainer container;
-
-        public CustomizingMessageConstruction()
+        
+        [Fact]
+        public void it_should_add_custom_header_to_headers_collection_using_builder()
         {
-            container = new WindsorContainer("RhinoQueues/RhinoQueues.config");
+            using( var container = new WindsorContainer("RhinoQueues/RhinoQueues.config"))
+            {
+                container.Register(Component.For<IMessageBuilder<MessagePayload>>().ImplementedBy<CustomHeaderBuilder>());//before facility
+                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
 
-            container.Register(Component.For<IMessageBuilder<MessagePayload>>().ImplementedBy<CustomHeaderBuilder>());
-            container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            
+                var builder = container.Resolve<IMessageBuilder<MessagePayload>>();
+                builder.Initialize(new Endpoint { Uri = RhinoQueuesOneWayBus.NullEndpoint });
+                var msg = builder.BuildFromMessageBatch("somemsg");
+                Assert.NotNull(msg);
+                Assert.NotEqual(0, msg.Data.Length);
+                Assert.Equal("mikey", msg.Headers["user-id"]);    
+            }
 
         }
 
-
         [Fact]
-        public void it_should_add_custom_header_to_headers_collection()
+        public void it_should_add_custom_header_to_headers_collection_using_interface()
         {
-            var builder = container.Resolve<IMessageBuilder<MessagePayload>>();
-            builder.Initialize(new Endpoint {Uri = RhinoQueuesOneWayBus.NullEndpoint});
-            var msg = builder.BuildFromMessageBatch("somemsg");
-            Assert.NotNull(msg);
-            Assert.NotEqual(0,msg.Data.Length);
-            Assert.Equal("mikey",msg.Headers["user-id"]);
+            using (var container = new WindsorContainer("RhinoQueues/RhinoQueues.config"))
+            {
+                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+                container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
+
+                var builder = container.Resolve<IMessageBuilder<MessagePayload>>();
+                builder.Initialize(new Endpoint { Uri = RhinoQueuesOneWayBus.NullEndpoint });
+                var msg = builder.BuildFromMessageBatch("somemsg");
+                Assert.NotNull(msg);
+                Assert.NotEqual(0, msg.Data.Length);
+                Assert.Equal("mikey", msg.Headers["user-id"]);
+            }
 
         }
         
@@ -61,10 +75,15 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 message.Headers.Add("user-id","mikey");
             }
         }
-
-        public void Dispose()
+        public class AppIdentityCustomizer : ICustomizeMessageHeaders
         {
-            container.Dispose();
+            public void Customize(NameValueCollection headers)
+            {
+                headers.Add("user-id","mikey");
+            }
         }
+
     }
+
+    
 }
