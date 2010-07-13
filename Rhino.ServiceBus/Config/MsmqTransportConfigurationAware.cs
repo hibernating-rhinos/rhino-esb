@@ -71,8 +71,8 @@ namespace Rhino.ServiceBus.Config
                         transactional = facility.Transactional,
                         consumeInTransaction = facility.ConsumeInTransaction,
                     }),
-                AllTypes.Of<IMsmqTransportAction>()
-                    .FromAssembly(typeof(IMsmqTransportAction).Assembly)
+                AllTypes.FromAssembly(typeof(IMsmqTransportAction).Assembly)
+                    .BasedOn<IMsmqTransportAction>()
                     .Unless(x => x == typeof(ErrorAction))
                     .WithService.FirstInterface()
                     .Configure(registration =>
