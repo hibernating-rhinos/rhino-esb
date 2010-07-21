@@ -30,35 +30,39 @@ namespace Rhino.ServiceBus.RhinoQueues
         private bool Transport_OnMessageArrived(CurrentMessageInformation information)
         {
             var info = (RhinoQueueCurrentMessageInformation) information;
-            ErrorCounter val = null;
-            failureCounts.Read(reader => reader.TryGetValue(info.TransportMessageId, out val));
-            if(val == null || val.FailureCount < numberOfRetries)
-                return false;
-
-            var result = false;
-            failureCounts.Write(writer =>
-            {
-                if (writer.TryGetValue(info.TransportMessageId, out val) == false)
-                    return;
-
-                info.Queue.MoveTo(SubQueue.Errors.ToString(), info.TransportMessage);
-                info.Queue.EnqueueDirectlyTo(SubQueue.Errors.ToString(), new MessagePayload
-                {
-                    Data = val.ExceptionText == null ? null : Encoding.Unicode.GetBytes(val.ExceptionText),
-                    Headers =
-                        {
-                            {"correlation-id", info.TransportMessageId},
-                            {"retries", val.FailureCount.ToString()}
-                        }
-                });
-
-                result = true;
-            });
-
-            return result;
+			ErrorCounter val = null;
+    		failureCounts.Read(reader => reader.TryGetValue(info.TransportMessageId, out val));
+			if (val != null)
+				val.AtLeastOneMessageWasReceived = true;
+        	return MoveToErrorSubqueueIfReachedMaximumRetry(info, val);
         }
 
-        private void Transport_OnMessageSerializationException(CurrentMessageInformation information, Exception exception)
+    	private bool MoveToErrorSubqueueIfReachedMaximumRetry(RhinoQueueCurrentMessageInformation info, ErrorCounter errorCounter)
+    	{
+    		if(errorCounter == null || errorCounter.FailureCount < numberOfRetries)
+    			return false;
+
+    		failureCounts.Write(writer =>
+    		{
+    			if (writer.TryGetValue(info.TransportMessageId, out errorCounter) == false)
+    				return;
+
+    			info.Queue.MoveTo(SubQueue.Errors.ToString(), info.TransportMessage);
+    			info.Queue.EnqueueDirectlyTo(SubQueue.Errors.ToString(), new MessagePayload
+    			{
+    				Data = errorCounter.ExceptionText == null ? null : Encoding.Unicode.GetBytes(errorCounter.ExceptionText),
+    				Headers =
+    					{
+    						{"correlation-id", info.TransportMessageId},
+    						{"retries", errorCounter.FailureCount.ToString()}
+    					}
+    			});
+
+    		});
+    		return true;
+    	}
+
+    	private void Transport_OnMessageSerializationException(CurrentMessageInformation information, Exception exception)
         {
             var info = (RhinoQueueCurrentMessageInformation) information;
             failureCounts.Write(writer => writer.Add(info.TransportMessageId, new ErrorCounter
@@ -94,6 +98,9 @@ namespace Rhino.ServiceBus.RhinoQueues
                     };
                     writer.Add(information.TransportMessageId, errorCounter);
                 }
+
+				if (errorCounter.AtLeastOneMessageWasReceived == false)
+					MoveToErrorSubqueueIfReachedMaximumRetry((RhinoQueueCurrentMessageInformation) information, errorCounter);
                 errorCounter.FailureCount += 1;
             });
         }
@@ -102,6 +109,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         {
             public string ExceptionText;
             public int FailureCount;
+        	public bool AtLeastOneMessageWasReceived;
         }
 
     }

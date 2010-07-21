@@ -289,6 +289,12 @@ namespace Rhino.ServiceBus.RhinoQueues
 			Exception ex = null;
 			try
 			{
+				currentMessageInformation = new RhinoQueueCurrentMessageInformation
+				{
+					TransportMessageId = message.Id.ToString(),
+					TransportMessage = message,
+					Queue = queue,
+				};
 				//deserialization errors do not count for module events
 				object[] messages = DeserializeMessages(message);
 				try
