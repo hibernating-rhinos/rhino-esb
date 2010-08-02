@@ -51,6 +51,32 @@ namespace Rhino.ServiceBus.Tests
                 Assert.True(PongHandler.GotReply);
             }
         }
+        [Fact]
+        public void Can_notify_when_at_least_one_message_has_handler()
+        {
+            using(var bus1 = container1.Resolve<IStartableServiceBus>())
+            using(var bus2 = container2.Resolve<IStartableServiceBus>())
+            {
+                var subscriptionStorage2 = container2.Resolve<ISubscriptionStorage>();
+                
+                var wait = new ManualResetEvent(false);
+                subscriptionStorage2.SubscriptionChanged += () => wait.Set();
+                
+                bus1.Start();
+                bus2.Start();
+
+                PongHandler.ResetEvent = new ManualResetEvent(false);
+                PongHandler.GotReply = false;
+
+                wait.WaitOne(TimeSpan.FromSeconds(30), false);
+
+                bus2.Notify("ping", new Ping());
+
+                PongHandler.ResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+
+                Assert.True(PongHandler.GotReply);
+            }
+        }
 
         public class Ping
         {
