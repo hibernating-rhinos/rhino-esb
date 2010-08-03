@@ -350,13 +350,13 @@ namespace Rhino.ServiceBus.Impl
             bool sentMsg = false;
             if (messages.Length == 0)
                 throw new MessagePublicationException("Cannot publish an empty message batch");
-            
-            var subscriptions = new Uri[0];
+
+            IEnumerable<Uri> subscriptions=new Uri[0];
             var index = -1;
-            while(subscriptions.Length==0 && index<messages.Length)
+            do
             {
-                subscriptions = subscriptionStorage.GetSubscriptionsFor(messages[++index].GetType()).ToArray();
-            }
+                subscriptions = subscriptionStorage.GetSubscriptionsFor(messages[++index].GetType());
+            } while ((messages.Length > index && subscriptions.Count() == 0));
             
             foreach (Uri subscription in subscriptions)
             {
