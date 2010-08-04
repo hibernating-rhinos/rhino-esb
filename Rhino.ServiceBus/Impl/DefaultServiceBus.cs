@@ -351,13 +351,14 @@ namespace Rhino.ServiceBus.Impl
             if (messages.Length == 0)
                 throw new MessagePublicationException("Cannot publish an empty message batch");
 
-            IEnumerable<Uri> subscriptions=new Uri[0];
-            var index = 0;
-            do
+            var subscriptions = new HashSet<Uri>();
+            foreach (var message in messages)
             {
-                subscriptions = subscriptionStorage.GetSubscriptionsFor(messages[index++].GetType());
-            } while ((messages.Length > index && subscriptions.Count() == 0));
-            
+                foreach (var uri in subscriptionStorage.GetSubscriptionsFor(message.GetType()))
+                {
+                    subscriptions.Add(uri);
+                }
+            }
             foreach (Uri subscription in subscriptions)
             {
                 transport.Send(endpointRouter.GetRoutedEndpoint(subscription), messages);
