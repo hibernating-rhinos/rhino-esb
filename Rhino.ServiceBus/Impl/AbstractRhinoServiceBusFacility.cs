@@ -80,8 +80,9 @@ namespace Rhino.ServiceBus.Impl
             ReadConfiguration();
 
             Kernel.Register(
-                AllTypes.Of<IBusConfigurationAware>()
-                    .FromAssembly(typeof(IBusConfigurationAware).Assembly)
+
+                AllTypes.FromAssembly(typeof(IBusConfigurationAware).Assembly)
+                    .BasedOn<IBusConfigurationAware>()
                 );
 
             foreach (var configurationAware in Kernel.ResolveAll<IBusConfigurationAware>())
@@ -92,7 +93,7 @@ namespace Rhino.ServiceBus.Impl
             foreach (var type in messageModules)
             {
                 if (Kernel.HasComponent(type) == false)
-                    Kernel.AddComponent(type.FullName, type);
+                    Kernel.Register(Component.For(type).Named(type.FullName));
             }
 
             RegisterComponents();

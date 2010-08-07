@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Transactions;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -26,7 +27,7 @@ namespace Rhino.ServiceBus.Tests
                 Directory.Delete("test_queue_subscriptions.esent", true);
             container = new WindsorContainer(new XmlInterpreter("OneWayBusRhinoQueues.config"));
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.AddComponent<StringConsumer>();
+            container.Register(Component.For<StringConsumer>());
             StringConsumer.Value = null;
             StringConsumer.Event = new ManualResetEvent(false);
         }

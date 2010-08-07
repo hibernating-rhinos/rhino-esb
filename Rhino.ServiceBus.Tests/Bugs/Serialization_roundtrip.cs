@@ -10,6 +10,7 @@ using Xunit.Extensions;
 
 namespace Rhino.ServiceBus.Tests.Bugs
 {
+    [CLSCompliant(false)]
     public class Serialization_roundtrip
     {
         public class Foo

@@ -32,10 +32,10 @@ namespace Rhino.ServiceBus.Hosting
         protected virtual void ConfigureContainer()
         {
             container.Register(
-                AllTypes.Of<IDeploymentAction>()
-                    .FromAssembly(Assembly),
-                AllTypes.Of<IEnvironmentValidationAction>()
-                    .FromAssembly(Assembly)
+                AllTypes.FromAssembly(Assembly)
+                    .BasedOn<IDeploymentAction>(),
+                AllTypes.FromAssembly(Assembly)
+                    .BasedOn<IEnvironmentValidationAction>()
                 );
 			RegisterConsumersFrom (Assembly);
         }

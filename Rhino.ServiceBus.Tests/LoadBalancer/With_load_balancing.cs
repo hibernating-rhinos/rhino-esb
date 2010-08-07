@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             container = new WindsorContainer(interpreter);
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
 
-            container.AddComponent<MyHandler>();
+            container.Register(Component.For<MyHandler>());
 
             container.Register(
                 Component.For<MsmqLoadBalancer>()

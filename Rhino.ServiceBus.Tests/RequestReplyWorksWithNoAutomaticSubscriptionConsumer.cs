@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -7,18 +8,18 @@ using Xunit;
 
 namespace Rhino.ServiceBus.Tests
 {
-	public class RequestReplyWorksWithNoAutomaticSubscriptionConsumer : 
-		OccasionalConsumerOf<RequestReplyWorksWithNoAutomaticSubscriptionConsumer.PongMessage>
-	{
-		private readonly WindsorContainer container;
+    public class RequestReplyWorksWithNoAutomaticSubscriptionConsumer :
+        OccasionalConsumerOf<RequestReplyWorksWithNoAutomaticSubscriptionConsumer.PongMessage>
+    {
+        private readonly WindsorContainer container;
         private readonly ManualResetEvent handle = new ManualResetEvent(false);
         private PongMessage message;
 
-		public RequestReplyWorksWithNoAutomaticSubscriptionConsumer()
+        public RequestReplyWorksWithNoAutomaticSubscriptionConsumer()
         {
             container = new WindsorContainer(new XmlInterpreter());
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.AddComponent<PingConsumer>();
+            container.Register(Component.For<PingConsumer>());
         }
 
 
@@ -64,5 +65,5 @@ namespace Rhino.ServiceBus.Tests
             message = pong;
             handle.Set();
         }
-	}
+    }
 }

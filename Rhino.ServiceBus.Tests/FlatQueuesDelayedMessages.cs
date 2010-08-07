@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -15,11 +16,11 @@ namespace Rhino.ServiceBus.Tests
         public FlatQueuesDelayedMessages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", 
+            container.Kernel.AddFacility("rhino.esb",
                 new RhinoServiceBusFacility()
                     .UseFlatQueueStructure());
-            container.AddComponent<HandleMessageLater>();
-            container.AddComponent<ProcessInteger>();
+            container.Register(Component.For<HandleMessageLater>());
+            container.Register(Component.For<ProcessInteger>());
         }
 
         [Fact]
@@ -42,7 +43,7 @@ namespace Rhino.ServiceBus.Tests
         public void Can_send_message_with_time_delay()
         {
             HandleMessageLater.ResetEvent = new ManualResetEvent(false);
-            using (var bus = container.Resolve<IStartableServiceBus>()) 
+            using (var bus = container.Resolve<IStartableServiceBus>())
             {
                 bus.Start();
 

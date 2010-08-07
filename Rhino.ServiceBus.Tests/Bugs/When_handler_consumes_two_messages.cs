@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         [Fact]
         public void Should_be_registered()
         {
-            container.AddComponent<MyHandler>();
+            container.Register(Component.For<MyHandler>());
 
             var bus = (DefaultServiceBus)container.Resolve<IServiceBus>();
             var consumers = bus.GatherConsumers(new CurrentMessageInformation
@@ -51,7 +51,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         [Fact]
         public void Should_be_registered_for_second_type()
         {
-            container.AddComponent<MyHandler>();
+            container.Register(Component.For<MyHandler>());
 
             var bus = (DefaultServiceBus)container.Resolve<IServiceBus>();
             var consumers = bus.GatherConsumers(new CurrentMessageInformation
