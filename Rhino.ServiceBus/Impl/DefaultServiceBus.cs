@@ -350,8 +350,15 @@ namespace Rhino.ServiceBus.Impl
             bool sentMsg = false;
             if (messages.Length == 0)
                 throw new MessagePublicationException("Cannot publish an empty message batch");
-            object msg = messages[0];
-            IEnumerable<Uri> subscriptions = subscriptionStorage.GetSubscriptionsFor(msg.GetType());
+
+            var subscriptions = new HashSet<Uri>();
+            foreach (var message in messages)
+            {
+                foreach (var uri in subscriptionStorage.GetSubscriptionsFor(message.GetType()))
+                {
+                    subscriptions.Add(uri);
+                }
+            }
             foreach (Uri subscription in subscriptions)
             {
                 transport.Send(endpointRouter.GetRoutedEndpoint(subscription), messages);
