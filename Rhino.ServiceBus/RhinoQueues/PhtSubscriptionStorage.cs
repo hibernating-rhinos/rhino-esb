@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         private readonly ILog logger = LogManager.GetLogger(typeof (PhtSubscriptionStorage));
 
         private readonly IMessageSerializer messageSerializer;
-        private readonly PersistentHashTable.PersistentHashTable pht;
+        private PersistentHashTable.PersistentHashTable pht;
         private readonly IReflection reflection;
 
         private readonly MultiValueIndexHashtable<Guid, string, Uri, int> remoteInstanceSubscriptions =
@@ -54,7 +54,10 @@ namespace Rhino.ServiceBus.RhinoQueues
         public void Dispose()
         {
             if (pht != null)
+            {
                 pht.Dispose();
+                pht = null;
+            }
         }
 
         #endregion
