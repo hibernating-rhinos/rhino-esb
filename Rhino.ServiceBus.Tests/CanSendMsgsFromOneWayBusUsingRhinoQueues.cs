@@ -40,18 +40,19 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                var oneWay = new RhinoQueuesOneWayBus(new[]
+                using (var oneWay = new RhinoQueuesOneWayBus(new[]
                                                  {
                                                      new MessageOwner
                                                          {
                                                              Endpoint = bus.Endpoint.Uri,
                                                              Name = "System",
                                                          },
-                                                 }, container.Resolve<IMessageSerializer>(),new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>()));
+                                                 }, container.Resolve<IMessageSerializer>(), new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
+                {
+                    oneWay.Send("hello there, one way");
 
-                oneWay.Send("hello there, one way");
-
-                StringConsumer.Event.WaitOne();
+                    StringConsumer.Event.WaitOne();
+                }
 
                 Assert.Equal("hello there, one way", StringConsumer.Value);
             }
