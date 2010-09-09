@@ -157,6 +157,9 @@ namespace Rhino.ServiceBus.Impl
             var subscriptionAsModule = subscriptionStorage as IMessageModule;
             if (subscriptionAsModule != null)
                 subscriptionAsModule.Stop(transport, this);
+            var disposableSubscriptionStorage = subscriptionStorage as IDisposable;
+            if (disposableSubscriptionStorage != null)
+                disposableSubscriptionStorage.Dispose();
         	FireServiceBusAware(aware => aware.BusDisposed(this));
         }
 
