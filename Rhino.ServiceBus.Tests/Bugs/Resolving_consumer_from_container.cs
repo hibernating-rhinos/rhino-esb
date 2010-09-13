@@ -1,3 +1,4 @@
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -14,7 +15,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
             container = new WindsorContainer(new XmlInterpreter());
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
 
-            container.AddComponent<SendByMessageOwner.TestHandler>();
+            container.Register(Component.For<SendByMessageOwner.TestHandler>());
         }
 
         [Fact]

@@ -50,6 +50,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
 
         }
         
+        [CLSCompliant(false)]
         public class CustomHeaderBuilder : IMessageBuilder<MessagePayload>
         {
             private IMessageBuilder<MessagePayload> inner;

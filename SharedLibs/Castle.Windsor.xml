@@ -195,39 +195,6 @@
             </summary>
             <value>The lifestyle.</value>
         </member>
-        <member name="M:Castle.Core.CastleComponentAttribute.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Castle.Core.CastleComponentAttribute"/> class.
-            </summary>
-            <param name="key">The key.</param>
-        </member>
-        <member name="M:Castle.Core.CastleComponentAttribute.#ctor(System.String,System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Castle.Core.CastleComponentAttribute"/> class.
-            </summary>
-            <param name="key">The key.</param>
-            <param name="service">The service.</param>
-        </member>
-        <member name="M:Castle.Core.CastleComponentAttribute.#ctor(System.String,System.Type,Castle.Core.LifestyleType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Castle.Core.CastleComponentAttribute"/> class.
-            </summary>
-            <param name="key">The key.</param>
-            <param name="service">The service.</param>
-            <param name="lifestyle">The lifestyle.</param>
-        </member>
-        <member name="P:Castle.Core.CastleComponentAttribute.Service">
-            <summary>
-            Gets the service.
-            </summary>
-            <value>The service.</value>
-        </member>
-        <member name="P:Castle.Core.CastleComponentAttribute.Key">
-            <summary>
-            Gets the key.
-            </summary>
-            <value>The key.</value>
-        </member>
         <member name="T:Castle.Core.ComponentActivatorAttribute">
             <summary>
             Associates a custom component with a component
@@ -324,6 +291,14 @@
             That is the actual type is not known exactly at the time when <see cref="T:Castle.Core.ComponentModel"/>
             is created. Those are for example components instantiated via abstract factory.
             </summary>
+        </member>
+        <member name="M:Castle.Core.Internal.ReflectionUtil.GetCompatibileArrayItemType(System.Type)">
+            <summary>
+            If the extended type is a Foo[] or IEnumerable{Foo} which is assignable from Foo[] this method will return typeof(Foo)
+            otherwise <c>null</c>.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
         </member>
         <member name="T:Castle.Core.SingletonAttribute">
             <summary>
@@ -504,12 +479,13 @@
             them in turn whethere they can provide that component, until it finds one that will.
             </remarks>
         </member>
-        <member name="M:Castle.MicroKernel.Resolvers.ILazyComponentLoader.Load(System.String,System.Type)">
+        <member name="M:Castle.MicroKernel.Resolvers.ILazyComponentLoader.Load(System.String,System.Type,System.Collections.IDictionary)">
             <summary>
             Used by container to allow the loader gister component for given <paramref name="key"/> and <paramref name="service"/> to the container at the time when it is requested
             </summary>
             <param name="key">Key of the requested component or null</param>
             <param name="service">Type of requested service or null</param>
+            <param name="arguments">User supplied arguments or null</param>
             <returns>Registration that registers component for given key and/or service or null.</returns>
             <remarks>
             While either key or service can be null reference it is guaranteed that at least one of them will not be null.
@@ -607,7 +583,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Castle.Core.DependencyModel"/> class.
             </summary>
-            <param name="type">The type.</param>
+            <param name="dependencyType">The type.</param>
             <param name="dependencyKey">The dependency key.</param>
             <param name="targetType">Type of the target.</param>
             <param name="isOptional">if set to <c>true</c> [is optional].</param>
@@ -1049,12 +1025,13 @@
             with itself.
             </summary>
         </member>
-        <member name="M:Castle.MicroKernel.Context.CreationContext.#ctor(System.Type,Castle.MicroKernel.Context.CreationContext)">
+        <member name="M:Castle.MicroKernel.Context.CreationContext.#ctor(System.Type,Castle.MicroKernel.Context.CreationContext,System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:Castle.MicroKernel.Context.CreationContext"/> class.
             </summary>
             <param name="typeToExtractGenericArguments">The type to extract generic arguments.</param>
             <param name="parentContext">The parent context.</param>
+            <param name="propagateInlineDependencies">When set to <c>true</c> will clone <paramref name="parentContext"/> <see cref="P:Castle.MicroKernel.Context.CreationContext.AdditionalParameters"/>.</param>
         </member>
         <member name="M:Castle.MicroKernel.Context.CreationContext.#ctor(Castle.MicroKernel.IHandler,Castle.MicroKernel.IReleasePolicy,System.Type,System.Collections.IDictionary,Castle.MicroKernel.SubSystems.Conversion.ITypeConverter)">
             <summary>
@@ -4581,44 +4558,6 @@
             <typeparam name="S">The service type.</typeparam>
             <returns>The component registration.</returns>
         </member>
-        <member name="M:Castle.MicroKernel.Registration.Component.For``2">
-            <summary>
-            Creates a component registration for the service types.
-            </summary>
-            <typeparam name="S">The primary service type.</typeparam>
-            <typeparam name="F">The forwarded type.</typeparam>
-            <returns>The component registration.</returns>
-        </member>
-        <member name="M:Castle.MicroKernel.Registration.Component.For``3">
-            <summary>
-            Creates a component registration for the service types.
-            </summary>
-            <typeparam name="S">The primary service type.</typeparam>
-            <typeparam name="F1">The first forwarded type.</typeparam>
-            <typeparam name="F2">The second forwarded type.</typeparam>
-            <returns>The component registration.</returns>
-        </member>
-        <member name="M:Castle.MicroKernel.Registration.Component.For``4">
-            <summary>
-            Creates a component registration for the service types.
-            </summary>
-            <typeparam name="S">The primary service type.</typeparam>
-            <typeparam name="F1">The first forwarded type.</typeparam>
-            <typeparam name="F2">The second forwarded type.</typeparam>
-            <typeparam name="F3">The third forwarded type.</typeparam>
-            <returns>The component registration.</returns>
-        </member>
-        <member name="M:Castle.MicroKernel.Registration.Component.For``5">
-            <summary>
-            Creates a component registration for the service types.
-            </summary>
-            <typeparam name="S">The primary service type.</typeparam>
-            <typeparam name="F1">The first forwarded type.</typeparam>
-            <typeparam name="F2">The second forwarded type.</typeparam>
-            <typeparam name="F3">The third forwarded type.</typeparam>
-            <typeparam name="F4">The fourth forwarded type.</typeparam>
-            <returns>The component registration.</returns>
-        </member>
         <member name="M:Castle.MicroKernel.Registration.Component.For(Castle.Core.ComponentModel)">
             <summary>
             Create a component registration for an exisiting <see cref="T:Castle.Core.ComponentModel"/>
@@ -4626,13 +4565,14 @@
             <param name="model">The component model.</param>
             <returns>The component registration.</returns>
         </member>
-        <member name="M:Castle.MicroKernel.Registration.Component.ServiceAlreadyRegistered(Castle.MicroKernel.IKernel,Castle.Core.ComponentModel)">
+        <member name="M:Castle.MicroKernel.Registration.Component.IsCastleComponent(System.Type)">
             <summary>
-            Determines if the component service is already registered.
+            Determines if the component is a Castle component, that is - if it has a <see cref="T:Castle.Core.CastleComponentAttribute"/>.
             </summary>
-            <param name="kernel">The kernel.</param>
-            <param name="model">The component model.</param>
-            <returns>true if the service is already registered.</returns>
+            <returns>true if the service is a Castle Component.</returns>
+            <remarks>
+            This method is usually used as argument for <see cref="M:Castle.MicroKernel.Registration.ComponentRegistration`1.If(Castle.MicroKernel.Registration.ComponentFilter)"/> method.
+            </remarks>
         </member>
         <member name="M:Castle.MicroKernel.Registration.Component.IsInNamespace(System.String)">
             <summary>
@@ -4678,6 +4618,52 @@
             <typeparam name="T">The component type to test namespace against.</typeparam>
             <param name="includeSubnamespaces">If set to true, will also include types from subnamespaces.</param>
             <returns>true if the component is in the same namespace.</returns>
+        </member>
+        <member name="M:Castle.MicroKernel.Registration.Component.ServiceAlreadyRegistered(Castle.MicroKernel.IKernel,Castle.Core.ComponentModel)">
+            <summary>
+            Determines if the component service is already registered.
+            </summary>
+            <param name="kernel">The kernel.</param>
+            <param name="model">The component model.</param>
+            <returns>true if the service is already registered.</returns>
+        </member>
+        <member name="M:Castle.MicroKernel.Registration.Component.For``2">
+            <summary>
+            Creates a component registration for the service types.
+            </summary>
+            <typeparam name="S">The primary service type.</typeparam>
+            <typeparam name="F">The forwarded type.</typeparam>
+            <returns>The component registration.</returns>
+        </member>
+        <member name="M:Castle.MicroKernel.Registration.Component.For``3">
+            <summary>
+            Creates a component registration for the service types.
+            </summary>
+            <typeparam name="S">The primary service type.</typeparam>
+            <typeparam name="F1">The first forwarded type.</typeparam>
+            <typeparam name="F2">The second forwarded type.</typeparam>
+            <returns>The component registration.</returns>
+        </member>
+        <member name="M:Castle.MicroKernel.Registration.Component.For``4">
+            <summary>
+            Creates a component registration for the service types.
+            </summary>
+            <typeparam name="S">The primary service type.</typeparam>
+            <typeparam name="F1">The first forwarded type.</typeparam>
+            <typeparam name="F2">The second forwarded type.</typeparam>
+            <typeparam name="F3">The third forwarded type.</typeparam>
+            <returns>The component registration.</returns>
+        </member>
+        <member name="M:Castle.MicroKernel.Registration.Component.For``5">
+            <summary>
+            Creates a component registration for the service types.
+            </summary>
+            <typeparam name="S">The primary service type.</typeparam>
+            <typeparam name="F1">The first forwarded type.</typeparam>
+            <typeparam name="F2">The second forwarded type.</typeparam>
+            <typeparam name="F3">The third forwarded type.</typeparam>
+            <typeparam name="F4">The fourth forwarded type.</typeparam>
+            <returns>The component registration.</returns>
         </member>
         <member name="M:Castle.MicroKernel.Registration.ComponentDependencyRegistrationExtensions.Insert(System.Collections.IDictionary,System.String,System.Object)">
             <summary>
@@ -5792,6 +5778,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Castle.MicroKernel.Registration.ServiceDescriptor.DefaultInterface">
+            <summary>
+            Uses all interfaces that have names matched by implementation type name.
+            Matches Foo to IFoo, SuperFooExtended to IFoo and IFooExtended etc
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Castle.MicroKernel.Registration.ServiceDescriptor.FirstInterface">
             <summary>
             Uses the first interface of a type. This method has non-deterministic behavior when type implements more than one interface!
@@ -6142,6 +6135,15 @@
             }
             </code>
             </example>
+        </member>
+        <member name="T:Castle.MicroKernel.Resolvers.SpecializedResolvers.CollectionResolver">
+            <summary>
+            More generic alternative to <see cref="T:Castle.MicroKernel.Resolvers.SpecializedResolvers.ArrayResolver"/> and <see cref="T:Castle.MicroKernel.Resolvers.SpecializedResolvers.ListResolver"/>.
+            It supports arrays as well as any generic interface type assignable from arrays.
+            </summary>
+            <remarks>
+            The collection instance that is provided is read only, even for interfaces like <see cref="T:System.Collections.Generic.IList`1"/>
+            </remarks>
         </member>
         <member name="T:Castle.MicroKernel.Resolvers.SpecializedResolvers.ListResolver">
             <summary>
@@ -7698,13 +7700,6 @@
             <returns>The container.</returns>
             </summary>
         </member>
-        <member name="M:Castle.Windsor.IWindsorContainer.Resolve(System.String)">
-            <summary>
-            Returns a component instance by the key
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
         <member name="M:Castle.Windsor.IWindsorContainer.Resolve(System.String,System.Collections.IDictionary)">
             <summary>
             Returns a component instance by the key
@@ -7896,7 +7891,7 @@
         </member>
         <member name="P:Castle.Windsor.IWindsorContainer.Item(System.String)">
             <summary>
-            Shortcut to <see cref="M:Castle.Windsor.IWindsorContainer.Resolve(System.String)"/>
+            Shortcut to <see cref="M:Castle.Windsor.IWindsorContainer.Resolve``1(System.String)"/>
             </summary>
         </member>
         <member name="P:Castle.Windsor.IWindsorContainer.Item(System.Type)">
@@ -8258,13 +8253,6 @@
             <returns>The container.</returns>
             </summary>
         </member>
-        <member name="M:Castle.Windsor.WindsorContainer.Resolve(System.String)">
-            <summary>
-            Returns a component instance by the key
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
         <member name="M:Castle.Windsor.WindsorContainer.Resolve(System.Type,System.Collections.IDictionary)">
             <summary>
             Returns a component instance by the service
@@ -8467,7 +8455,7 @@
         </member>
         <member name="P:Castle.Windsor.WindsorContainer.Item(System.String)">
             <summary>
-            Shortcut to the method <see cref="M:Castle.Windsor.WindsorContainer.Resolve(System.String)"/>
+            Shortcut to the method <see cref="M:Castle.Windsor.WindsorContainer.Resolve(System.String,System.Collections.IDictionary)"/>
             </summary>
         </member>
         <member name="P:Castle.Windsor.WindsorContainer.Item(System.Type)">

@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
@@ -25,7 +26,7 @@ namespace Rhino.ServiceBus.Tests
                     .AddMessageModule<Module2>()
                 );
 
-            container.AddComponent<BadHandler>();
+            container.Register(Component.For<BadHandler>());
         }
 
         [Fact]

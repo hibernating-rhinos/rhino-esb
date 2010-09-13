@@ -80,6 +80,7 @@ namespace Rhino.ServiceBus.Impl
             ReadConfiguration();
 
             Kernel.Register(
+
                 AllTypes.FromAssembly(typeof(IBusConfigurationAware).Assembly)
                     .BasedOn<IBusConfigurationAware>()
                 );

@@ -1,3 +1,4 @@
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Exceptions;
@@ -20,7 +21,7 @@ namespace Rhino.ServiceBus.Tests.Warnings
         [Fact]
         public void Registering_consumer_with_initiated_by_and_no_saga_should_throw()
         {
-            var exception = Assert.Throws<InvalidUsageException>(() => container.AddComponent<ConsumerWithInitiateBy_NoIsaga>());
+            var exception = Assert.Throws<InvalidUsageException>(() => container.Register(Component.For<ConsumerWithInitiateBy_NoIsaga>()));
             Assert.Equal(@"Message consumer: Rhino.ServiceBus.Tests.Warnings.Warnings_would_be_generated+ConsumerWithInitiateBy_NoIsaga implements InitiatedBy<TMsg> but doesn't implment ISaga<TState>. 
 Did you forget to inherit from ISaga<TState> ?", exception.Message);
         }
@@ -28,7 +29,7 @@ Did you forget to inherit from ISaga<TState> ?", exception.Message);
         [Fact]
         public void Registering_consumer_without_initiated_by_and_orchestrate()
         {
-            var exception = Assert.Throws<InvalidUsageException>(() => container.AddComponent<ConsumerWithoutInitiateBy_WithOrchestrate>());
+            var exception = Assert.Throws<InvalidUsageException>(() => container.Register(Component.For<ConsumerWithoutInitiateBy_WithOrchestrate>()));
             Assert.Equal(@"Message consumer: Rhino.ServiceBus.Tests.Warnings.ConsumerWithoutInitiateBy_WithOrchestrate implements Orchestrates<TMsg> but doesn't implment InitiatedBy<TState>. 
 Did you forget to inherit from InitiatedBy<TState> ?", exception.Message);
         }

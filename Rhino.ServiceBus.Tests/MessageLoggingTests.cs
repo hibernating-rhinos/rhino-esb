@@ -1,5 +1,6 @@
 using System;
 using System.Transactions;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.Mocks;
@@ -21,7 +22,7 @@ namespace Rhino.ServiceBus.Tests
         {
             container = new WindsorContainer(new XmlInterpreter());
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.AddComponent<MessageLoggingModule>();
+            container.Register(Component.For<MessageLoggingModule>());
 
             messageSerializer = container.Resolve<IMessageSerializer>();
 

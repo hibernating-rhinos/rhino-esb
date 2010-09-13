@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Hosting;
@@ -30,25 +31,25 @@ namespace Rhino.ServiceBus.Tests.Hosting
             container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
         }
 
-		[Fact]
-		public void Components_are_registered_using_name_only()
-		{
-			var windsorContainer = new WindsorContainer();
-			new SimpleBootStrapper().InitializeContainer(windsorContainer);
-			var handler = windsorContainer.Kernel.GetHandler(typeof(TestRemoteHandler).Name);
-			Assert.NotNull(handler);
-		}
+        [Fact]
+        public void Components_are_registered_using_name_only()
+        {
+            var windsorContainer = new WindsorContainer();
+            new SimpleBootStrapper().InitializeContainer(windsorContainer);
+            var handler = windsorContainer.Kernel.GetHandler(typeof(TestRemoteHandler).Name);
+            Assert.NotNull(handler);
+        }
 
         [Fact]
         public void And_accept_messages_from_there()
         {
             host.Start();
 
-            using(var bus = container.Resolve<IStartableServiceBus>())
+            using (var bus = container.Resolve<IStartableServiceBus>())
             {
                 bus.Start();
-                
-                using(bus.AddInstanceSubscription(this))
+
+                using (bus.AddInstanceSubscription(this))
                 {
                     bus.Send(new Uri("msmq://localhost/test_queue").ToEndpoint(), new StringMsg
                     {
@@ -75,16 +76,16 @@ namespace Rhino.ServiceBus.Tests.Hosting
         }
     }
 
-	public class SimpleBootStrapper : AbstractBootStrapper
-	{
-		
-	}
+    public class SimpleBootStrapper : AbstractBootStrapper
+    {
+
+    }
 
     public class TestBootStrapper : AbstractBootStrapper
     {
         protected override void ConfigureContainer()
         {
-            container.AddComponent<TestRemoteHandler>();
+            container.Register(Component.For<TestRemoteHandler>());
         }
     }
 
