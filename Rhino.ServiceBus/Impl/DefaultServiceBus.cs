@@ -285,7 +285,7 @@ namespace Rhino.ServiceBus.Impl
         {
             foreach (var message in information.ConsumedMessages)
             {
-                foreach (var owner in messageOwners.NotOf(message))
+                foreach (var owner in messageOwners.Of(message))
                 {
                 	var endpoint = endpointRouter.GetRoutedEndpoint(owner.Endpoint);
                 	endpoint.Transactional = owner.Transactional;

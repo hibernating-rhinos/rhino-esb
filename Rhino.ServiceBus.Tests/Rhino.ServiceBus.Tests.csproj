@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bugs\Can_read_subscriptions_from_queue.cs" />
+    <Compile Include="Bugs\When_subscribing_instance_subscriptions.cs" />
     <Compile Include="Bugs\FIeldProblem_Nick.cs" />
     <Compile Include="Bugs\MsmqFlatSubscriptionsTests.cs" />
     <Compile Include="Bugs\MsmqSubQueueSubscriptionTests.cs" />
