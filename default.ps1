@@ -64,9 +64,17 @@ task Compile -depends Init {
 } 
 
 task Test -depends Compile {
+  $test_runner =  "$tools_dir\xUnit\"
   $old = pwd
   cd $build_dir
-  & $tools_dir\xUnit\xunit.console.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
+  if($target_framework_version -eq '4.0')
+  {
+    & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
+  }
+  else
+  {
+    & $tools_dir\xUnit\xunit.console.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
+  }
   cd $old		
 }
 

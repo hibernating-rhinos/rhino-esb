@@ -18,7 +18,7 @@ namespace Rhino.ServiceBus.Config
             if (facility.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) == false)
                 return;
 
-            IConfiguration busConfig = facility.FacilityConfig.Children["bus"];
+            IConfiguration busConfig = configuration.Children["bus"];
             if (busConfig == null)
                 throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
             var name = busConfig.Attributes["name"];

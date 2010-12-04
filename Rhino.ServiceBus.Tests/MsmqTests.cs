@@ -257,9 +257,7 @@ namespace Rhino.ServiceBus.Tests
 
             Assert.False(asyncResult.CompletedSynchronously);
 
-            Assert.Throws<MessageQueueException>(
-                "Timeout for the requested operation has expired.",
-                () => queue.EndPeek(asyncResult));
+            Assert.Throws<MessageQueueException>(() => queue.EndPeek(asyncResult));
         }
 
 
