@@ -54,7 +54,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             //New conatainer to more closely mimic as separate app.
             receivingBusContainer = new WindsorContainer(new XmlInterpreter(@"LoadBalancer\ReceivingBusWithLoadBalancer.config"));
             receivingBusContainer.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.Register(Component.For<TestHandler>());
+            receivingBusContainer.Register(Component.For<TestHandler>());
         }
 
         [Fact]
