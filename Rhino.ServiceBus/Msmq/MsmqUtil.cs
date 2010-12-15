@@ -134,10 +134,21 @@ namespace Rhino.ServiceBus.Msmq
         public static MessageQueue CreateQueue(string newQueuePath, bool transactional)
         {
 			var queue = MessageQueue.Create(newQueuePath, transactional);
-            var administratorsGroupName = new SecurityIdentifier("S-1-5-32-544")
-                                                .Translate(typeof(NTAccount))
-                                                .ToString();
+
+            var administratorsGroupName = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null)
+                .Translate(typeof(NTAccount))
+                .ToString();
+            var everyoneGroupName = new SecurityIdentifier(WellKnownSidType.WorldSid, null)
+                .Translate(typeof(NTAccount))
+                .ToString();
+            var anonymousLogonName = new SecurityIdentifier(WellKnownSidType.AnonymousSid, null)
+                .Translate(typeof(NTAccount))
+                .ToString();
+
             queue.SetPermissions(administratorsGroupName, MessageQueueAccessRights.FullControl, AccessControlEntryType.Allow);
+            queue.SetPermissions(everyoneGroupName, MessageQueueAccessRights.WriteMessage, AccessControlEntryType.Allow);
+            queue.SetPermissions(anonymousLogonName, MessageQueueAccessRights.WriteMessage, AccessControlEntryType.Allow);
+            
             return queue;
         }
         
