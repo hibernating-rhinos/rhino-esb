@@ -101,6 +101,7 @@ task Release  -depends Test{
     	$build_dir\Rhino.Queues.dll `
     	$build_dir\Rhino.ServiceBus.dll `
     	$build_dir\Rhino.ServiceBus.xml `
+    	$build_dir\Rhino.ServiceBus.Host.exe `
     	$build_dir\Wintellect.Threading.dll `
     	$build_dir\Wintellect.Threading.xml `
     	license.txt `
