@@ -1,11 +1,11 @@
 using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Configuration.Interpreters;
 
 namespace Rhino.ServiceBus.Tests
 {
     using System;
     using System.Threading;
-    using Castle.Windsor;
-    using Castle.Windsor.Configuration.Interpreters;
     using Impl;
     using Xunit;
 

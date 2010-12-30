@@ -2,13 +2,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Castle.Core.Configuration;
-using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using log4net;
 using log4net.Config;
-using Rhino.ServiceBus.Actions;
-using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -17,11 +12,14 @@ namespace Rhino.ServiceBus.Hosting
         private readonly ILog logger = LogManager.GetLogger(typeof(DefaultHost));
         private string assemblyName;
         private AbstractBootStrapper bootStrapper;
-        private IWindsorContainer container;
         private IStartableServiceBus serviceBus;
         private string bootStrapperName;
-    	private string standaloneCastleConfigurationFileName;
-        private IConfiguration hostConfiguration;
+        //private IConfiguration hostConfiguration;
+
+        public IServiceBus Bus
+        {
+            get { return serviceBus; }
+        }
 
         public void SetBootStrapperTypeName(string typeName)
         {
@@ -56,37 +54,20 @@ namespace Rhino.ServiceBus.Hosting
 
             log4net.GlobalContext.Properties["BusName"] = bootStrapper.GetType().Namespace;
 
-            CreateContainer();
-
             InitializeContainer();
 
             bootStrapper.BeforeStart();
 
             logger.Debug("Starting bus");
-            serviceBus = container.Resolve<IStartableServiceBus>();
+            serviceBus = bootStrapper.GetStartableServiceBus();
         }
 
         private void InitializeContainer()
         {
-            bootStrapper.InitializeContainer(container);
-            if (hostConfiguration != null)
-                container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
-
-            var facility = new RhinoServiceBusFacility();
-            bootStrapper.ConfigureBusFacility(facility);
-            container.Kernel.AddFacility("rhino.esb", facility);
-        }
-
-        private void CreateContainer()
-        {
-			if (container == null)
-			{
-				container = string.IsNullOrEmpty(standaloneCastleConfigurationFileName) 
-					? File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
-                        ? new WindsorContainer(new XmlInterpreter()) 
-                        : new WindsorContainer() 
-					: new WindsorContainer(new XmlInterpreter(standaloneCastleConfigurationFileName));
-			}
+            bootStrapper.InitializeContainer();
+            //TODO handle this differently
+            //if (hostConfiguration != null)
+                //container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
         }
 
         private void CreateBootStrapper()
@@ -109,11 +90,6 @@ namespace Rhino.ServiceBus.Hosting
             {
                 throw new InvalidOperationException("Failed to create " + bootStrapperType + ".", e);
             }
-        }
-
-        public IWindsorContainer Container
-        {
-            get { return container; }
         }
 
         private static Type GetAutoBootStrapperType(Assembly assembly)
@@ -142,8 +118,6 @@ namespace Rhino.ServiceBus.Hosting
                 bootStrapper.Dispose();
             if (serviceBus != null)
                 serviceBus.Dispose();
-            if (container != null)
-                container.Dispose();
         }
 
         public override object InitializeLifetimeService()
@@ -154,31 +128,15 @@ namespace Rhino.ServiceBus.Hosting
         public void InitialDeployment(string asmName, string user)
         {
             InitailizeBus(asmName);
-
-            foreach (var action in container.ResolveAll<IDeploymentAction>())
-            {
-                action.Execute(user);
-            }
-
-            foreach (var action in container.ResolveAll<IEnvironmentValidationAction>())
-            {
-                action.Execute();
-            }
+            bootStrapper.ExecuteDeploymentActions(user);
+            
+            bootStrapper.ExecuteEnvironmentValidationActions();
         }
 
-		public void UseContainer(IWindsorContainer theContainer)
-		{
-			container = theContainer;
-		}
-
-		public void UseStandaloneCastleConfigurationFileName(string configurationFileName)
-		{
-			standaloneCastleConfigurationFileName = configurationFileName;
-		}
-
-        public void BusConfiguration(Func<HostConfiguration, HostConfiguration> configuration)
-        {
-            hostConfiguration = configuration(new HostConfiguration()).ToIConfiguration();
-        }
+        //TODO change this to work with all containers
+        //public void BusConfiguration(Func<HostConfiguration, HostConfiguration> configuration)
+        //{
+        //    hostConfiguration = configuration(new HostConfiguration()).ToIConfiguration();
+        //}
     }
 }

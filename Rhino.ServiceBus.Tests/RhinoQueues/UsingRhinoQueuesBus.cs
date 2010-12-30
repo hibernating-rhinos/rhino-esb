@@ -40,7 +40,6 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             container.Register(Component.For<WhenTransactionCommitErrors_ShouldNotCrash_Msmq.ConsumerEnlistingInBadTransaction>());
             container.Register(Component.For<StringConsumer>());
             container.Register(Component.For<ThrowingIntConsumer>());
-            container.Register(Component.For<IConsumerLocator>().ImplementedBy<CastleConsumerLocator>());
             bus = container.Resolve<IStartableServiceBus>();
             bus.Start();
         }

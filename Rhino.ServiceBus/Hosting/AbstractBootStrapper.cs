@@ -1,18 +1,10 @@
 using System;
 using System.Reflection;
-using Castle.Core;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
-using Rhino.ServiceBus.Actions;
-using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Hosting
 {
     public abstract class AbstractBootStrapper : IDisposable
     {
-        protected IWindsorContainer container;
-
         public virtual Assembly Assembly
         {
             get { return GetType().Assembly; }
@@ -22,46 +14,13 @@ namespace Rhino.ServiceBus.Hosting
         {
         }
 
-        public void InitializeContainer(IWindsorContainer windsorContainer)
-        {
-            container = windsorContainer;
+        public abstract void InitializeContainer();
 
-            ConfigureContainer();
-        }
+        public abstract void ExecuteDeploymentActions(string user);
 
-        protected virtual void ConfigureContainer()
-        {
-            container.Register(
-                AllTypes.FromAssembly(Assembly)
-                    .BasedOn<IDeploymentAction>(),
-                AllTypes.FromAssembly(Assembly)
-                    .BasedOn<IEnvironmentValidationAction>()
-                );
-			RegisterConsumersFrom (Assembly);
-        }
+        public abstract void ExecuteEnvironmentValidationActions();
 
-		protected virtual void RegisterConsumersFrom(Assembly assembly)
-		{
-			container.Register (
-				 AllTypes
-					.FromAssembly (assembly)
-					.Where (type =>
-						typeof (IMessageConsumer).IsAssignableFrom (type) &&
-						typeof (IOccasionalMessageConsumer).IsAssignableFrom (type) == false &&
-						IsTypeAcceptableForThisBootStrapper (type)
-					)
-					.Configure (registration =>
-					{
-						registration.LifeStyle.Is (LifestyleType.Transient);
-						ConfigureConsumer (registration);
-					})
-				);
-		}
-
-    	protected virtual void ConfigureConsumer(ComponentRegistration registration)
-    	{
-    		registration.Named(registration.Implementation.Name);
-    	}
+        public abstract IStartableServiceBus GetStartableServiceBus();
 
     	protected virtual bool IsTypeAcceptableForThisBootStrapper(Type t)
         {
@@ -70,17 +29,8 @@ namespace Rhino.ServiceBus.Hosting
 
         public virtual void BeforeStart()
         {
-            
         }
 
-        public virtual void ConfigureBusFacility(RhinoServiceBusFacility facility)
-        {
-            
-        }
-
-        public virtual void Dispose()
-        {
-            container.Dispose();
-        }
+        public abstract void Dispose();
     }
 }

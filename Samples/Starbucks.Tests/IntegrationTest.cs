@@ -46,7 +46,7 @@ namespace Starbucks.Tests
             customerHost = new DefaultHost();
             customerHost.Start<CustomerBootStrapper>();
 
-            var bus = customerHost.Container.Resolve<IServiceBus>();
+            var bus = customerHost.Bus;
 
             var userInterface = new MockCustomerUserInterface();
             var customer = new CustomerController(bus)

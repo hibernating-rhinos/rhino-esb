@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Host", "Rh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starbucks.Tests", "Samples\Starbucks.Tests\Starbucks.Tests.csproj", "{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Castle", "Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj", "{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBCAD5F6-F6A4-47C8-B8B5-F92E26CBACDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

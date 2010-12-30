@@ -1,12 +1,12 @@
 using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.Tests.Bugs
 {
     using System;
     using System.Messaging;
-    using Castle.Windsor;
-    using Castle.Windsor.Configuration.Interpreters;
     using Impl;
     using Msmq;
     using Xunit;

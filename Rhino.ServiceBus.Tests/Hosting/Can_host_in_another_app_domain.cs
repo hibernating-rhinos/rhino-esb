@@ -6,6 +6,7 @@ using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 using Xunit;
@@ -34,8 +35,8 @@ namespace Rhino.ServiceBus.Tests.Hosting
         [Fact]
         public void Components_are_registered_using_name_only()
         {
-            var windsorContainer = new WindsorContainer();
-            new SimpleBootStrapper().InitializeContainer(windsorContainer);
+            var windsorContainer = new WindsorContainer(new XmlInterpreter());
+            new SimpleBootStrapper(windsorContainer).InitializeContainer();
             var handler = windsorContainer.Kernel.GetHandler(typeof(TestRemoteHandler).Name);
             Assert.NotNull(handler);
         }
@@ -76,16 +77,19 @@ namespace Rhino.ServiceBus.Tests.Hosting
         }
     }
 
-    public class SimpleBootStrapper : AbstractBootStrapper
+    public class SimpleBootStrapper : CastleBootStrapper
     {
-
+        public SimpleBootStrapper(IWindsorContainer container) : base(container)
+        {
+            
+        }
     }
 
-    public class TestBootStrapper : AbstractBootStrapper
+    public class TestBootStrapper : CastleBootStrapper
     {
         protected override void ConfigureContainer()
         {
-            container.Register(Component.For<TestRemoteHandler>());
+            Container.Register(Component.For<TestRemoteHandler>());
         }
     }
 
