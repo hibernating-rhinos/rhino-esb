@@ -25,8 +25,11 @@ namespace Rhino.ServiceBus.Tests
                 Directory.Delete("test_queue.esent", true);
             if (Directory.Exists("test_queue_subscriptions.esent"))
                 Directory.Delete("test_queue_subscriptions.esent", true);
-            container = new WindsorContainer(new XmlInterpreter("OneWayBusRhinoQueues.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("OneWayBusRhinoQueues.config")
+                .Configure();
             container.Register(Component.For<StringConsumer>());
             StringConsumer.Value = null;
             StringConsumer.Event = new ManualResetEvent(false);

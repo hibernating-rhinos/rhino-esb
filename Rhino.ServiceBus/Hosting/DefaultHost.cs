@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using log4net.Config;
+using Rhino.ServiceBus.Config;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -14,7 +15,7 @@ namespace Rhino.ServiceBus.Hosting
         private AbstractBootStrapper bootStrapper;
         private IStartableServiceBus serviceBus;
         private string bootStrapperName;
-        //private IConfiguration hostConfiguration;
+        private BusConfigurationSection hostConfiguration;
 
         public IServiceBus Bus
         {
@@ -65,9 +66,8 @@ namespace Rhino.ServiceBus.Hosting
         private void InitializeContainer()
         {
             bootStrapper.InitializeContainer();
-            //TODO handle this differently
-            //if (hostConfiguration != null)
-                //container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration);
+            if (hostConfiguration != null)
+                bootStrapper.UseConfiguration(hostConfiguration);
         }
 
         private void CreateBootStrapper()
@@ -133,10 +133,9 @@ namespace Rhino.ServiceBus.Hosting
             bootStrapper.ExecuteEnvironmentValidationActions();
         }
 
-        //TODO change this to work with all containers
-        //public void BusConfiguration(Func<HostConfiguration, HostConfiguration> configuration)
-        //{
-        //    hostConfiguration = configuration(new HostConfiguration()).ToIConfiguration();
-        //}
+        public void BusConfiguration(Func<HostConfiguration, HostConfiguration> configuration)
+        {
+            hostConfiguration = configuration(new HostConfiguration()).ToBusConfiguration();
+        }
     }
 }

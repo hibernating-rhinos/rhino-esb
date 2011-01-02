@@ -1,83 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using Castle.Core;
-using Castle.Core.Configuration;
-using Castle.MicroKernel;
-using Castle.MicroKernel.Registration;
-using Rhino.ServiceBus.Actions;
 using System.Transactions;
-using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Impl
 {
 	public class RhinoServiceBusFacility : AbstractRhinoServiceBusFacility
     {
-        protected readonly List<MessageOwner> messageOwners = new List<MessageOwner>();
+        private readonly List<MessageOwner> messageOwners = new List<MessageOwner>();
 
-        protected override void ReadConfiguration()
+	    public IEnumerable<MessageOwner> MessageOwners
 	    {
-	        ReadBusConfiguration();
-	        new MessageOwnersConfigReader(FacilityConfig, messageOwners).ReadMessageOwners();
+            get { return messageOwners; }
 	    }
 
-        protected override void RegisterComponents()
-        {
-            Kernel.Register(
-                Component.For<IConsumerLocator>()
-                    .ImplementedBy<CastleConsumerLocator>(),
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLogQueueAction>(),
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateQueuesAction>(),
-                Component.For<IServiceBus, IStartableServiceBus>()
-                    .ImplementedBy<DefaultServiceBus>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .DependsOn(new
-                    {
-                        messageOwners = messageOwners.ToArray(),
-                    })
-                    .Parameters(Parameter.ForKey("modules").Eq(CreateModuleConfigurationNode())
-                    )
-                );
-        }
+	    protected override void ReadBusConfiguration()
+	    {
+	        base.ReadBusConfiguration();
+	        new MessageOwnersConfigReader(ConfigurationSection, messageOwners).ReadMessageOwners();
+	    }
 
-        private IConfiguration CreateModuleConfigurationNode()
+        protected override void ApplyConfiguration()
         {
-            var config = new MutableConfiguration("array");
-            foreach (Type type in messageModules)
-            {
-                config.CreateChild("item", "${" + type.FullName + "}");
-            }
-            return config;
-        }
-
-        protected void ReadBusConfiguration()
-        {
-            IConfiguration busConfig = FacilityConfig.Children["bus"];
+            BusElement busConfig = ConfigurationSection.Bus;
             if (busConfig == null)
                 throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
 
-            string retries = busConfig.Attributes["numberOfRetries"];
-            int result;
-            if (int.TryParse(retries, out result))
-                NumberOfRetries = result;
+            if(busConfig.NumberOfRetries.HasValue)
+                NumberOfRetries = busConfig.NumberOfRetries.Value;
 
-            string threads = busConfig.Attributes["threadCount"];
-            if (int.TryParse(threads, out result))
-                ThreadCount = result;
+            if(busConfig.ThreadCount.HasValue)
+                ThreadCount = busConfig.ThreadCount.Value;
 
-        	string isolationLevel = busConfig.Attributes["queueIsolationLevel"];
+            string isolationLevel = busConfig.QueueIsolationLevel;
 			if (!string.IsNullOrEmpty(isolationLevel))
 				queueIsolationLevel = (IsolationLevel)Enum.Parse(typeof(IsolationLevel), isolationLevel);
 
-            string inTransaction = busConfig.Attributes["consumeInTransaction"];
-            bool boolResult;
-            if (bool.TryParse(inTransaction, out boolResult))
-                consumeInTxn = boolResult;
+            if(busConfig.ConsumeInTransaction.HasValue)
+                consumeInTxn = busConfig.ConsumeInTransaction.Value;
 
-            string uriString = busConfig.Attributes["endpoint"];
+            string uriString = busConfig.Endpoint;
             Uri endpoint;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)
             {
@@ -86,7 +50,8 @@ namespace Rhino.ServiceBus.Impl
             }
             Endpoint = endpoint;
 
-			string transactionalString = busConfig.Attributes["transactional"];
+            string transactionalString = busConfig.Transactional;
+
         	bool temp;
 			if (bool.TryParse(transactionalString, out temp))
 			{
@@ -95,11 +60,11 @@ namespace Rhino.ServiceBus.Impl
 			else if(transactionalString != null)
 			{
 				throw new ConfigurationErrorsException(
-					"Attribute 'transactional' on 'bus' has an invalid value '" + uriString + "'");
+					"Attribute 'transactional' on 'bus' has an invalid value '" + transactionalString + "'");
 			}
         }
 
-		public IFacility UseFlatQueueStructure()
+		public AbstractRhinoServiceBusFacility UseFlatQueueStructure()
 	    {
 	        UseFlatQueue = true;
 	        return this;

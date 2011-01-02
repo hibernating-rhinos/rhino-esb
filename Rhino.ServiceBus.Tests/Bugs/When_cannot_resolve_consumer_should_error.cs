@@ -16,7 +16,9 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_cannot_resolve_consumer_because_of_missing_dependecies()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
         }
 
         [Fact]

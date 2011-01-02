@@ -1,6 +1,4 @@
-using System.Threading;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
@@ -16,8 +14,11 @@ namespace Rhino.ServiceBus.Tests
 
         public BugWithLogTest()
         {
-            container = new WindsorContainer(new XmlInterpreter("BusWithLogging.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
         }
 
         [Fact]

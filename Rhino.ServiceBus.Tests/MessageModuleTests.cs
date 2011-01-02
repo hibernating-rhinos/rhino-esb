@@ -20,11 +20,11 @@ namespace Rhino.ServiceBus.Tests
             Module2.Stopped = Module2.Started = false;
 
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", 
-                new RhinoServiceBusFacility()
-                    .AddMessageModule<Module1>()
-                    .AddMessageModule<Module2>()
-                );
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .AddMessageModule<Module1>()
+                .AddMessageModule<Module2>()
+                .Configure();
 
             container.Register(Component.For<BadHandler>());
         }
@@ -50,12 +50,13 @@ namespace Rhino.ServiceBus.Tests
 			Module2.Stopped = Module2.Started = false;
 
 			container = new WindsorContainer(new XmlInterpreter());
-			var facility = new RhinoServiceBusFacility()
+			new RhinoServiceBusFacility()
 				.AddMessageModule<Module1>()
 				.AddMessageModule<Module2>()
-				.DisableQueueAutoCreation();
+				.DisableQueueAutoCreation()
+                .UseCastleWindsor(container)
+                .Configure();
 
-			container.Kernel.AddFacility("rhino.esb", facility);
 
 			var serviceBus = (DefaultServiceBus)container.Resolve<IServiceBus>();
 			Assert.IsType<Module1>(serviceBus.Modules[0]);

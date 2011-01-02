@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Messaging;
 using System.Transactions;
@@ -7,6 +8,7 @@ using Castle.Core;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
 using Rhino.Queues;
+using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.RhinoQueues;
@@ -19,15 +21,22 @@ namespace Rhino.ServiceBus.Impl
     {
         private readonly List<MessageOwner> messageOwners = new List<MessageOwner>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
+        private BusConfigurationSection configuration;
 
         public void UseMessageSerializer<TMessageSerializer>()
         {
             serializerImpl = typeof(TMessageSerializer);
         }
 
+        private void ReadConfiguration()
+        {
+            configuration = ConfigurationManager.GetSection("rhino.esb") as BusConfigurationSection;
+        }
+
         protected override void Init()
         {
-            var messageOwnersReader = new MessageOwnersConfigReader(FacilityConfig, messageOwners);
+            ReadConfiguration();
+            var messageOwnersReader = new MessageOwnersConfigReader(configuration, messageOwners);
             messageOwnersReader.ReadMessageOwners();
             if (IsRhinoQueues(messageOwnersReader.EndpointScheme))
             {

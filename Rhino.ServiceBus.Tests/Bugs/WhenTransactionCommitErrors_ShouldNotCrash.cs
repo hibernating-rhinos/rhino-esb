@@ -52,7 +52,9 @@ namespace Rhino.ServiceBus.Tests.Bugs
         private static IWindsorContainer CreateContainer()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
             container.Register(Component.For<ConsumerEnlistingInBadTransaction>());
             return container;
         }

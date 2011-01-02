@@ -1,16 +1,11 @@
 using System;
-using System.Messaging;
-using Castle.Core;
-using Castle.Core.Configuration;
-using Castle.MicroKernel.Registration;
+using System.Transactions;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
-using Rhino.ServiceBus.Msmq.TransportActions;
 
 namespace Rhino.ServiceBus.Config
 {
-    public class MsmqTransportConfigurationAware : IBusConfigurationAware
+    public abstract class MsmqTransportConfigurationAware : IBusConfigurationAware
     {
         private Type queueStrategyImpl = typeof(SubQueueStrategy);
 
@@ -25,63 +20,46 @@ namespace Rhino.ServiceBus.Config
             }
         }
 
-        public MsmqTransportConfigurationAware()
+        protected Type QueueStrategyType
+        {
+            get { return queueStrategyImpl; }
+        }
+
+        protected MsmqTransportConfigurationAware()
         {
             DetectQueueStrategy();
         }
 
-        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusFacility facility)
         {
             if (facility.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
                 return;
 
-            if(facility.UseFlatQueue)
+            if (facility.UseFlatQueue)
             {
                 queueStrategyImpl = typeof (FlatQueueStrategy);
             }
 
-            if(facility.DisableAutoQueueCreation==false)
+            if (facility.DisableAutoQueueCreation == false)
             {
-                facility.Kernel.Register(Component.For<QueueCreationModule>());
+                RegisterQueueCreationModule();
             }
 
-            facility.Kernel.Register(
-                Component.For<IMessageBuilder<Message>>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy<MsmqMessageBuilder>(),
-                Component.For<IQueueStrategy>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(queueStrategyImpl)
-                    .DependsOn(new { endpoint = facility.Endpoint }),
-                Component.For<IMsmqTransportAction>()
-                    .ImplementedBy<ErrorAction>()
-                    .DependsOn(new { numberOfRetries = facility.NumberOfRetries }),
-                Component.For<ISubscriptionStorage>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqSubscriptionStorage))
-                    .DependsOn(new
-                    {
-                        queueBusListensTo = facility.Endpoint
-                    }),
-                Component.For<ITransport>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqTransport))
-                    .DependsOn(new
-                    {
-                        threadCount = facility.ThreadCount,
-                        endpoint = facility.Endpoint,
-                        queueIsolationLevel = facility.IsolationLevel,
-                        numberOfRetries = facility.NumberOfRetries,
-                        transactional = facility.Transactional,
-                        consumeInTransaction = facility.ConsumeInTransaction,
-                    }),
-                AllTypes.FromAssembly(typeof(IMsmqTransportAction).Assembly)
-                    .BasedOn<IMsmqTransportAction>()
-                    .Unless(x => x == typeof(ErrorAction))
-                    .WithService.FirstInterface()
-                    .Configure(registration =>
-                               registration.LifeStyle.Is(LifestyleType.Singleton))
-                );
+            RegisterTransportServices(facility.ThreadCount,
+                                      facility.Endpoint,
+                                      facility.IsolationLevel,
+                                      facility.NumberOfRetries,
+                                      facility.Transactional,
+                                      facility.consumeInTxn);
         }
+
+        protected abstract void RegisterQueueCreationModule();
+
+        protected abstract void RegisterTransportServices(int threadCount, 
+            Uri endpoint, 
+            IsolationLevel queueIsolationLevel, 
+            int numberOfRetries, 
+            TransactionalOptions transactionalOptions, 
+            bool consumeInTransaction);
     }
 }

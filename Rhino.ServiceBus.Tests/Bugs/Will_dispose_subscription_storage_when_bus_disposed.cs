@@ -21,8 +21,11 @@ namespace Rhino.ServiceBus.Tests.Bugs
 
         private static IStartableServiceBus CreateServiceBus()
         {
-            var windsorContainer = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
-            windsorContainer.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            var windsorContainer = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(windsorContainer)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                .Configure();
             var serviceBus = windsorContainer.Resolve<IStartableServiceBus>();
             serviceBus.Start();
             return serviceBus;

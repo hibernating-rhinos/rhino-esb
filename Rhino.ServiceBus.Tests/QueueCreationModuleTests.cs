@@ -31,10 +31,11 @@ namespace Rhino.ServiceBus.Tests
 		[Fact]
 		public void Should_create_subqueue_strategy_queues()
 		{
-			container = new WindsorContainer(new XmlInterpreter(
-			                                 	Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InitBus.config")
-			                                 	));
-			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+			container = new WindsorContainer(new XmlInterpreter());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InitBus.config"))
+                .Configure();
 			using (var bus = container.Resolve<IStartableServiceBus>())
 			{
 				bus.Start();
@@ -46,9 +47,13 @@ namespace Rhino.ServiceBus.Tests
 		public void Should_create_flat_queue_strategy_queues()
 		{
 			container = new WindsorContainer(new XmlInterpreter(
-			                                 	Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InitBus.config")
 			                                 	));
-			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility().UseFlatQueueStructure());
+            new RhinoServiceBusFacility()
+                .UseFlatQueueStructure()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InitBus.config"))
+                .Configure();
+
 			using (var bus = container.Resolve<IStartableServiceBus>())
 			{
 				bus.Start();

@@ -3,6 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Serializers;
 using Xunit;
@@ -34,7 +36,8 @@ namespace Rhino.ServiceBus.Tests.Bugs
         [Fact]
         public void Can_roundtrip()
         {
-            var serializer = new XmlMessageSerializer(new DefaultReflection(),new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
 
             var stream = new MemoryStream();
             serializer.Serialize(new object[] {new Foo {Name = "abc"}}, stream);
@@ -57,7 +60,8 @@ namespace Rhino.ServiceBus.Tests.Bugs
 
             try
             {
-                var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+                var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             
                 var stream = new MemoryStream();
                 var date = DateTime.Now;

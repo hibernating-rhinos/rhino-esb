@@ -23,9 +23,11 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
         {
             testQueue2.Purge();
 
-            var interpreter = new XmlInterpreter(@"LoadBalancer\BusWithLoadBalancer.config");
-            container = new WindsorContainer(interpreter);
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
+                .Configure();
 
             container.Register(
                 Component.For<MsmqSecondaryLoadBalancer>()

@@ -23,7 +23,9 @@ namespace Rhino.ServiceBus.Tests
             OrderProcessor.LastState = null;
             wait = new ManualResetEvent(false);
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
             container.Register(
                 Component.For(typeof(ISagaPersister<>))
                     .ImplementedBy(typeof(InMemorySagaPersister<>)),

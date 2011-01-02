@@ -26,10 +26,11 @@ namespace Rhino.ServiceBus.Tests.Hosting
 
         public Can_host_in_another_app_domain()
         {
-            container = new WindsorContainer(new XmlInterpreter(
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnotherBus.config")
-                ));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnotherBus.config"))
+                .Configure();
         }
 
         [Fact]

@@ -17,10 +17,13 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void it_should_add_custom_header_to_headers_collection_using_builder()
         {
-            using( var container = new WindsorContainer("RhinoQueues/RhinoQueues.config"))
+            using( var container = new WindsorContainer())
             {
                 container.Register(Component.For<IMessageBuilder<MessagePayload>>().ImplementedBy<CustomHeaderBuilder>());//before facility
-                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+                new RhinoServiceBusFacility()
+                    .UseCastleWindsor(container)
+                    .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                    .Configure();
 
                 var builder = container.Resolve<IMessageBuilder<MessagePayload>>();
                 builder.Initialize(new Endpoint { Uri = RhinoQueuesOneWayBus.NullEndpoint });
@@ -35,10 +38,13 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void it_should_add_custom_header_to_headers_collection_using_interface()
         {
-            using (var container = new WindsorContainer("RhinoQueues/RhinoQueues.config"))
+            using (var container = new WindsorContainer())
             {
-                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
                 container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
+                new RhinoServiceBusFacility()
+                    .UseCastleWindsor(container)
+                    .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                    .Configure();
 
                 var builder = container.Resolve<IMessageBuilder<MessagePayload>>();
                 builder.Initialize(new Endpoint { Uri = RhinoQueuesOneWayBus.NullEndpoint });

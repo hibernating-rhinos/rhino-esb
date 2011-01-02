@@ -16,9 +16,10 @@ namespace Rhino.ServiceBus.Tests
         public FlatQueuesDelayedMessages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb",
-                new RhinoServiceBusFacility()
-                    .UseFlatQueueStructure());
+            new RhinoServiceBusFacility()
+                .UseFlatQueueStructure()
+                .UseCastleWindsor(container)
+                .Configure();
             container.Register(Component.For<HandleMessageLater>());
             container.Register(Component.For<ProcessInteger>());
         }

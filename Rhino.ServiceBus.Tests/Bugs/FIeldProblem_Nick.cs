@@ -4,6 +4,8 @@ using System.Linq;
 using System.Messaging;
 using System.Threading;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
@@ -20,8 +22,8 @@ namespace Rhino.ServiceBus.Tests.Bugs
                                                                                   enumer)
         {
             Guid id = Guid.NewGuid();
-            var serializer = new XmlMessageSerializer(new
-                                                          DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
 
             var subscriptionStorage = new MsmqSubscriptionStorage(new
                                                                       DefaultReflection(),

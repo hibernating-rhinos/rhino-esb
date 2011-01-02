@@ -39,8 +39,12 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\SharedLibs\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <HintPath>..\SharedLibs\Rhino.Queues.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -48,6 +52,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CastleBootStrapper.cs" />
+    <Compile Include="CastleServiceLocator.cs" />
+    <Compile Include="Config\CastleBusConfiguration.cs" />
+    <Compile Include="Config\CastleLoadBalancerConfiguration.cs" />
+    <Compile Include="Config\CastleLoadBalancerEndpointConfiguration.cs" />
+    <Compile Include="Config\CastleLoggingConfiguration.cs" />
+    <Compile Include="Config\CastleMsmqConfiguration.cs" />
+    <Compile Include="Config\CastleRhinoQueuesConfiguration.cs" />
+    <Compile Include="Config\CastleSecurityConfiguration.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

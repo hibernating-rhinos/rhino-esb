@@ -18,7 +18,9 @@ namespace Rhino.ServiceBus.Tests.Bugs
 		public Will_send_invalid_admin_message_to_error_queue()
 		{
 			container = new WindsorContainer(new XmlInterpreter());
-			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
 		}
 
 		[Fact]

@@ -24,8 +24,10 @@ namespace Rhino.ServiceBus.Tests.Bugs
         private WindsorContainer CreateContainer()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            var facility = new RhinoServiceBusFacility().UseFlatQueueStructure();
-            container.Kernel.AddFacility("rhino.esb", facility);
+            new RhinoServiceBusFacility()
+                .UseFlatQueueStructure()
+                .UseCastleWindsor(container)
+                .Configure();
             return container;
         }
     }

@@ -20,7 +20,9 @@ namespace Rhino.ServiceBus.LoadBalancer
         public void Start()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb.loadbalancer", new LoadBalancerFacility());
+
+            //TODO come back to this
+            //container.Kernel.AddFacility("rhino.esb.loadbalancer", new LoadBalancerFacility());
 
             loadBalancer = container.Resolve<MsmqLoadBalancer>();
             log4net.GlobalContext.Properties["BusName"] = loadBalancer.Endpoint.Uri.AbsolutePath;

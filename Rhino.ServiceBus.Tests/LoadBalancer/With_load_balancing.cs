@@ -3,7 +3,6 @@ using System.Messaging;
 using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
@@ -22,9 +21,11 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
     	public With_load_balancing()
         {
-            var interpreter = new XmlInterpreter(@"LoadBalancer\BusWithLoadBalancer.config");
-            container = new WindsorContainer(interpreter);
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
+                .Configure();
 
             container.Register(Component.For<MyHandler>());
 

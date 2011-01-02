@@ -1,7 +1,5 @@
-using System;
 using System.Messaging;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Xunit;
 
@@ -13,8 +11,11 @@ namespace Rhino.ServiceBus.Tests
 
         public When_queue_does_not_exists()
         {
-            container = new WindsorContainer(new XmlInterpreter("BusWithLogging.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
         }
 
 

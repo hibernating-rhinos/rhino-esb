@@ -2,7 +2,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Convertors;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Impl;
@@ -16,8 +15,11 @@ namespace Rhino.ServiceBus.Tests
     {
         private static IWindsorContainer CreateContainer()
         {
-            var container = new WindsorContainer(new XmlInterpreter("AnotherBus.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            var container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("AnotherBus.config")
+                .Configure();
             return container;
         }
 

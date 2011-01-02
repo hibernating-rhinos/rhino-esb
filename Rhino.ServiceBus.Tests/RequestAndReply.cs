@@ -19,7 +19,9 @@ namespace Rhino.ServiceBus.Tests
         public RequestAndReply()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
             container.Register(Component.For<PingConsumer>());
         }
 

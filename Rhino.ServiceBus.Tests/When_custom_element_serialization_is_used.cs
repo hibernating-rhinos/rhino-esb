@@ -19,7 +19,9 @@ namespace Rhino.ServiceBus.Tests
 		public When_custom_element_serialization_is_used()
 		{
 			container = new WindsorContainer(new XmlInterpreter());
-			container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
 			container.Register(
 				Component.For<ICustomElementSerializer>()
 				.ImplementedBy<DataContractMessageElementSerializer>()

@@ -26,8 +26,11 @@ namespace Rhino.ServiceBus.Tests
 
 		private static IWindsorContainer CreateContainer()
 		{
-			var container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
-			container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+			var container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                .Configure();
 			return container;
 		}
 

@@ -16,7 +16,9 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_running_on_MTA_thread()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
         }
 
         [Fact]

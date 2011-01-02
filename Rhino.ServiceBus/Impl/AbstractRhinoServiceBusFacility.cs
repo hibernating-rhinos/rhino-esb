@@ -1,32 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
-using System.Linq;
-using Castle.Core;
-using Castle.MicroKernel;
-using Castle.MicroKernel.Facilities;
-using Castle.MicroKernel.Registration;
-using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Rhino.ServiceBus.Config;
-using Rhino.ServiceBus.Exceptions;
-using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
-using Rhino.ServiceBus.Sagas;
 using Rhino.ServiceBus.Serializers;
 using System.Transactions;
 
 namespace Rhino.ServiceBus.Impl
 {
-    public abstract class AbstractRhinoServiceBusFacility : AbstractFacility
+    public abstract class AbstractRhinoServiceBusFacility 
     {
-        protected readonly List<Type> messageModules = new List<Type>();
+        private readonly List<Type> messageModules = new List<Type>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
         protected IsolationLevel queueIsolationLevel = IsolationLevel.Serializable;
         public bool consumeInTxn = true;
+        private BusConfigurationSection configurationSection;
+        private Action readConfiguration;
+
 
         protected AbstractRhinoServiceBusFacility()
         {
+            readConfiguration = () =>
+            {
+                configurationSection = ConfigurationManager.GetSection("rhino.esb") as BusConfigurationSection;
+            };
             ThreadCount = 1;
             NumberOfRetries = 5;
             Transactional = TransactionalOptions.FigureItOut;
@@ -44,10 +43,13 @@ namespace Rhino.ServiceBus.Impl
 
 		public TransactionalOptions Transactional { get; set; }
 
-        //yuck
-        public new IKernel Kernel
+        public event Action ConfigurationStarted;
+
+        public event Action ConfigurationComplete;
+
+        public BusConfigurationSection ConfigurationSection
         {
-            get { return base.Kernel; }
+            get { return configurationSection; }
         }
 
         public IsolationLevel IsolationLevel
@@ -58,6 +60,16 @@ namespace Rhino.ServiceBus.Impl
         public bool ConsumeInTransaction
         {
             get { return consumeInTxn; }
+        }
+
+        public Type SerializerType
+        {
+            get { return serializerImpl; }
+        }
+
+        public IEnumerable<Type> MessageModules
+        {
+            get { return new ReadOnlyCollection<Type>(messageModules); }
         }
 
         public AbstractRhinoServiceBusFacility AddMessageModule<TModule>()
@@ -74,86 +86,56 @@ namespace Rhino.ServiceBus.Impl
             return this;
         }
 
-        protected override void Init()
+        public void Configure()
         {
-            if(FacilityConfig==null)
-                throw new ConfigurationErrorsException(
-                    "could not find facility configuration section with the same name of the facility");
+            ReadBusConfiguration();
 
-            Kernel.ComponentModelCreated += Kernel_OnComponentModelCreated;
-            Kernel.Resolver.AddSubResolver(new ArrayResolver(Kernel));
+            ApplyConfiguration();
 
-            ReadConfiguration();
+            var copy = ConfigurationStarted;
+            if (copy != null)
+                copy();
 
-            Kernel.Register(
-
-                AllTypes.FromAssembly(typeof(IBusConfigurationAware).Assembly)
-                    .BasedOn<IBusConfigurationAware>()
-                );
-
-            foreach (var configurationAware in Kernel.ResolveAll<IBusConfigurationAware>())
-            {
-                configurationAware.Configure(this, FacilityConfig);
-            }
-            
-            foreach (var type in messageModules)
-            {
-                if (Kernel.HasComponent(type) == false)
-                    Kernel.Register(Component.For(type).Named(type.FullName));
-            }
-
-            RegisterComponents();
-
-            Kernel.Register(
-                Component.For<IReflection>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy<DefaultReflection>(),
-                
-                Component.For<IMessageSerializer>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(serializerImpl),
-                Component.For<IEndpointRouter>()
-                     .ImplementedBy<EndpointRouter>()
-                );   
+            var complete = ConfigurationComplete;
+            if (complete != null)
+                complete();
         }
 
-        protected abstract void RegisterComponents();
+        protected abstract void ApplyConfiguration();
 
-        protected abstract void ReadConfiguration();
-
-        private static void Kernel_OnComponentModelCreated(ComponentModel model)
+        protected virtual void ReadBusConfiguration()
         {
-            if (typeof(IMessageConsumer).IsAssignableFrom(model.Implementation) == false)
+            if (configurationSection != null)
                 return;
 
-            var interfaces = model.Implementation.GetInterfaces()
-                .Where(x => x.IsGenericType && x.IsGenericTypeDefinition == false)
-                .Select(x => x.GetGenericTypeDefinition())
-                .ToList();
+            readConfiguration();
 
-            if (interfaces.Contains(typeof(InitiatedBy<>)) &&
-                interfaces.Contains(typeof(ISaga<>)) == false)
-            {
-                throw new InvalidUsageException("Message consumer: " + model.Implementation + " implements InitiatedBy<TMsg> but doesn't implment ISaga<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from ISaga<TState> ?");
-            }
-
-            if (interfaces.Contains(typeof(InitiatedBy<>)) == false &&
-                interfaces.Contains(typeof(Orchestrates<>)))
-            {
-                throw new InvalidUsageException("Message consumer: " + model.Implementation + " implements Orchestrates<TMsg> but doesn't implment InitiatedBy<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from InitiatedBy<TState> ?");
-            }
-
-            model.LifestyleType = LifestyleType.Transient;
+            if (configurationSection == null)
+                throw new ConfigurationErrorsException("could not find rhino.esb configuration section");
         }
 
-        public void UseMessageSerializer<TMessageSerializer>()
+        public AbstractRhinoServiceBusFacility UseMessageSerializer<TMessageSerializer>()
         {
             serializerImpl = typeof(TMessageSerializer);
+            return this;
         }
 
-        public IFacility DisableQueueAutoCreation()
+        public AbstractRhinoServiceBusFacility UseStandaloneConfigurationFile(string fileName)
+        {
+            readConfiguration = () =>
+            {
+                configurationSection = ConfigurationManager.OpenMappedMachineConfiguration(new ConfigurationFileMap(fileName)).GetSection("rhino.esb") as BusConfigurationSection;
+            };
+            return this;
+        }
+
+        public AbstractRhinoServiceBusFacility UseConfiguration(BusConfigurationSection busConfiguration)
+        {
+            configurationSection = busConfiguration;
+            return this;
+        }
+
+        public AbstractRhinoServiceBusFacility DisableQueueAutoCreation()
         {
             DisableAutoQueueCreation = true;
             return this;

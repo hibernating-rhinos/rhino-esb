@@ -17,9 +17,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
         public Full_test_of_load_balancer_and_failover()
         {
-            var interpreter = new XmlInterpreter(@"LoadBalancer\BusWithLoadBalancer.config");
-            container = new WindsorContainer(interpreter);
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
 
             container.Register(
                 Component.For<MsmqLoadBalancer>()
@@ -39,6 +37,10 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 						transactional = TransactionalOptions.FigureItOut
                     })
                 );
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
+                .Configure();
         }
 
         [Fact]

@@ -16,8 +16,10 @@ namespace Rhino.ServiceBus.Tests
         public CanRouteMessageToConsumerThroughContainer()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
             container.Register(Component.For<TestConsumer>());
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .Configure();
         }
 
         [Fact]

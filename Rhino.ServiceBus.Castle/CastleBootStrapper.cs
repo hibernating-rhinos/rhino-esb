@@ -12,15 +12,15 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Castle
 {
-    public class CastleBootStrapper : AbstractBootStrapper
+    public abstract class CastleBootStrapper : AbstractBootStrapper
     {
         private IWindsorContainer container;
 
-        public CastleBootStrapper()
+        protected CastleBootStrapper()
         {
         }
 
-        public CastleBootStrapper(IWindsorContainer container)
+        protected CastleBootStrapper(IWindsorContainer container)
         {
             this.container = container;
         }
@@ -30,18 +30,9 @@ namespace Rhino.ServiceBus.Castle
             get { return container; }
         }
 
-        public override void InitializeContainer()
+        protected override void ConfigureBusFacility(RhinoServiceBusFacility facility)
         {
-            CreateContainer();
-            ConfigureContainer();
-
-            var facility = new RhinoServiceBusFacility();
-            ConfigureBusFacility(facility);
-            container.Kernel.AddFacility("rhino.esb", facility);
-        }
-
-        protected virtual void ConfigureBusFacility(RhinoServiceBusFacility facility)
-        {
+            facility.UseCastleWindsor(container);
         }
 
         public override void ExecuteDeploymentActions(string user)
@@ -70,14 +61,14 @@ namespace Rhino.ServiceBus.Castle
             container.Dispose();
         }
 
-        protected virtual void CreateContainer()
+        protected override void CreateContainer()
         {
-            if (container != null)
-                return;
-
-            container = File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
+            if (container == null)
+                container = File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
                             ? new WindsorContainer(new XmlInterpreter())
                             : new WindsorContainer();
+
+            ConfigureContainer();
         }
 
         protected virtual void ConfigureContainer()
@@ -103,7 +94,7 @@ namespace Rhino.ServiceBus.Castle
 					)
 					.Configure (registration =>
 					{
-						registration.LifeStyle.Is (LifestyleType.Transient);
+						registration.LifeStyle.Is(LifestyleType.Transient);
 						ConfigureConsumer (registration);
 					})
 				);

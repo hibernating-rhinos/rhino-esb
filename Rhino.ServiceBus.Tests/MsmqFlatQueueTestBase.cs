@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Messaging;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
@@ -123,7 +125,7 @@ namespace Rhino.ServiceBus.Tests
                     var serializer =
                         new XmlMessageSerializer(
                             new DefaultReflection(),
-                            new DefaultKernel());
+                        	new CastleServiceLocator(new WindsorContainer())),
                     transport = new MsmqTransport(serializer,
                             new FlatQueueStrategy(new EndpointRouter(),testQueueEndPoint.Uri),
                             testQueueEndPoint.Uri, 1,
@@ -158,7 +160,7 @@ namespace Rhino.ServiceBus.Tests
                 if (transactionalTransport == null)
                 {
                     var serializer =
-                        new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+                        new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(new WindsorContainer())),
                     transactionalTransport = new MsmqTransport(serializer,
                         new FlatQueueStrategy(new EndpointRouter(),transactionalTestQueueEndpoint.Uri),
                         transactionalTestQueueEndpoint.Uri, 1, DefaultTransportActions(transactionalTestQueueEndpoint.Uri),

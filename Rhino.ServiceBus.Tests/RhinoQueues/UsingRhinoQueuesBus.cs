@@ -35,8 +35,11 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             StringConsumer.Value = null;
             StringConsumer.Wait = new ManualResetEvent(false);
 
-            container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusFacility()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                .Configure();
             container.Register(Component.For<WhenTransactionCommitErrors_ShouldNotCrash_Msmq.ConsumerEnlistingInBadTransaction>());
             container.Register(Component.For<StringConsumer>());
             container.Register(Component.For<ThrowingIntConsumer>());

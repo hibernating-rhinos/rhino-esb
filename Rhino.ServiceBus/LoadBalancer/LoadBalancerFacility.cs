@@ -1,14 +1,7 @@
 using System;
 using System.Configuration;
-using System.Messaging;
-using Castle.Core;
-using Castle.Core.Configuration;
-using Castle.MicroKernel.Registration;
 using log4net;
-using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.LoadBalancer
 {
@@ -21,75 +14,36 @@ namespace Rhino.ServiceBus.LoadBalancer
         private Uri primaryLoadBalancer;
         private Uri readyForWork;
 
-        protected override void RegisterComponents()
+        public Type LoadBalancerType
         {
-            logger.InfoFormat("Configuring load balancer '{0}' with endpoint '{1}', primary '{2}', secondary '{3}'",
-                loadBalancerType.Name,
-                Endpoint,
-                primaryLoadBalancer,
-                secondaryLoadBalancer);
-
-        	if (secondaryLoadBalancer!=null)
-            {
-				Kernel.Register(Component.For<MsmqLoadBalancer>()
-									.ImplementedBy(loadBalancerType)
-									.LifeStyle.Is(LifestyleType.Singleton)
-									.DependsOn(new
-									{
-										endpoint = Endpoint,
-										threadCount = ThreadCount,
-										primaryLoadBalancer,
-										transactional = Transactional,
-										secondaryLoadBalancer
-									}));
-            }
-			else
-            {
-            	Kernel.Register(Component.For<MsmqLoadBalancer>()
-            	                	.ImplementedBy(loadBalancerType)
-            	                	.LifeStyle.Is(LifestyleType.Singleton)
-            	                	.DependsOn(new
-            	                	{
-            	                		endpoint = Endpoint,
-            	                		threadCount = ThreadCount,
-            	                		primaryLoadBalancer,
-            	                		transactional = Transactional
-            	                	}));
-            }
-            Kernel.Register(
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLoadBalancerQueuesAction>()
-                );
-
-            if (readyForWork != null)
-            {
-                Kernel.Register(Component.For<MsmqReadyForWorkListener>()
-                                    .LifeStyle.Is(LifestyleType.Singleton)
-                                    .DependsOn(new
-                                    {
-                                        endpoint = readyForWork,
-                                        threadCount = ThreadCount,
-                                        transactional = Transactional
-                                    }));
-                Kernel.Register(
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateReadyForWorkQueuesAction>()
-                );
-            }
+            get { return loadBalancerType; }
         }
 
-        protected override void ReadConfiguration()
+        public Uri PrimaryLoadBalancer
         {
-            IConfiguration busConfig = FacilityConfig.Children["loadBalancer"];
+            get { return primaryLoadBalancer; }
+        }
+
+        public Uri SecondaryLoadBalancer
+        {
+            get { return secondaryLoadBalancer; }
+        }
+
+        public Uri ReadyForWork
+        {
+            get { return readyForWork; }
+        }
+
+        protected override void ApplyConfiguration()
+        {
+            var busConfig = ConfigurationSection.LoadBalancer;
             if (busConfig == null)
                 throw new ConfigurationErrorsException("Could not find 'loadBalancer' node in configuration");
 
-            int result;
-            string threads = busConfig.Attributes["threadCount"];
-            if (int.TryParse(threads, out result))
-                ThreadCount = result;
+            if(busConfig.ThreadCount.HasValue)
+                ThreadCount = busConfig.ThreadCount.Value;
 
-            string uriString = busConfig.Attributes["endpoint"];
+            string uriString = busConfig.Endpoint;
             Uri endpoint;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)
             {
@@ -103,10 +57,10 @@ namespace Rhino.ServiceBus.LoadBalancer
             if (Uri.TryCreate(readyForWorkEndPoint, UriKind.Absolute, out readyForWork) == false)
             {
                 throw new ConfigurationErrorsException(
-                "Attribute 'readyForWorkEndPoint' on 'loadBalancer' has an invalid value '" + uriString + "'");
+                "Attribute 'readyForWorkEndPoint' on 'loadBalancer' has an invalid value '" + readyForWorkEndPoint + "'");
             }
 
-            var secondaryUri = busConfig.Attributes["secondaryLoadBalancerEndpoint"];
+            var secondaryUri = busConfig.SecondaryLoadBalancerEndpoint;
             if (secondaryUri != null)//primary with secondary
             {
                 if (Uri.TryCreate(secondaryUri, UriKind.Absolute, out secondaryLoadBalancer) == false)
@@ -115,7 +69,7 @@ namespace Rhino.ServiceBus.LoadBalancer
                         "Attribute 'secondaryLoadBalancerEndpoint' on 'loadBalancer' has an invalid value '" + secondaryUri + "'");
                 }
             }
-            var primaryUri = busConfig.Attributes["primaryLoadBalancerEndpoint"];
+            var primaryUri = busConfig.PrimaryLoadBalancerEndpoint;
             if (primaryUri != null)//secondary with primary
             {
                 loadBalancerType = typeof (MsmqSecondaryLoadBalancer);
@@ -126,6 +80,12 @@ namespace Rhino.ServiceBus.LoadBalancer
                         primaryLoadBalancer + "'");
                 }
             }
+
+            logger.InfoFormat("Configuring load balancer '{0}' with endpoint '{1}', primary '{2}', secondary '{3}'",
+                loadBalancerType.Name,
+                Endpoint,
+                primaryLoadBalancer,
+                secondaryLoadBalancer);
         }
     }
 }
