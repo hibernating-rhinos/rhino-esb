@@ -1,5 +1,5 @@
 ﻿using System;
-using Rhino.ServiceBus;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Msmq;
 using Starbucks.Barista;
@@ -26,7 +26,7 @@ namespace Starbucks.Tests
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof (RemoteAppDomainHost).Assembly, "LoadBalancer.config");
+            baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
             baristaLoadBalancer.Start();
 
             Console.WriteLine("Barista load balancer has started");

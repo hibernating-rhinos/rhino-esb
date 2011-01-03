@@ -17,6 +17,9 @@ namespace Rhino.ServiceBus.Castle.Config
 
         public void Configure(AbstractRhinoServiceBusFacility config)
         {
+            var busConfig = config as RhinoServiceBusFacility;
+            if (busConfig == null)
+                return;
             var loadBalancerReader = new LoadBalancerConfigurationReader(config);
             if (loadBalancerReader.LoadBalancerEndpoint == null)
                 return;

@@ -116,6 +116,7 @@
     <Compile Include="Exceptions\MessagePublicationException.cs" />
     <Compile Include="Exceptions\SubscriptionException.cs" />
     <Compile Include="Exceptions\TransportException.cs" />
+    <Compile Include="LoadBalancer\LoadBalancerBootStrapper.cs" />
     <Compile Include="LoadBalancer\LoadBalancerHost.cs" />
     <Compile Include="LoadBalancer\MsmqLoadBalancer.cs" />
     <Compile Include="MessageModules\LoadBalancerMessageModule.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
     <Compile Include="Util\CurrentMessage.cs" />
+    <Compile Include="Util\ProxyUtil.cs" />
     <Compile Include="Util\SerializationExtensions.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />

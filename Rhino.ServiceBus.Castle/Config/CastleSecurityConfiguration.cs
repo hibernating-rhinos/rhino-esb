@@ -56,6 +56,10 @@ namespace Rhino.ServiceBus.Castle.Config
 
         public void Configure(AbstractRhinoServiceBusFacility config)
         {
+            var busConfig = config as RhinoServiceBusFacility;
+            if (busConfig == null)
+                return;
+
             var securityReader = new SecurityConfigurationReader(config);
             if (securityReader.Key == null)
                 RegisterNoSecurity();

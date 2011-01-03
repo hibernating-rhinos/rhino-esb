@@ -60,7 +60,7 @@ namespace Rhino.ServiceBus.Hosting
             bootStrapper.BeforeStart();
 
             logger.Debug("Starting bus");
-            serviceBus = bootStrapper.GetStartableServiceBus();
+            serviceBus = bootStrapper.GetInstance<IStartableServiceBus>();
         }
 
         private void InitializeContainer()

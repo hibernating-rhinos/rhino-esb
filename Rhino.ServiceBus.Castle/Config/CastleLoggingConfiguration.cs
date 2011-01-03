@@ -17,6 +17,10 @@ namespace Rhino.ServiceBus.Castle.Config
 
         public void Configure(AbstractRhinoServiceBusFacility config)
         {
+            var busConfig = config as RhinoServiceBusFacility;
+            if (busConfig == null)
+                return;
+
             var logReader = new LoggingConfigurationReader(config);
             if (logReader.LogEndpoint == null)
                 return;

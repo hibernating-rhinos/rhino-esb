@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Castle.MicroKernel.Proxy;
 using log4net;
 using Rhino.Queues.Utils;
 using Rhino.ServiceBus.Exceptions;
@@ -10,6 +9,7 @@ using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Sagas;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {

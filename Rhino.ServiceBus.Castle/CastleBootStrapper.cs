@@ -12,15 +12,15 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Castle
 {
-    public abstract class CastleBootStrapper : AbstractBootStrapper
+    public class CastleBootStrapper : AbstractBootStrapper
     {
         private IWindsorContainer container;
 
-        protected CastleBootStrapper()
+        public CastleBootStrapper()
         {
         }
 
-        protected CastleBootStrapper(IWindsorContainer container)
+        public CastleBootStrapper(IWindsorContainer container)
         {
             this.container = container;
         }
@@ -30,7 +30,7 @@ namespace Rhino.ServiceBus.Castle
             get { return container; }
         }
 
-        protected override void ConfigureBusFacility(RhinoServiceBusFacility facility)
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
         {
             facility.UseCastleWindsor(container);
         }
@@ -51,9 +51,9 @@ namespace Rhino.ServiceBus.Castle
             }
         }
 
-        public override IStartableServiceBus GetStartableServiceBus()
+        public override T GetInstance<T>()
         {
-            return container.Resolve<IStartableServiceBus>();
+            return container.Resolve<T>();
         }
 
         public override void Dispose()
@@ -61,12 +61,10 @@ namespace Rhino.ServiceBus.Castle
             container.Dispose();
         }
 
-        protected override void CreateContainer()
+        public override void CreateContainer()
         {
             if (container == null)
-                container = File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
-                            ? new WindsorContainer(new XmlInterpreter())
-                            : new WindsorContainer();
+                container = new WindsorContainer();
 
             ConfigureContainer();
         }

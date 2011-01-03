@@ -61,6 +61,7 @@
     <Compile Include="Config\CastleRhinoQueuesConfiguration.cs" />
     <Compile Include="Config\CastleSecurityConfiguration.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="CastleLoadBalancerBootStrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

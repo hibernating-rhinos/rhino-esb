@@ -7,7 +7,7 @@ namespace Rhino.ServiceBus.Hosting
 {
     public abstract class AbstractBootStrapper : IDisposable
     {
-        private RhinoServiceBusFacility config;
+        private AbstractRhinoServiceBusFacility config;
 
         public virtual Assembly Assembly
         {
@@ -21,7 +21,8 @@ namespace Rhino.ServiceBus.Hosting
         public virtual void InitializeContainer()
         {
             CreateContainer();
-            CreateConfiguration();
+            config = CreateConfiguration();
+            ConfigureBusFacility(config);
             config.Configure();
         }
 
@@ -30,26 +31,25 @@ namespace Rhino.ServiceBus.Hosting
             config.UseConfiguration(configurationSection);
         }
 
-        protected abstract void CreateContainer();
+        public abstract void CreateContainer();
 
         public abstract void ExecuteDeploymentActions(string user);
 
         public abstract void ExecuteEnvironmentValidationActions();
 
-        public abstract IStartableServiceBus GetStartableServiceBus();
+        public abstract T GetInstance<T>();
 
     	protected virtual bool IsTypeAcceptableForThisBootStrapper(Type t)
         {
             return true;
         }
 
-        protected virtual void CreateConfiguration()
+        protected virtual AbstractRhinoServiceBusFacility CreateConfiguration()
         {
-            config = new RhinoServiceBusFacility();
-            ConfigureBusFacility(config);
+            return new RhinoServiceBusFacility();
         }
 
-        protected virtual void ConfigureBusFacility(RhinoServiceBusFacility facility)
+        protected virtual void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
         {
         }
 

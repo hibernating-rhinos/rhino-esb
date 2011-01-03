@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Castle.Core.Configuration;
 using Rhino.ServiceBus.Config;
 
 namespace Rhino.ServiceBus.Hosting
