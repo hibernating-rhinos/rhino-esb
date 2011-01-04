@@ -39,9 +39,6 @@
     <Reference Include="Castle.Core">
       <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Windsor">
-      <HintPath>..\SharedLibs\build\Castle.Windsor.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\build\Esent.Interop.dll</HintPath>
     </Reference>

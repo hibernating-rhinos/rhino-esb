@@ -28,7 +28,7 @@ namespace Rhino.ServiceBus.Tests
             container = new WindsorContainer();
             new RhinoServiceBusFacility()
                 .UseCastleWindsor(container)
-                .UseStandaloneConfigurationFile("OneWayBusRhinoQueues.config")
+                .UseStandaloneConfigurationFile("ReceiveOneWayBusRhinoQueues.config")
                 .Configure();
             container.Register(Component.For<StringConsumer>());
             StringConsumer.Value = null;
@@ -69,9 +69,12 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                using (var c = new WindsorContainer(new XmlInterpreter("OneWayBusRhinoQueues.config")))
+                using (var c = new WindsorContainer())
                 {
-                    c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
+                    new OnewayRhinoServiceBusFacility()
+                        .UseCastleWindsor(c)
+                        .UseStandaloneConfigurationFile("OneWayBusRhinoQueues.config")
+                        .Configure();
                     var oneway = c.Resolve<IOnewayBus>();
                     oneway.Send("hello there, one way");
                     StringConsumer.Event.WaitOne();

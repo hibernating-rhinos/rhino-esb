@@ -10,13 +10,17 @@ namespace Rhino.ServiceBus.Config
     {
         public void Configure(AbstractRhinoServiceBusFacility facility)
         {
+            var busConfig = facility as RhinoServiceBusFacility;
+            if (busConfig == null)
+                return;
+
             if (facility.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) ==
                 false)
                 return;
 
-            var busConfig = facility.ConfigurationSection.Bus;
+            var busConfigSection = facility.ConfigurationSection.Bus;
 
-            if (string.IsNullOrEmpty(busConfig.Name))
+            if (string.IsNullOrEmpty(busConfigSection.Name))
                 throw new ConfigurationErrorsException(
                     "Could not find attribute 'name' in node 'bus' in configuration");
 
@@ -27,7 +31,7 @@ namespace Rhino.ServiceBus.Config
                                       facility.IsolationLevel,
                                       facility.NumberOfRetries,
                                       path,
-                                      busConfig.Name);
+                                      busConfigSection.Name);
         }
 
         protected abstract void RegisterTransportServices(int threadCount, Uri endpoint,

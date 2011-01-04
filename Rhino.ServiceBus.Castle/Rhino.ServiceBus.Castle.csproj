@@ -43,7 +43,9 @@
       <HintPath>..\SharedLibs\Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -60,6 +62,7 @@
     <Compile Include="Config\CastleMsmqConfiguration.cs" />
     <Compile Include="Config\CastleRhinoQueuesConfiguration.cs" />
     <Compile Include="Config\CastleSecurityConfiguration.cs" />
+    <Compile Include="Config\OneWayBusConfiguration.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CastleLoadBalancerBootStrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

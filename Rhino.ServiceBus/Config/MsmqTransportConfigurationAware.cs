@@ -1,6 +1,7 @@
 using System;
 using System.Transactions;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Config
@@ -32,6 +33,9 @@ namespace Rhino.ServiceBus.Config
 
         public void Configure(AbstractRhinoServiceBusFacility facility)
         {
+            if (!(facility is RhinoServiceBusFacility) && !(facility is LoadBalancerFacility))
+                return;
+
             if (facility.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
                 return;
 

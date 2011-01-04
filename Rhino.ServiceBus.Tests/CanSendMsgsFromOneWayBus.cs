@@ -1,7 +1,6 @@
 using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
@@ -15,7 +14,7 @@ namespace Rhino.ServiceBus.Tests
 
         public CanSendMsgsFromOneWayBus()
         {
-            container = new WindsorContainer(new XmlInterpreter());
+            container = new WindsorContainer();
             new RhinoServiceBusFacility()
                 .UseCastleWindsor(container)
                 .Configure();
@@ -56,9 +55,12 @@ namespace Rhino.ServiceBus.Tests
             {           
                 bus.Start();
 
-                using(var c = new WindsorContainer(new XmlInterpreter("OneWayBus.config")))
+                using (var c = new WindsorContainer())
                 {
-                    c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
+                    new OnewayRhinoServiceBusFacility()
+                        .UseCastleWindsor(c)
+                        .UseStandaloneConfigurationFile("OneWayBus.config")
+                        .Configure();
                     c.Resolve<IOnewayBus>().Send("hello there, one way");
                 }
 

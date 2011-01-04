@@ -178,6 +178,9 @@
     <None Include="BusOnTransactionalQueue.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ReceiveOneWayBusRhinoQueues.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="OneWayBusRhinoQueues.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
