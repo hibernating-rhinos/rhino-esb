@@ -12,13 +12,12 @@ namespace Starbucks.Tests
 {
     public class IntegrationTest : IDisposable
     {
-        private RemoteAppDomainLoadBalancerHost baristaLoadBalancer;
-        private RemoteAppDomainHost cashier;
-        private RemoteAppDomainHost barista;
-        private DefaultHost customerHost;
+        private readonly RemoteAppDomainLoadBalancerHost baristaLoadBalancer;
+        private readonly RemoteAppDomainHost cashier;
+        private readonly RemoteAppDomainHost barista;
+        private readonly DefaultHost customerHost;
 
-        [Fact]
-        public void Can_by_coffee_from_starbucks()
+        public IntegrationTest()
         {
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer", QueueType.LoadBalancer);
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer.acceptingwork", QueueType.LoadBalancer);
@@ -27,8 +26,17 @@ namespace Starbucks.Tests
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
             baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
-            baristaLoadBalancer.Start();
+            cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))
+                .Configuration("Cashier.config");
+            barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))
+                .Configuration("Barista.config");
+            customerHost = new DefaultHost();
+        }
 
+        [Fact]
+        public void Can_by_coffee_from_starbucks()
+        {
+            baristaLoadBalancer.Start();
             Console.WriteLine("Barista load balancer has started");
 
             cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))

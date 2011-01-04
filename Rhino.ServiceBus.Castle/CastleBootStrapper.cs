@@ -1,10 +1,7 @@
-using System;
-using System.IO;
 using System.Reflection;
 using Castle.Core;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;

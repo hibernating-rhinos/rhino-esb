@@ -1,3 +1,4 @@
+using Castle.Windsor;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.LoadBalancer;
 
@@ -5,21 +6,23 @@ namespace Rhino.ServiceBus.Castle
 {
     public sealed class CastleLoadBalancerBootStrapper : LoadBalancerBootStrapper
     {
-        private readonly CastleBootStrapper inner;
-
-        public CastleLoadBalancerBootStrapper()
-        {
-            inner = new CastleBootStrapper();
-        }
+        private IWindsorContainer container;
+        private CastleBootStrapper inner;
 
         public override void CreateContainer()
         {
-            inner.CreateContainer();
+            container = new WindsorContainer();
+            inner = new CastleBootStrapper(container);
         }
 
         protected override AbstractRhinoServiceBusFacility CreateConfiguration()
         {
             return new LoadBalancerFacility();
+        }
+
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
+        {
+            facility.UseCastleWindsor(container);
         }
 
         public override void ExecuteDeploymentActions(string user)
@@ -39,7 +42,7 @@ namespace Rhino.ServiceBus.Castle
 
         public override void Dispose()
         {
-            inner.Dispose();
+            container.Dispose();
         }
     }
 }

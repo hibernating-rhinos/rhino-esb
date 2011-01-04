@@ -14,5 +14,10 @@ namespace Rhino.ServiceBus.Config
         {
             return ((MessageOwnerElement) element).Endpoint;
         }
+
+        public void Add(MessageOwnerElement messageOwner)
+        {
+            BaseAdd(messageOwner);
+        }
     }
 }
