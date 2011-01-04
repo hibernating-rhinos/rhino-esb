@@ -6,11 +6,11 @@ using Rhino.ServiceBus.MessageModules;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleLoggingConfiguration : IBusConfigurationAware 
+    public class LoadBalancerEndpointConfiguration : IBusConfigurationAware 
     {
         private readonly IWindsorContainer container;
 
-        public CastleLoggingConfiguration(IWindsorContainer container)
+        public LoadBalancerEndpointConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }
@@ -20,16 +20,16 @@ namespace Rhino.ServiceBus.Castle.Config
             var busConfig = config as RhinoServiceBusFacility;
             if (busConfig == null)
                 return;
-
-            var logReader = new LoggingConfigurationReader(config);
-            if (logReader.LogEndpoint == null)
+            var loadBalancerReader = new LoadBalancerConfigurationReader(config);
+            if (loadBalancerReader.LoadBalancerEndpoint == null)
                 return;
 
+            var endpoint = new Endpoint { Uri = loadBalancerReader.LoadBalancerEndpoint };
             container.Register(
-                Component.For<MessageLoggingModule>()
-                    .DependsOn(new {logQueue = logReader.LogEndpoint})
+                Component.For<LoadBalancerMessageModule>()
+                    .DependsOn(new { loadBalancerEndpoint = endpoint.Uri })
                 );
-            config.InsertMessageModuleAtFirst<MessageLoggingModule>();
+            config.AddMessageModule<LoadBalancerMessageModule>();
         }
     }
 }

@@ -11,11 +11,11 @@ using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleBusConfiguration : IBusConfigurationAware 
+    public class BusConfiguration : IBusConfigurationAware 
     {
         private readonly IWindsorContainer container;
 
-        public CastleBusConfiguration(IWindsorContainer container)
+        public BusConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }

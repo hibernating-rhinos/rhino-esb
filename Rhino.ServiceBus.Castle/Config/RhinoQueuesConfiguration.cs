@@ -11,11 +11,11 @@ using Rhino.ServiceBus.RhinoQueues;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleRhinoQueuesConfiguration : RhinoQueuesConfigurationAware 
+    public class RhinoQueuesConfiguration : RhinoQueuesConfigurationAware 
     {
         private readonly IWindsorContainer container;
 
-        public CastleRhinoQueuesConfiguration(IWindsorContainer container)
+        public RhinoQueuesConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }

@@ -8,11 +8,11 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleSecurityConfiguration : IBusConfigurationAware 
+    public class SecurityConfiguration : IBusConfigurationAware 
     {
         private readonly IWindsorContainer container;
 
-        public CastleSecurityConfiguration(IWindsorContainer container)
+        public SecurityConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }

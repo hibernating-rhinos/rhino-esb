@@ -55,13 +55,13 @@
   <ItemGroup>
     <Compile Include="CastleBootStrapper.cs" />
     <Compile Include="CastleServiceLocator.cs" />
-    <Compile Include="Config\CastleBusConfiguration.cs" />
-    <Compile Include="Config\CastleLoadBalancerConfiguration.cs" />
-    <Compile Include="Config\CastleLoadBalancerEndpointConfiguration.cs" />
-    <Compile Include="Config\CastleLoggingConfiguration.cs" />
-    <Compile Include="Config\CastleMsmqConfiguration.cs" />
-    <Compile Include="Config\CastleRhinoQueuesConfiguration.cs" />
-    <Compile Include="Config\CastleSecurityConfiguration.cs" />
+    <Compile Include="Config\BusConfiguration.cs" />
+    <Compile Include="Config\LoadBalancerConfiguration.cs" />
+    <Compile Include="Config\LoadBalancerEndpointConfiguration.cs" />
+    <Compile Include="Config\LoggingConfiguration.cs" />
+    <Compile Include="Config\MsmqConfiguration.cs" />
+    <Compile Include="Config\RhinoQueuesConfiguration.cs" />
+    <Compile Include="Config\SecurityConfiguration.cs" />
     <Compile Include="Config\OneWayBusConfiguration.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CastleLoadBalancerBootStrapper.cs" />

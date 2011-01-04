@@ -10,11 +10,11 @@ using Rhino.ServiceBus.Msmq.TransportActions;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleMsmqConfiguration : MsmqTransportConfigurationAware
+    public class MsmqConfiguration : MsmqTransportConfigurationAware
     {
         private readonly IWindsorContainer container;
 
-        public CastleMsmqConfiguration(IWindsorContainer container)
+        public MsmqConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }

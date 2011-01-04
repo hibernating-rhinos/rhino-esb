@@ -8,11 +8,11 @@ using Rhino.ServiceBus.LoadBalancer;
 
 namespace Rhino.ServiceBus.Castle.Config
 {
-    public class CastleLoadBalancerConfiguration : IBusConfigurationAware
+    public class LoadBalancerConfiguration : IBusConfigurationAware
     {
         private readonly IWindsorContainer container;
 
-        public CastleLoadBalancerConfiguration(IWindsorContainer container)
+        public LoadBalancerConfiguration(IWindsorContainer container)
         {
             this.container = container;
         }
