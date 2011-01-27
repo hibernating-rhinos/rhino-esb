@@ -1,14 +1,19 @@
 using System;
 using System.Configuration;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.MessageModules;
 
 namespace Rhino.ServiceBus.Config
 {
-    public class LoadBalancerConfigurationReader
+    public class LoadBalancerEndpointConfiguration : IBusConfigurationAware 
     {
-        public LoadBalancerConfigurationReader(AbstractRhinoServiceBusFacility configuration)
+        public void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder)
         {
-            var busElement = configuration.ConfigurationSection.Bus;
+            var busConfig = config as RhinoServiceBusFacility;
+            if (busConfig == null)
+                return;
+
+            var busElement = config.ConfigurationSection.Bus;
 
             if (busElement == null)
                 return;
@@ -27,9 +32,10 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Attribute 'loadBalancerEndpoint' on 'bus' has an invalid value '" + loadBalancerEndpointAsString + "'");
             }
-            LoadBalancerEndpoint = loadBalancerEndpoint;
-        }
 
-        public Uri LoadBalancerEndpoint { get; private set; }
+            var endpoint = new Endpoint { Uri = loadBalancerEndpoint };
+            builder.RegisterLoadBalancerEndpoint(endpoint.Uri);
+            config.AddMessageModule<LoadBalancerMessageModule>();
+        }
     }
 }

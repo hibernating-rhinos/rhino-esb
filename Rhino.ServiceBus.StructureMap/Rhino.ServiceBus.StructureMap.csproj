@@ -5,15 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</ProjectGuid>
+    <ProjectGuid>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Rhino.ServiceBus.Castle</RootNamespace>
-    <AssemblyName>Rhino.ServiceBus.Castle</AssemblyName>
+    <RootNamespace>Rhino.ServiceBus.StructureMap</RootNamespace>
+    <AssemblyName>Rhino.ServiceBus.StructureMap</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\ayende-open-source.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,17 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\SharedLibs\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor">
-      <HintPath>..\SharedLibs\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\SharedLibs\Rhino.Queues.dll</HintPath>
+    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL" />
+    <Reference Include="StructureMap">
+      <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
@@ -53,12 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CastleBootStrapper.cs" />
-    <Compile Include="CastleBuilder.cs" />
-    <Compile Include="CastleServiceLocator.cs" />
+    <Compile Include="ConsumerInterceptor.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="CastleLoadBalancerBootStrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SingletonConvention.cs" />
+    <Compile Include="StructureMapBootStrapper.cs" />
+    <Compile Include="StructureMapBuilder.cs" />
+    <Compile Include="StructureMapServiceLocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
@@ -66,6 +59,7 @@
       <Name>Rhino.ServiceBus</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

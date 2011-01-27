@@ -64,6 +64,12 @@ namespace Rhino.ServiceBus.Impl
 			}
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            Builder.RegisterBus();
+        }
+
 		public AbstractRhinoServiceBusFacility UseFlatQueueStructure()
 	    {
 	        UseFlatQueue = true;

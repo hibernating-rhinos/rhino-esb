@@ -73,11 +73,14 @@
     <Compile Include="Config\BusElement.cs" />
     <Compile Include="Config\IBusConfigurationAware.cs" />
     <Compile Include="Config\KeyElement.cs" />
+    <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="Config\LoadBalancerElement.cs" />
-    <Compile Include="Config\LoggingConfigurationReader.cs" />
+    <Compile Include="Config\LoadBalancerEndpointConfiguration.cs" />
+    <Compile Include="Config\LoggingConfiguration.cs" />
     <Compile Include="Config\MessageOwnerElement.cs" />
     <Compile Include="Config\MessageOwnerElementCollection.cs" />
-    <Compile Include="Config\SecurityConfigurationReader.cs" />
+    <Compile Include="Config\OneWayBusConfiguration.cs" />
+    <Compile Include="Config\SecurityConfiguration.cs" />
     <Compile Include="Config\SecurityElement.cs" />
     <Compile Include="ConsumerOf.cs" />
     <Compile Include="Convertors\ThrowingWireEcryptedStringConvertor.cs" />
@@ -101,6 +104,7 @@
     <Compile Include="Impl\DefaultHandler.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />
     <Compile Include="Endpoint.cs" />
+    <Compile Include="Config\IBusContainerBuilder.cs" />
     <Compile Include="Internal\IEndpointRouter.cs" />
     <Compile Include="Internal\IHandler.cs" />
     <Compile Include="Internal\IServiceLocator.cs" />
@@ -188,7 +192,6 @@
     <Compile Include="Actions\CreateReadyForWorkQueuesAction.cs" />
     <Compile Include="Actions\IDeploymentAction.cs" />
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
-    <Compile Include="Config\LoadBalancerConfigurationReader.cs" />
     <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
     <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Consumer.cs" />

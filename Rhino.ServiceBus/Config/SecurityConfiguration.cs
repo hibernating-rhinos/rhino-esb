@@ -4,12 +4,18 @@ using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Config
 {
-    public class SecurityConfigurationReader
+    public class SecurityConfiguration : IBusConfigurationAware 
     {
-        public SecurityConfigurationReader(AbstractRhinoServiceBusFacility config)
+        public void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder)
         {
-            if (config.ConfigurationSection.Security.Key == null)
+            var busConfig = config as RhinoServiceBusFacility;
+            if (busConfig == null)
                 return;
+            if (config.ConfigurationSection.Security.Key == null)
+            {
+                builder.RegisterNoSecurity();
+                return;
+            }
 
             var key = config.ConfigurationSection.Security.Key;
             if (string.IsNullOrEmpty(key))
@@ -17,9 +23,7 @@ namespace Rhino.ServiceBus.Config
 
             var keyBuffer = Convert.FromBase64String(key);
 
-            Key = keyBuffer;
+            builder.RegisterSecurity(keyBuffer);
         }
-
-        public byte[] Key { get; private set; }
     }
 }

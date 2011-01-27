@@ -1,12 +1,11 @@
 using System;
-using System.Transactions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Config
 {
-    public abstract class MsmqTransportConfigurationAware : IBusConfigurationAware
+    public class MsmqTransportConfigurationAware : IBusConfigurationAware
     {
         private Type queueStrategyImpl = typeof(SubQueueStrategy);
 
@@ -21,17 +20,12 @@ namespace Rhino.ServiceBus.Config
             }
         }
 
-        protected Type QueueStrategyType
-        {
-            get { return queueStrategyImpl; }
-        }
-
-        protected MsmqTransportConfigurationAware()
+        public MsmqTransportConfigurationAware()
         {
             DetectQueueStrategy();
         }
 
-        public void Configure(AbstractRhinoServiceBusFacility facility)
+        public void Configure(AbstractRhinoServiceBusFacility facility, IBusContainerBuilder builder)
         {
             if (!(facility is RhinoServiceBusFacility) && !(facility is LoadBalancerFacility))
                 return;
@@ -46,24 +40,10 @@ namespace Rhino.ServiceBus.Config
 
             if (facility.DisableAutoQueueCreation == false)
             {
-                RegisterQueueCreationModule();
+                builder.RegisterQueueCreation();
             }
 
-            RegisterTransportServices(facility.ThreadCount,
-                                      facility.Endpoint,
-                                      facility.IsolationLevel,
-                                      facility.NumberOfRetries,
-                                      facility.Transactional,
-                                      facility.consumeInTxn);
+            builder.RegisterMsmqTransport(queueStrategyImpl);
         }
-
-        protected abstract void RegisterQueueCreationModule();
-
-        protected abstract void RegisterTransportServices(int threadCount, 
-            Uri endpoint, 
-            IsolationLevel queueIsolationLevel, 
-            int numberOfRetries, 
-            TransactionalOptions transactionalOptions, 
-            bool consumeInTransaction);
     }
 }

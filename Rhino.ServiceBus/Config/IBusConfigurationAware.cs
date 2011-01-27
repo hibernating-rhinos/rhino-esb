@@ -4,6 +4,6 @@ namespace Rhino.ServiceBus.Config
 {
     public interface IBusConfigurationAware
     {
-        void Configure(AbstractRhinoServiceBusFacility config);
+        void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder);
     }
 }

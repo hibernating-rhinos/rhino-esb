@@ -1,14 +1,13 @@
 using System;
 using System.Configuration;
 using System.IO;
-using System.Transactions;
 using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Config
 {
-    public abstract class RhinoQueuesConfigurationAware : IBusConfigurationAware
+    public class RhinoQueuesConfigurationAware : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility facility)
+        public void Configure(AbstractRhinoServiceBusFacility facility, IBusContainerBuilder builder)
         {
             var busConfig = facility as RhinoServiceBusFacility;
             if (busConfig == null)
@@ -26,16 +25,7 @@ namespace Rhino.ServiceBus.Config
 
             var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 
-            RegisterTransportServices(facility.ThreadCount,
-                                      facility.Endpoint,
-                                      facility.IsolationLevel,
-                                      facility.NumberOfRetries,
-                                      path,
-                                      busConfigSection.Name);
+            builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name);
         }
-
-        protected abstract void RegisterTransportServices(int threadCount, Uri endpoint,
-                                                          IsolationLevel queueIsolationLevel, int numberOfRetries,
-                                                          string path, string name);
     }
 }

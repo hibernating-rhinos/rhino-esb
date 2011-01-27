@@ -18,6 +18,7 @@ namespace Rhino.ServiceBus.Impl
         public bool consumeInTxn = true;
         private BusConfigurationSection configurationSection;
         private Action readConfiguration;
+        private IBusContainerBuilder busContainerBuilder;
 
 
         protected AbstractRhinoServiceBusFacility()
@@ -43,13 +44,14 @@ namespace Rhino.ServiceBus.Impl
 
 		public TransactionalOptions Transactional { get; set; }
 
-        public event Action ConfigurationStarted;
-
-        public event Action ConfigurationComplete;
-
         public BusConfigurationSection ConfigurationSection
         {
             get { return configurationSection; }
+        }
+
+        protected IBusContainerBuilder Builder
+        {
+            get { return busContainerBuilder; }
         }
 
         public IsolationLevel IsolationLevel
@@ -86,19 +88,13 @@ namespace Rhino.ServiceBus.Impl
             return this;
         }
 
-        public void Configure()
+        public virtual void Configure()
         {
             ReadBusConfiguration();
 
             ApplyConfiguration();
 
-            var copy = ConfigurationStarted;
-            if (copy != null)
-                copy();
-
-            var complete = ConfigurationComplete;
-            if (complete != null)
-                complete();
+            Builder.RegisterDefaultServices();
         }
 
         protected abstract void ApplyConfiguration();
@@ -139,6 +135,11 @@ namespace Rhino.ServiceBus.Impl
         {
             DisableAutoQueueCreation = true;
             return this;
+        }
+
+        public void BuildWith(IBusContainerBuilder builder)
+        {
+            busContainerBuilder = builder;
         }
     }
 }
