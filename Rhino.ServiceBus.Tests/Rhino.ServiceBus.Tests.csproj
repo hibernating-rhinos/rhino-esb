@@ -107,6 +107,7 @@
     <Compile Include="Containers\StructureMap\CanCreateInstancesOfOneWayBusFromContainer.cs" />
     <Compile Include="Containers\StructureMap\CanCreateInstancesOfServiceBusFromContainer.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\StructureMap\UsingRhinoQueuesBus.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
