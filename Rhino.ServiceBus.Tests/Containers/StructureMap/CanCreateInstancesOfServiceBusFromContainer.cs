@@ -1,6 +1,4 @@
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using StructureMap;
 using Xunit;
@@ -17,13 +15,6 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
             new RhinoServiceBusFacility()
                 .UseStructureMap(container)
                 .Configure();
-        }
-
-        [Fact]
-        public void Can_resolve_the_msmq_transport()
-        {
-            var transport = container.GetAllInstances<IMsmqTransportAction>();
-            Assert.NotNull(transport);
         }
 
         [Fact]

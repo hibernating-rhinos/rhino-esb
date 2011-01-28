@@ -38,7 +38,7 @@ namespace Rhino.ServiceBus.StructureMap
             ConfigureContainer();
         }
 
-        private void ConfigureContainer()
+        protected virtual void ConfigureContainer()
         {
             container.Configure(c => c.Scan(s =>
             {

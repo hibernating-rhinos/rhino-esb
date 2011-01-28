@@ -38,7 +38,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public IEnumerable<IHandler> GetAllHandlersFor(Type type)
         {
-            return from h in container.Model.InstancesOf(type)
+            return from h in container.Model.AllInstances.Where(x => type.IsAssignableFrom(x.ConcreteType))
                    select (IHandler)
                        new DefaultHandler(h.PluginType, h.ConcreteType, () => container.GetInstance(h.ConcreteType));
         }
