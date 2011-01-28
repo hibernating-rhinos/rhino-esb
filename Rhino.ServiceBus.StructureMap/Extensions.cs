@@ -1,7 +1,8 @@
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.StructureMap;
 using StructureMap;
 
-namespace Rhino.ServiceBus.StructureMap
+namespace Rhino.ServiceBus
 {
     public static class Extensions
     {

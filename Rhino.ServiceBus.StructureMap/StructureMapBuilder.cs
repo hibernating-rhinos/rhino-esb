@@ -138,14 +138,13 @@ namespace Rhino.ServiceBus.StructureMap
                 c.For(typeof (IQueueStrategy)).Singleton().Use(queueStrategyType)
                     .Child("endpoint").Is(config.Endpoint);
                 c.For<IMsmqTransportAction>().Singleton().Use<ErrorAction>()
-                    .Ctor<int>().Is(config.NumberOfRetries);
+                    .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries);
                 c.For<ISubscriptionStorage>().Singleton().Use<MsmqSubscriptionStorage>()
                     .Ctor<Uri>().Is(config.Endpoint);
                 c.For<ITransport>().Singleton().Use<MsmqTransport>()
                     .Ctor<int>("threadCount").Is(config.ThreadCount)
                     .Ctor<Uri>().Is(config.Endpoint)
                     .Ctor<IsolationLevel>().Is(config.IsolationLevel)
-                    .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
                     .Ctor<TransactionalOptions>().Is(config.Transactional)
                     .Ctor<bool>().Is(config.ConsumeInTransaction);
                 c.Scan(s =>
@@ -153,6 +152,7 @@ namespace Rhino.ServiceBus.StructureMap
                     s.Assembly(typeof(IMsmqTransportAction).Assembly);
                     s.With(new SingletonConvention<IMsmqTransportAction>());
                     s.AddAllTypesOf<IMsmqTransportAction>();
+                    s.Exclude(t => t == typeof(ErrorAction));
                 });
             });
         }

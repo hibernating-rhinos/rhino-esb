@@ -118,7 +118,7 @@ namespace Rhino.ServiceBus.Castle
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .DependsOn(new
                     {
-                        messageOwners = busConfig.MessageOwners.ToArray()
+                        messageOwners = busConfig.MessageOwners.ToArray(),
                     })
                     .Parameters(
                         Parameter.ForKey("modules").Eq(CreateModuleConfigurationNode(busConfig.MessageModules))
@@ -235,7 +235,6 @@ namespace Rhino.ServiceBus.Castle
                         threadCount = config.ThreadCount,
                         endpoint = config.Endpoint,
                         queueIsolationLevel = config.IsolationLevel,
-                        numberOfRetries = config.NumberOfRetries,
                         transactional = config.Transactional,
                         consumeInTransaction = config.ConsumeInTransaction,
                     }),

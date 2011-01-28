@@ -12,6 +12,8 @@
     <AssemblyName>Rhino.ServiceBus.StructureMap</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ayende-open-source.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +53,7 @@
     <Compile Include="SingletonConvention.cs" />
     <Compile Include="StructureMapBootStrapper.cs" />
     <Compile Include="StructureMapBuilder.cs" />
+    <Compile Include="StructureMapLoadBalancerBootStrapper.cs" />
     <Compile Include="StructureMapServiceLocator.cs" />
   </ItemGroup>
   <ItemGroup>
