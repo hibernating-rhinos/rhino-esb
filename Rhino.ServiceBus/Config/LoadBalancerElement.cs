@@ -21,7 +21,7 @@ namespace Rhino.ServiceBus.Config
 
         public string ReadForWorkEndpoint
         {
-            get { return this["readyForWorkEndPoint"] as string; }
+            get { return this["readyForWorkEndpoint"] as string; }
         }
 
         public string PrimaryLoadBalancerEndpoint
@@ -38,7 +38,7 @@ namespace Rhino.ServiceBus.Config
         {
             Properties.Add(new ConfigurationProperty("threadCount", typeof(int?), null));
             Properties.Add(new ConfigurationProperty("endpoint", typeof(string), null));
-            Properties.Add(new ConfigurationProperty("readyForWorkEndPoint", typeof(string), null));
+            Properties.Add(new ConfigurationProperty("readyForWorkEndpoint", typeof(string), null));
             Properties.Add(new ConfigurationProperty("primaryLoadBalancerEndpoint", typeof(string), null));
             Properties.Add(new ConfigurationProperty("secondaryLoadBalancerEndpoint", typeof(string), null));
         }

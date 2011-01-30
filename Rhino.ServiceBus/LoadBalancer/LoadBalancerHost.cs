@@ -40,6 +40,8 @@ namespace Rhino.ServiceBus.LoadBalancer
 
         public void InitialDeployment(string assembly, string user)
         {
+            bootStrapper.ExecuteDeploymentActions(user);
+            bootStrapper.ExecuteEnvironmentValidationActions();
         }
 
         public void SetBootStrapperTypeName(string type)

@@ -52,12 +52,12 @@ namespace Rhino.ServiceBus.LoadBalancer
             }
             Endpoint = endpoint;
 
-            string readyForWorkEndPoint = busConfig.Attributes["readyForWorkEndPoint"] ?? uriString;
+            string readyForWorkEndPoint = busConfig.ReadForWorkEndpoint ?? uriString;
 
-            if (Uri.TryCreate(uriString, UriKind.Absolute, out readyForWork) == false)
+            if (Uri.TryCreate(readyForWorkEndPoint, UriKind.Absolute, out readyForWork) == false)
             {
                 throw new ConfigurationErrorsException(
-                "Attribute 'readyForWorkEndPoint' on 'loadBalancer' has an invalid value '" + uriString + "'");
+                "Attribute 'readyForWorkEndPoint' on 'loadBalancer' has an invalid value '" + readyForWorkEndPoint + "'");
             }
 
             var secondaryUri = busConfig.SecondaryLoadBalancerEndpoint;
