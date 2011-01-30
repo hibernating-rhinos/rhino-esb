@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_cannot_resolve_consumer_because_of_missing_dependecies()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

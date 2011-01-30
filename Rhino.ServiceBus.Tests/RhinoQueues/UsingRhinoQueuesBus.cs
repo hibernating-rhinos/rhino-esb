@@ -36,7 +36,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             StringConsumer.Wait = new ManualResetEvent(false);
 
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .Configure();

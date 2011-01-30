@@ -22,7 +22,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
         public With_fail_over()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
                 .Configure();

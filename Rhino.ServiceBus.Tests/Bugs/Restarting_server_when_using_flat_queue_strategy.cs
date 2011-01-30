@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         private WindsorContainer CreateContainer()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseFlatQueueStructure()
                 .UseCastleWindsor(container)
                 .Configure();

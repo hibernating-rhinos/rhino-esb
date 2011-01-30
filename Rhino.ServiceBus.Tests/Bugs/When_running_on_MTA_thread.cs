@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_running_on_MTA_thread()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

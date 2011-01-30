@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         public Can_host_in_another_app_domain()
         {
             container = new Container();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .UseStandaloneConfigurationFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnotherBus.config"))
                 .Configure();

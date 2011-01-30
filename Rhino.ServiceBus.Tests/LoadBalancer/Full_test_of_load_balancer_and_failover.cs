@@ -37,7 +37,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 						transactional = TransactionalOptions.FigureItOut
                     })
                 );
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
                 .Configure();

@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.Tests.Warnings
         public Warnings_would_be_generated()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

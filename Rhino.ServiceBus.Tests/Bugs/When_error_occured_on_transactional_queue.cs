@@ -19,7 +19,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_error_occured_on_transactional_queue()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("BusOnTransactionalQueue.config")
                 .Configure();

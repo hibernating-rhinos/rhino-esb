@@ -23,15 +23,16 @@ using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.RhinoQueues;
 using Rhino.ServiceBus.Sagas;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
+using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
 
 namespace Rhino.ServiceBus.Castle
 {
     public class CastleBuilder : IBusContainerBuilder 
     {
         private readonly IWindsorContainer container;
-        private readonly AbstractRhinoServiceBusFacility config;
+        private readonly AbstractRhinoServiceBusConfiguration config;
 
-        public CastleBuilder(IWindsorContainer container, AbstractRhinoServiceBusFacility config)
+        public CastleBuilder(IWindsorContainer container, AbstractRhinoServiceBusConfiguration config)
         {
             this.container = container;
             this.config = config;
@@ -106,7 +107,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusFacility) config;
+            var busConfig = (RhinoServiceBusConfiguration) config;
 
             container.Register(
                 Component.For<IDeploymentAction>()
@@ -138,7 +139,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Register(Component.For<MsmqLoadBalancer>()
                                    .ImplementedBy(loadBalancerConfig.LoadBalancerType)
                                    .LifeStyle.Is(LifestyleType.Singleton)
@@ -158,7 +159,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Register(Component.For<MsmqLoadBalancer>()
                                        .ImplementedBy(loadBalancerConfig.LoadBalancerType)
                                        .LifeStyle.Is(LifestyleType.Singleton)
@@ -179,7 +180,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterReadyForWork()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Register(Component.For<MsmqReadyForWorkListener>()
                                     .LifeStyle.Is(LifestyleType.Singleton)
                                     .DependsOn(new
@@ -254,7 +255,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterMsmqOneWay()
         {
-            var oneWayConfig = (OnewayRhinoServiceBusFacility) config;
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
             container.Register(
                    Component.For<IMessageBuilder<Message>>()
                        .LifeStyle.Is(LifestyleType.Singleton)
@@ -294,7 +295,7 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterRhinoQueuesOneWay()
         {
-            var oneWayConfig = (OnewayRhinoServiceBusFacility) config;
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
             container.Register(
                      Component.For<IMessageBuilder<MessagePayload>>()
                         .ImplementedBy<RhinoQueuesMessageBuilder>()

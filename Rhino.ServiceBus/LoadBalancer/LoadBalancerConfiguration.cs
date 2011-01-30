@@ -5,9 +5,9 @@ using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.LoadBalancer
 {
-    public class LoadBalancerFacility : AbstractRhinoServiceBusFacility
+    public class LoadBalancerConfiguration : AbstractRhinoServiceBusConfiguration
     {
-        private readonly ILog logger = LogManager.GetLogger(typeof (LoadBalancerFacility));
+        private readonly ILog logger = LogManager.GetLogger(typeof (LoadBalancerConfiguration));
 
         private Type loadBalancerType = typeof(MsmqLoadBalancer);
         private Uri secondaryLoadBalancer;

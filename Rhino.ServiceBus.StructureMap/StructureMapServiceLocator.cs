@@ -7,6 +7,7 @@ using StructureMap;
 
 namespace Rhino.ServiceBus.StructureMap
 {
+    [CLSCompliant(false)]
     public class StructureMapServiceLocator : IServiceLocator 
     {
         private readonly IContainer container;

@@ -24,7 +24,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             testQueue2.Purge();
 
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithLoadBalancer.config")
                 .Configure();

@@ -1,17 +1,19 @@
+using System;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.StructureMap;
 using StructureMap;
 
 namespace Rhino.ServiceBus
 {
+    [CLSCompliant(false)]
     public static class Extensions
     {
-        public static AbstractRhinoServiceBusFacility UseStructureMap(this AbstractRhinoServiceBusFacility configuration)
+        public static AbstractRhinoServiceBusConfiguration UseStructureMap(this AbstractRhinoServiceBusConfiguration configuration)
         {
             return UseStructureMap(configuration, ObjectFactory.Container);
         }
 
-        public static AbstractRhinoServiceBusFacility UseStructureMap(this AbstractRhinoServiceBusFacility configuration, IContainer container)
+        public static AbstractRhinoServiceBusConfiguration UseStructureMap(this AbstractRhinoServiceBusConfiguration configuration, IContainer container)
         {
             new StructureMapBuilder(configuration, container);
             return configuration;

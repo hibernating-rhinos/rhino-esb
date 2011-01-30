@@ -23,7 +23,7 @@ namespace Rhino.ServiceBus.Tests
             OrderProcessor.LastState = null;
             wait = new ManualResetEvent(false);
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
             container.Register(

@@ -13,7 +13,7 @@ namespace Rhino.ServiceBus.Tests
         public PublishingTests()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

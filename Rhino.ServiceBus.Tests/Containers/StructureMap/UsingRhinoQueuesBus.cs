@@ -34,7 +34,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
             StringConsumer.Wait = new ManualResetEvent(false);
 
             container = new Container();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .Configure();

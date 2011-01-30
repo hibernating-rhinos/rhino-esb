@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Tests
             Module2.Stopped = Module2.Started = false;
 
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .AddMessageModule<Module1>()
                 .AddMessageModule<Module2>()
@@ -50,7 +50,7 @@ namespace Rhino.ServiceBus.Tests
 			Module2.Stopped = Module2.Started = false;
 
 			container = new WindsorContainer(new XmlInterpreter());
-			new RhinoServiceBusFacility()
+			new RhinoServiceBusConfiguration()
 				.AddMessageModule<Module1>()
 				.AddMessageModule<Module2>()
 				.DisableQueueAutoCreation()

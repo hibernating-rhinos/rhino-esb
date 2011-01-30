@@ -17,7 +17,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         private static IWindsorContainer CreateContainer()
         {
             var container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
             return container;

@@ -5,9 +5,9 @@ namespace Rhino.ServiceBus.Config
 {
     public class LoadBalancerConfiguration : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder)
+        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder)
         {
-            var loadBalancerConfig = config as LoadBalancerFacility;
+            var loadBalancerConfig = config as LoadBalancer.LoadBalancerConfiguration;
             if (loadBalancerConfig == null)
                 return;
             if (loadBalancerConfig.SecondaryLoadBalancer != null)

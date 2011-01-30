@@ -6,9 +6,9 @@ namespace Rhino.ServiceBus.Config
 {
     public class OneWayBusConfiguration : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder)
+        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder)
         {
-            var oneWayConfig = config as OnewayRhinoServiceBusFacility;
+            var oneWayConfig = config as OnewayRhinoServiceBusConfiguration;
             if (oneWayConfig == null)
                 return;
 

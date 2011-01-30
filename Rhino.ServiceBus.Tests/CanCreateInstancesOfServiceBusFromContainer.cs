@@ -12,7 +12,7 @@ namespace Rhino.ServiceBus.Tests
         public CanCreateInstancesOfServiceBusFromContainer()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

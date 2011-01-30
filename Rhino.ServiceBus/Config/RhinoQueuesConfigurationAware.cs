@@ -7,17 +7,17 @@ namespace Rhino.ServiceBus.Config
 {
     public class RhinoQueuesConfigurationAware : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility facility, IBusContainerBuilder builder)
+        public void Configure(AbstractRhinoServiceBusConfiguration configuration, IBusContainerBuilder builder)
         {
-            var busConfig = facility as RhinoServiceBusFacility;
+            var busConfig = configuration as RhinoServiceBusConfiguration;
             if (busConfig == null)
                 return;
 
-            if (facility.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) ==
+            if (configuration.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) ==
                 false)
                 return;
 
-            var busConfigSection = facility.ConfigurationSection.Bus;
+            var busConfigSection = configuration.ConfigurationSection.Bus;
 
             if (string.IsNullOrEmpty(busConfigSection.Name))
                 throw new ConfigurationErrorsException(

@@ -1,3 +1,4 @@
+using System;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
@@ -6,6 +7,7 @@ using StructureMap;
 
 namespace Rhino.ServiceBus.StructureMap
 {
+    [CLSCompliant(false)]
     public class StructureMapBootStrapper : AbstractBootStrapper 
     {
         private IContainer container;
@@ -24,10 +26,10 @@ namespace Rhino.ServiceBus.StructureMap
             get { return container; }
         }
 
-        protected override void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
         {
-            facility.UseStructureMap(container);
-            base.ConfigureBusFacility(facility);
+            configuration.UseStructureMap(container);
+            base.ConfigureBusFacility(configuration);
         }
 
         public override void CreateContainer()

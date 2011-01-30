@@ -7,7 +7,7 @@ namespace Rhino.ServiceBus.Hosting
 {
     public abstract class AbstractBootStrapper : IDisposable
     {
-        private AbstractRhinoServiceBusFacility config;
+        private AbstractRhinoServiceBusConfiguration config;
 
         public virtual Assembly Assembly
         {
@@ -44,12 +44,12 @@ namespace Rhino.ServiceBus.Hosting
             return true;
         }
 
-        protected virtual AbstractRhinoServiceBusFacility CreateConfiguration()
+        protected virtual AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {
-            return new RhinoServiceBusFacility();
+            return new RhinoServiceBusConfiguration();
         }
 
-        protected virtual void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
+        protected virtual void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
         {
         }
 

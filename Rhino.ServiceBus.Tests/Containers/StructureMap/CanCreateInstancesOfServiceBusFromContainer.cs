@@ -12,7 +12,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         public CanCreateInstancesOfServiceBusFromContainer()
         {
             container = ObjectFactory.Container;
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .Configure();
         }

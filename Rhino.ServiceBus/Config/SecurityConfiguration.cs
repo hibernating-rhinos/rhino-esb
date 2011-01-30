@@ -6,9 +6,9 @@ namespace Rhino.ServiceBus.Config
 {
     public class SecurityConfiguration : IBusConfigurationAware 
     {
-        public void Configure(AbstractRhinoServiceBusFacility config, IBusContainerBuilder builder)
+        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder)
         {
-            var busConfig = config as RhinoServiceBusFacility;
+            var busConfig = config as RhinoServiceBusConfiguration;
             if (busConfig == null)
                 return;
             if (config.ConfigurationSection.Security.Key == null)

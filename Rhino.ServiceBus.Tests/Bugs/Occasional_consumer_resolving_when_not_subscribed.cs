@@ -17,7 +17,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public Occasional_consumer_resolving_when_not_subscribed()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
             container.Register(Component.For<Occasional_consumer_resolving_when_not_subscribed>());

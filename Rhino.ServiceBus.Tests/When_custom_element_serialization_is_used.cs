@@ -19,7 +19,7 @@ namespace Rhino.ServiceBus.Tests
 		public When_custom_element_serialization_is_used()
 		{
 			container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
 			container.Register(

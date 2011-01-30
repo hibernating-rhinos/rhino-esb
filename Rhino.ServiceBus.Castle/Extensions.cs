@@ -6,12 +6,12 @@ namespace Rhino.ServiceBus
 {
     public static class Extensions
     {
-        public static AbstractRhinoServiceBusFacility UseCastleWindsor(this AbstractRhinoServiceBusFacility configuration)
+        public static AbstractRhinoServiceBusConfiguration UseCastleWindsor(this AbstractRhinoServiceBusConfiguration configuration)
         {
             return UseCastleWindsor(configuration, new WindsorContainer());
         }
 
-        public static AbstractRhinoServiceBusFacility UseCastleWindsor(this AbstractRhinoServiceBusFacility configuration, IWindsorContainer container)
+        public static AbstractRhinoServiceBusConfiguration UseCastleWindsor(this AbstractRhinoServiceBusConfiguration configuration, IWindsorContainer container)
         {
             new CastleBuilder(container, configuration);
             return configuration;

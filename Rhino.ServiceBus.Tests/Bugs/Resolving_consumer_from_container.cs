@@ -13,7 +13,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public Resolving_consumer_from_container()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
 

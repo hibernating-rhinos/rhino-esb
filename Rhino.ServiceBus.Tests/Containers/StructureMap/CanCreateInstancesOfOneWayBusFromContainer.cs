@@ -11,7 +11,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         public CanCreateInstancesOfOneWayBusFromContainer()
         {
             container = ObjectFactory.Container;
-            new OnewayRhinoServiceBusFacility()
+            new OnewayRhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .Configure();
         } 

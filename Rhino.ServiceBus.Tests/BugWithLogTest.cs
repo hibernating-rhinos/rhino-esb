@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.Tests
         public BugWithLogTest()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("BusWithLogging.config")
                 .Configure();

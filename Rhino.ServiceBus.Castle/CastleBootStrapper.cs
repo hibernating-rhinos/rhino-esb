@@ -27,9 +27,9 @@ namespace Rhino.ServiceBus.Castle
             get { return container; }
         }
 
-        protected override void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
         {
-            facility.UseCastleWindsor(container);
+            configuration.UseCastleWindsor(container);
         }
 
         public override void ExecuteDeploymentActions(string user)

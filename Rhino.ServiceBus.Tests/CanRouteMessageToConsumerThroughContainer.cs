@@ -17,7 +17,7 @@ namespace Rhino.ServiceBus.Tests
         {
             container = new WindsorContainer(new XmlInterpreter());
             container.Register(Component.For<TestConsumer>());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

@@ -22,7 +22,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         private static IStartableServiceBus CreateServiceBus()
         {
             var windsorContainer = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(windsorContainer)
                 .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .Configure();

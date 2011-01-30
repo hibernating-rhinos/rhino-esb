@@ -29,7 +29,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             acceptingWork.Purge();
 
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithAcceptingWorkLoadBalancer.config")
                 .Configure();

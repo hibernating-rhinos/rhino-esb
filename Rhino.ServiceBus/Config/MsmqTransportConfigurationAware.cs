@@ -25,20 +25,20 @@ namespace Rhino.ServiceBus.Config
             DetectQueueStrategy();
         }
 
-        public void Configure(AbstractRhinoServiceBusFacility facility, IBusContainerBuilder builder)
+        public void Configure(AbstractRhinoServiceBusConfiguration configuration, IBusContainerBuilder builder)
         {
-            if (!(facility is RhinoServiceBusFacility) && !(facility is LoadBalancerFacility))
+            if (!(configuration is RhinoServiceBusConfiguration) && !(configuration is LoadBalancer.LoadBalancerConfiguration))
                 return;
 
-            if (facility.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
+            if (configuration.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
                 return;
 
-            if (facility.UseFlatQueue)
+            if (configuration.UseFlatQueue)
             {
                 queueStrategyImpl = typeof (FlatQueueStrategy);
             }
 
-            if (facility.DisableAutoQueueCreation == false)
+            if (configuration.DisableAutoQueueCreation == false)
             {
                 builder.RegisterQueueCreation();
             }

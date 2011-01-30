@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Tests
         public FlatQueuesDelayedMessages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseFlatQueueStructure()
                 .UseCastleWindsor(container)
                 .Configure();

@@ -32,7 +32,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             MessageQueue.Create(loadBalancerQueuePath2, true);
 
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\SendingBusToLoadBalancer.config")
                 .Configure();
@@ -61,7 +61,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
 
             //New conatainer to more closely mimic as separate app.
             receivingBusContainer = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(receivingBusContainer)
                 .UseStandaloneConfigurationFile(@"LoadBalancer\ReceivingBusWithLoadBalancer.config")
                 .Configure();

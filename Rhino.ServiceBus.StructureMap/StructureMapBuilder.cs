@@ -17,15 +17,17 @@ using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.RhinoQueues;
 using StructureMap;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
+using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
 
 namespace Rhino.ServiceBus.StructureMap
 {
+    [CLSCompliant(false)]
     public class StructureMapBuilder : IBusContainerBuilder 
     {
-        private readonly AbstractRhinoServiceBusFacility config;
+        private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IContainer container;
 
-        public StructureMapBuilder(AbstractRhinoServiceBusFacility config, IContainer container)
+        public StructureMapBuilder(AbstractRhinoServiceBusConfiguration config, IContainer container)
         {
             this.config = config;
             this.container = container;
@@ -66,7 +68,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusFacility) config;
+            var busConfig = (RhinoServiceBusConfiguration) config;
             container.Configure(c =>
             {
                 c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
@@ -79,7 +81,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Configure(c =>
             {
                 c.For(typeof (MsmqLoadBalancer)).Singleton().Use(loadBalancerConfig.LoadBalancerType)
@@ -93,7 +95,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Configure(c =>
             {
                 c.For(typeof (MsmqLoadBalancer)).Singleton().Use(loadBalancerConfig.LoadBalancerType)
@@ -108,7 +110,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterReadyForWork()
         {
-            var loadBalancerConfig = (LoadBalancerFacility) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Configure(c =>
             {
                 c.For<MsmqReadyForWorkListener>().Singleton().Use<MsmqReadyForWorkListener>()
@@ -164,7 +166,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterMsmqOneWay()
         {
-            var oneWayConfig = (OnewayRhinoServiceBusFacility) config;
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
             container.Configure(c =>
             {
                 c.For<IMessageBuilder<Message>>().Singleton().Use<MsmqMessageBuilder>();
@@ -191,7 +193,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterRhinoQueuesOneWay()
         {
-            var oneWayConfig = (OnewayRhinoServiceBusFacility) config;
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
 
             container.Configure(c =>
             {

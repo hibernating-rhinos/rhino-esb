@@ -27,7 +27,7 @@ namespace Rhino.ServiceBus.Tests.Hosting
         public Can_host_in_another_app_domain()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnotherBus.config"))
                 .Configure();

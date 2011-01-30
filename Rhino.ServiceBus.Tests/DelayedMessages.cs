@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Tests
         public DelayedMessages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
             container.Register(

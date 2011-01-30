@@ -15,14 +15,14 @@ namespace Rhino.ServiceBus.Castle
             inner = new CastleBootStrapper(container);
         }
 
-        protected override AbstractRhinoServiceBusFacility CreateConfiguration()
+        protected override AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {
-            return new LoadBalancerFacility();
+            return new LoadBalancerConfiguration();
         }
 
-        protected override void ConfigureBusFacility(AbstractRhinoServiceBusFacility facility)
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
         {
-            facility.UseCastleWindsor(container);
+            configuration.UseCastleWindsor(container);
         }
 
         public override void ExecuteDeploymentActions(string user)

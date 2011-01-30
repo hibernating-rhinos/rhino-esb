@@ -19,11 +19,11 @@ namespace Rhino.ServiceBus.Tests
             container1 = new WindsorContainer(new XmlInterpreter());
             container2 = new WindsorContainer();
 
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container1)
                 .Configure();
 
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container2)
                 .UseStandaloneConfigurationFile("AnotherBus.config")
                 .Configure();

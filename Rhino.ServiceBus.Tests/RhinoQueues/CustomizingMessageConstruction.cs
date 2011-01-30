@@ -19,8 +19,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         {
             using( var container = new WindsorContainer())
             {
-                container.Register(Component.For<IMessageBuilder<MessagePayload>>().ImplementedBy<CustomHeaderBuilder>());//before facility
-                new RhinoServiceBusFacility()
+                container.Register(Component.For<IMessageBuilder<MessagePayload>>().ImplementedBy<CustomHeaderBuilder>());//before configuration
+                new RhinoServiceBusConfiguration()
                     .UseCastleWindsor(container)
                     .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                     .Configure();
@@ -41,7 +41,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             using (var container = new WindsorContainer())
             {
                 container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
-                new RhinoServiceBusFacility()
+                new RhinoServiceBusConfiguration()
                     .UseCastleWindsor(container)
                     .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                     .Configure();

@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.Tests
         public CanSendMsgsFromOneWayBus()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
             container.Register(Component.For<StringConsumer>());
@@ -57,7 +57,7 @@ namespace Rhino.ServiceBus.Tests
 
                 using (var c = new WindsorContainer())
                 {
-                    new OnewayRhinoServiceBusFacility()
+                    new OnewayRhinoServiceBusConfiguration()
                         .UseCastleWindsor(c)
                         .UseStandaloneConfigurationFile("OneWayBus.config")
                         .Configure();

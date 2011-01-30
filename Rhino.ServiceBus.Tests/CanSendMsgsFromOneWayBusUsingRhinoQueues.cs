@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.Tests
             if (Directory.Exists("test_queue_subscriptions.esent"))
                 Directory.Delete("test_queue_subscriptions.esent", true);
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("ReceiveOneWayBusRhinoQueues.config")
                 .Configure();
@@ -71,7 +71,7 @@ namespace Rhino.ServiceBus.Tests
 
                 using (var c = new WindsorContainer())
                 {
-                    new OnewayRhinoServiceBusFacility()
+                    new OnewayRhinoServiceBusConfiguration()
                         .UseCastleWindsor(c)
                         .UseStandaloneConfigurationFile("OneWayBusRhinoQueues.config")
                         .Configure();

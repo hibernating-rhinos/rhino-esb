@@ -7,6 +7,7 @@ using StructureMap.Interceptors;
 
 namespace Rhino.ServiceBus.StructureMap
 {
+    [CLSCompliant(false)]
     public  class ConsumerInterceptor : InstanceInterceptor
     {
         public object Process(object target, IContext context)

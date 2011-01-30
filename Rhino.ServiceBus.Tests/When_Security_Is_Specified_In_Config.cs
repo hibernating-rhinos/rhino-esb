@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Tests
         private static IWindsorContainer CreateContainer()
         {
             var container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("AnotherBus.config")
                 .Configure();

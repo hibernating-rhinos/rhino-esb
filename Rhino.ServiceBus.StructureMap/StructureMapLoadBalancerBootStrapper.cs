@@ -15,9 +15,9 @@ namespace Rhino.ServiceBus.StructureMap
             inner = new StructureMapBootStrapper(container);
         }
 
-        protected override AbstractRhinoServiceBusFacility CreateConfiguration()
+        protected override AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {
-            return new LoadBalancerFacility();
+            return new LoadBalancerConfiguration();
         }
 
         public override void ExecuteDeploymentActions(string user)

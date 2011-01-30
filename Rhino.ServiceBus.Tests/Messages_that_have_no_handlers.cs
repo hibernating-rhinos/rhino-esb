@@ -15,7 +15,7 @@ namespace Rhino.ServiceBus.Tests
         public Messages_that_have_no_handlers()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }
@@ -48,7 +48,7 @@ namespace Rhino.ServiceBus.Tests
             public Messages_that_have_no_handlers()
             {
                 container = new WindsorContainer(new XmlInterpreter());
-                new RhinoServiceBusFacility()
+                new RhinoServiceBusConfiguration()
                     .UseFlatQueueStructure()
                     .UseCastleWindsor(container)
                     .Configure();

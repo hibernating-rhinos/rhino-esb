@@ -14,7 +14,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_handler_consumes_two_messages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
         }

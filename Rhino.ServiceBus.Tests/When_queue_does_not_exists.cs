@@ -12,7 +12,7 @@ namespace Rhino.ServiceBus.Tests
         public When_queue_does_not_exists()
         {
             container = new WindsorContainer();
-            new RhinoServiceBusFacility()
+            new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("BusWithLogging.config")
                 .Configure();
