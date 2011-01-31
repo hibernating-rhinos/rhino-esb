@@ -9,7 +9,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 {
     public class LoadBalancerHost : MarshalByRefObject, IApplicationHost
     {
-        private LoadBalancerBootStrapper bootStrapper;
+        private AbstractBootStrapper bootStrapper;
         private MsmqLoadBalancer loadBalancer;
 
         public override object InitializeLifetimeService()
@@ -55,7 +55,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             Type bootStrapperType = GetAutoBootStrapperType(assembly);
             try
             {
-                bootStrapper = (LoadBalancerBootStrapper)Activator.CreateInstance(bootStrapperType);
+                bootStrapper = (AbstractBootStrapper)Activator.CreateInstance(bootStrapperType);
             }
             catch (Exception e)
             {
@@ -72,7 +72,7 @@ namespace Rhino.ServiceBus.LoadBalancer
         private static Type GetAutoBootStrapperType(Assembly assembly)
         {
             var bootStrappers = assembly.GetTypes()
-                .Where(x => typeof(LoadBalancerBootStrapper).IsAssignableFrom(x))
+                .Where(x => typeof(AbstractBootStrapper).IsAssignableFrom(x) && x.IsAbstract == false)
                 .ToArray();
 
             if (bootStrappers.Length == 0)

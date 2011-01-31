@@ -66,6 +66,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         }
     }
 
+    [CLSCompliant(false)]
     public class SimpleBootStrapper : StructureMapBootStrapper
     {
         public SimpleBootStrapper(IContainer container) : base(container)
@@ -73,6 +74,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         }
     }
 
+    [CLSCompliant(false)]
     public class TestBootStrapper : StructureMapBootStrapper
     {
         protected override void ConfigureContainer()
