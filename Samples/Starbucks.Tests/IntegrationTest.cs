@@ -1,4 +1,5 @@
 ﻿using System;
+using Rhino.ServiceBus;
 using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Msmq;
@@ -12,7 +13,7 @@ namespace Starbucks.Tests
 {
     public class IntegrationTest : IDisposable
     {
-        private readonly RemoteAppDomainLoadBalancerHost baristaLoadBalancer;
+        private readonly RemoteAppDomainHost baristaLoadBalancer;
         private readonly RemoteAppDomainHost cashier;
         private readonly RemoteAppDomainHost barista;
         private readonly DefaultHost customerHost;
@@ -25,7 +26,7 @@ namespace Starbucks.Tests
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
+            baristaLoadBalancer = new RemoteAppDomainHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
             cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))
                 .Configuration("Cashier.config");
             barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))
@@ -54,7 +55,7 @@ namespace Starbucks.Tests
             customerHost = new DefaultHost();
             customerHost.Start<CustomerBootStrapper>();
 
-            var bus = customerHost.Bus;
+            var bus = (IServiceBus)customerHost.Bus;
 
             var userInterface = new MockCustomerUserInterface();
             var customer = new CustomerController(bus)

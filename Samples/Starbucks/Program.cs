@@ -19,7 +19,7 @@ namespace Starbucks
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            var baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof(RemoteAppDomainHost).Assembly, "LoadBalancer.config");
+            var baristaLoadBalancer = new RemoteAppDomainHost(typeof(RemoteAppDomainHost).Assembly, "LoadBalancer.config");
             baristaLoadBalancer.Start();
             
             Console.WriteLine("Barista load balancer has started");
@@ -43,7 +43,7 @@ namespace Starbucks
                 .Receive("Starbucks.Messages.Barista", "msmq://localhost/starbucks.barista.balancer"));
             customerHost.Start<CustomerBootStrapper>();
 
-            var bus = customerHost.Bus;
+            var bus = (IServiceBus)customerHost.Bus;
 
             var customer = new CustomerController(bus)
             {

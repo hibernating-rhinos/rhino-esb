@@ -5,6 +5,7 @@ using System.Reflection;
 using log4net;
 using log4net.Config;
 using Rhino.ServiceBus.Config;
+using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -13,13 +14,13 @@ namespace Rhino.ServiceBus.Hosting
         private readonly ILog logger = LogManager.GetLogger(typeof(DefaultHost));
         private string assemblyName;
         private AbstractBootStrapper bootStrapper;
-        private IStartableServiceBus serviceBus;
+        private IStartable startable;
         private string bootStrapperName;
         private BusConfigurationSection hostConfiguration;
 
-        public IServiceBus Bus
+        public IStartable Bus
         {
-            get { return serviceBus; }
+            get { return startable; }
         }
 
         public void SetBootStrapperTypeName(string typeName)
@@ -38,7 +39,7 @@ namespace Rhino.ServiceBus.Hosting
         {
             InitailizeBus(asmName);
 
-            serviceBus.Start();
+            startable.Start();
 
             bootStrapper.AfterStart();
         }
@@ -60,7 +61,7 @@ namespace Rhino.ServiceBus.Hosting
             bootStrapper.BeforeStart();
 
             logger.Debug("Starting bus");
-            serviceBus = bootStrapper.GetInstance<IStartableServiceBus>();
+            startable = bootStrapper.GetInstance<IStartable>();
         }
 
         private void InitializeContainer()
@@ -95,7 +96,7 @@ namespace Rhino.ServiceBus.Hosting
         private static Type GetAutoBootStrapperType(Assembly assembly)
         {
             var bootStrappers = assembly.GetTypes()
-                .Where(x => typeof(AbstractBootStrapper).IsAssignableFrom(x))
+                .Where(x => typeof(AbstractBootStrapper).IsAssignableFrom(x) && x.IsAbstract == false)
                 .ToArray();
 
             if (bootStrappers.Length == 0)
@@ -116,8 +117,8 @@ namespace Rhino.ServiceBus.Hosting
         {
             if (bootStrapper != null)
                 bootStrapper.Dispose();
-            if (serviceBus != null)
-                serviceBus.Dispose();
+            if (startable != null)
+                startable.Dispose();
         }
 
         public override object InitializeLifetimeService()

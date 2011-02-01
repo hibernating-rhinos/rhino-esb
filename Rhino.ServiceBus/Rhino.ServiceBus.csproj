@@ -98,7 +98,6 @@
     <Compile Include="Hosting\AbstractBootStrapper.cs" />
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
-    <Compile Include="Hosting\RemoteAppDomainLoadBalancerHost.cs" />
     <Compile Include="Hosting\RhinoQueuesHostConfiguration.cs" />
     <Compile Include="ICustomizeMessageHeaders.cs" />
     <Compile Include="Impl\DefaultHandler.cs" />
@@ -108,6 +107,7 @@
     <Compile Include="Internal\IEndpointRouter.cs" />
     <Compile Include="Internal\IHandler.cs" />
     <Compile Include="Internal\IServiceLocator.cs" />
+    <Compile Include="Internal\IStartable.cs" />
     <Compile Include="IServiceBusAware.cs" />
     <Compile Include="Impl\DefaultServiceBus.cs" />
     <Compile Include="Impl\DisposableAction.cs" />
@@ -117,7 +117,6 @@
     <Compile Include="Exceptions\MessagePublicationException.cs" />
     <Compile Include="Exceptions\SubscriptionException.cs" />
     <Compile Include="Exceptions\TransportException.cs" />
-    <Compile Include="LoadBalancer\LoadBalancerHost.cs" />
     <Compile Include="LoadBalancer\MsmqLoadBalancer.cs" />
     <Compile Include="MessageModules\LoadBalancerMessageModule.cs" />
     <Compile Include="Messages\AcceptingWork.cs" />

@@ -9,15 +9,15 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Castle
 {
-    public class CastleBootStrapper : AbstractBootStrapper
+    public abstract class CastleBootStrapper : AbstractBootStrapper
     {
         private IWindsorContainer container;
 
-        public CastleBootStrapper()
+        protected CastleBootStrapper()
         {
         }
 
-        public CastleBootStrapper(IWindsorContainer container)
+        protected CastleBootStrapper(IWindsorContainer container)
         {
             this.container = container;
         }

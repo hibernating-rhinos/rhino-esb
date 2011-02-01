@@ -75,6 +75,7 @@ namespace Rhino.ServiceBus.StructureMap
                 c.For<IDeploymentAction>().Use<CreateQueuesAction>();
                 c.For<IStartableServiceBus>().Singleton().Use<DefaultServiceBus>()
                     .Ctor<MessageOwner[]>().Is(busConfig.MessageOwners.ToArray());
+                c.Forward<IStartableServiceBus, IStartable>();
                 c.Forward<IStartableServiceBus, IServiceBus>();
             });
         }
@@ -89,6 +90,7 @@ namespace Rhino.ServiceBus.StructureMap
                     .Child("primaryLoadBalancer").Is(loadBalancerConfig.PrimaryLoadBalancer)
                     .Child("transactional").Is(loadBalancerConfig.Transactional)
                     .Child("endpoint").Is(loadBalancerConfig.Endpoint);
+                c.Forward<MsmqLoadBalancer, IStartable>();
                 c.For<IDeploymentAction>().Use<CreateLoadBalancerQueuesAction>();
             });
         }

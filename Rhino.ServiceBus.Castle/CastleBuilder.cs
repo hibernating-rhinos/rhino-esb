@@ -23,6 +23,7 @@ using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.RhinoQueues;
 using Rhino.ServiceBus.Sagas;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
+using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
 
 namespace Rhino.ServiceBus.Castle
@@ -114,7 +115,7 @@ namespace Rhino.ServiceBus.Castle
                     .ImplementedBy<CreateLogQueueAction>(),
                 Component.For<IDeploymentAction>()
                     .ImplementedBy<CreateQueuesAction>(),
-                Component.For<IServiceBus, IStartableServiceBus>()
+                Component.For<IServiceBus, IStartableServiceBus, IStartable>()
                     .ImplementedBy<DefaultServiceBus>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .DependsOn(new
@@ -140,7 +141,7 @@ namespace Rhino.ServiceBus.Castle
         public void RegisterPrimaryLoadBalancer()
         {
             var loadBalancerConfig = (LoadBalancerConfiguration) config;
-            container.Register(Component.For<MsmqLoadBalancer>()
+            container.Register(Component.For<MsmqLoadBalancer, IStartable>()
                                    .ImplementedBy(loadBalancerConfig.LoadBalancerType)
                                    .LifeStyle.Is(LifestyleType.Singleton)
                                    .DependsOn(new
