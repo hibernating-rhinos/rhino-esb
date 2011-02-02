@@ -14,6 +14,7 @@ namespace Starbucks
         public static void Main()
         {
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer", QueueType.LoadBalancer);
+            PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer.acceptingwork", QueueType.LoadBalancer);
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
