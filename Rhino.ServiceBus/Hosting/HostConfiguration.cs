@@ -67,19 +67,8 @@ namespace Rhino.ServiceBus.Hosting
         {
             var config = new MutableConfiguration("rhino.esb");
 
-            var busConfig = config.CreateChild("bus")
-                .Attribute("endpoint", Endpoint)
-                .Attribute("threadCount", ThreadCount.ToString())
-                .Attribute("numberOfRetries", NumberOfRetries.ToString());
-
-            if (string.IsNullOrEmpty(Name) == false)
-                busConfig.Attribute("name", Name);
-
-            if (string.IsNullOrEmpty(LoadBalancerEndpoint) == false)
-                busConfig.Attribute("loadBalancerEndpoint", LoadBalancerEndpoint);
-
-            if (string.IsNullOrEmpty(LogEndpoint) == false)
-                busConfig.Attribute("logEndpoint", LogEndpoint);
+            var busConfig = config.CreateChild("bus");
+            PopulateBusConfiguration(busConfig);
 
             var messagesConfig = config.CreateChild("messages");
 
@@ -92,5 +81,22 @@ namespace Rhino.ServiceBus.Hosting
 
             return config;
         }
-    }
+
+        protected virtual void PopulateBusConfiguration(MutableConfiguration busConfig)
+        {
+            busConfig
+                .Attribute("endpoint", Endpoint)
+                .Attribute("threadCount", ThreadCount.ToString())
+                .Attribute("numberOfRetries", NumberOfRetries.ToString());
+
+            if (string.IsNullOrEmpty(Name) == false)
+                busConfig.Attribute("name", Name);
+
+            if (string.IsNullOrEmpty(LoadBalancerEndpoint) == false)
+                busConfig.Attribute("loadBalancerEndpoint", LoadBalancerEndpoint);
+
+            if (string.IsNullOrEmpty(LogEndpoint) == false)
+                busConfig.Attribute("logEndpoint", LogEndpoint);
+        }
+	}
 }

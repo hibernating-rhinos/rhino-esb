@@ -25,7 +25,9 @@ namespace Rhino.ServiceBus.Config
             if (string.IsNullOrEmpty(name))
                 throw new ConfigurationErrorsException("Could not find attribute 'name' in node 'bus' in configuration");
 
-            var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+            var path = busConfig.Attributes["path"];
+            if (string.IsNullOrEmpty(path))
+                path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 
             facility.Kernel.Register(
                 Component.For<ISubscriptionStorage>()
