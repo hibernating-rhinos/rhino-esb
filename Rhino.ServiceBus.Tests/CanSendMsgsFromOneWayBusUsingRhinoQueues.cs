@@ -32,8 +32,27 @@ namespace Rhino.ServiceBus.Tests
             StringConsumer.Event = new ManualResetEvent(false);
         }
 
+        [Fact]
+        public void SendMessageToRemoteBusFromConfigDrivenOneWayBusWithCustomEndpoint()
+        {
+            using (var bus = container.Resolve<IStartableServiceBus>())
+            {
+                bus.Start();
+                using (var c = new WindsorContainer(new XmlInterpreter("OneWayBusRhinoQueuesWithEndpoint.config")))
+                {
+                    c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
+                    var oneWay = c.Resolve<IOnewayBus>();
+                    var facilityUri = ((RhinoQueuesOneWayBus) oneWay).Endpoint.Uri.ToString();
+                    Assert.Equal("my://custom:24555/endpoint", facilityUri);
+                    oneWay.Send("hello there, one way");
+                    Assert.True(StringConsumer.Event.WaitOne(TimeSpan.FromSeconds(30), false));
+                }
+                
+            }
 
 
+            Assert.Equal("hello there, one way", StringConsumer.Value);
+        }
         [Fact]
         public void SendMessageToRemoteBus()
         {
@@ -41,14 +60,14 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                using (var oneWay = new RhinoQueuesOneWayBus(new[]
-                                                 {
-                                                     new MessageOwner
-                                                         {
-                                                             Endpoint = bus.Endpoint.Uri,
-                                                             Name = "System",
-                                                         },
-                                                 }, container.Resolve<IMessageSerializer>(), new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
+                using (var oneWay = new RhinoQueuesOneWayBus(RhinoQueuesOneWayBus.NullEndpoint, new[]
+                                                                       {
+                                                                           new MessageOwner
+                                                                               {
+                                                                                   Endpoint = bus.Endpoint.Uri,
+                                                                                   Name = "System",
+                                                                               },
+                                                                       }, container.Resolve<IMessageSerializer>(), new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
                 {
                     oneWay.Send("hello there, one way");
 

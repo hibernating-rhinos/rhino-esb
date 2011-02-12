@@ -66,7 +66,7 @@ namespace Rhino.ServiceBus.Tests
             }
 
         }
-
+        
         public class StringConsumer : ConsumerOf<string>
         {
             public static ManualResetEvent Event;

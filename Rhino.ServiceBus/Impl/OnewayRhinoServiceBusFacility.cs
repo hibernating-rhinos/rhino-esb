@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Messaging;
 using System.Transactions;
 using Castle.Core;
+using Castle.Core.Configuration;
 using Castle.MicroKernel.Facilities;
 using Castle.MicroKernel.Registration;
 using Rhino.Queues;
@@ -31,6 +33,12 @@ namespace Rhino.ServiceBus.Impl
             messageOwnersReader.ReadMessageOwners();
             if (IsRhinoQueues(messageOwnersReader.EndpointScheme))
             {
+                Uri endpoint;
+                if(TryGetCustomEndpoint(FacilityConfig, out endpoint)==false)
+                {
+                    endpoint = RhinoQueuesOneWayBus.NullEndpoint;
+                }
+
                 Kernel.Register(
                      Component.For<IMessageBuilder<MessagePayload>>()
                         .ImplementedBy<RhinoQueuesMessageBuilder>()
@@ -40,6 +48,7 @@ namespace Rhino.ServiceBus.Impl
                         .ImplementedBy<RhinoQueuesOneWayBus>()
                         .DependsOn(new
                                        {
+                                           endpoint=endpoint,
                                            messageOwners = messageOwners.ToArray(),
                                        })
                     );
@@ -68,7 +77,15 @@ namespace Rhino.ServiceBus.Impl
                 );
 
         }
-
+        private bool TryGetCustomEndpoint(IConfiguration facilityConfiguration,out Uri endpoint)
+        {
+            endpoint = null;
+            IConfiguration busConfig = facilityConfiguration.Children["bus"];
+            if (busConfig == null)
+                return false;
+            string uriString = busConfig.Attributes["endpoint"];
+            return Uri.TryCreate(uriString, UriKind.Absolute, out endpoint);
+        }
         private static bool IsRhinoQueues(string endpointScheme)
         {
             return endpointScheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase);
