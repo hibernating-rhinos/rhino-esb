@@ -10,8 +10,7 @@ Rhino Service Bus currently supports two transports [MSMQ](http://msdn.microsoft
 ## HOW TO BUILD
 
 From a powershell window
-* .NET 3.5 -- `.\psake.ps1`
-* .NET 4   -- `.\build_release_4.ps1`
+-- `.\psake.ps1`
 
 ## MORE INFORMATION
 
