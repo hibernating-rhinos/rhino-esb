@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<package> 
+  <metadata> 
+    <id>Rhino-ESB</id> 
+    <version>1.8.0.0</version> 
+    <authors>Ayende Rahien, Corey Kaylor</authors>
+    <description>A developer friendly service bus for .NET</description> 
+    <language>en-US</language>
+    <licenseUrl>https://github.com/hibernating-rhinos/rhino-esb/blob/master/license.txt</licenseUrl>
+    <projectUrl>https://github.com/hibernating-rhinos/rhino-esb</projectUrl>
+  </metadata> 
+</package>
+
