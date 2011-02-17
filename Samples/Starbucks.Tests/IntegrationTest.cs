@@ -40,19 +40,14 @@ namespace Starbucks.Tests
             baristaLoadBalancer.Start();
             Console.WriteLine("Barista load balancer has started");
 
-            cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))
-                .Configuration("Cashier.config");
             cashier.Start();
 
             Console.WriteLine("Cashier has started");
 
-            barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))
-                .Configuration("Barista.config");
             barista.Start();
 
             Console.WriteLine("Barista has started");
 
-            customerHost = new DefaultHost();
             customerHost.Start<CustomerBootStrapper>();
 
             var bus = (IServiceBus)customerHost.Bus;

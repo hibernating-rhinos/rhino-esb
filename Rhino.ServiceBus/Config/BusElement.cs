@@ -60,6 +60,12 @@ namespace Rhino.ServiceBus.Config
             set { this["name"] = value; }
         }
 
+        public string Path
+        {
+            get { return this["path"] as string; }
+            set { this["path"] = value; }
+        }
+
         private void SetupDefaults()
         {
             Properties.Add(new ConfigurationProperty("transactional", typeof(string), null));
@@ -71,6 +77,7 @@ namespace Rhino.ServiceBus.Config
             Properties.Add(new ConfigurationProperty("logEndpoint", typeof(string), null));
             Properties.Add(new ConfigurationProperty("loadBalancerEndpoint", typeof(string), null));
             Properties.Add(new ConfigurationProperty("name", typeof(string), null));
+            Properties.Add(new ConfigurationProperty("path", typeof(string), null));
         }
     }
 }

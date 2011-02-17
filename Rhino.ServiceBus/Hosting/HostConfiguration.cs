@@ -63,7 +63,7 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
-        public BusConfigurationSection ToBusConfiguration()
+        public virtual BusConfigurationSection ToBusConfiguration()
         {
             var config = new BusConfigurationSection();
             config.Bus.Endpoint = Endpoint;

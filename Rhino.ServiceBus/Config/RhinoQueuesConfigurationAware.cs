@@ -23,7 +23,7 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Could not find attribute 'name' in node 'bus' in configuration");
 
-            var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+            var path = busConfigSection.Path ?? Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 
             builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name);
         }
