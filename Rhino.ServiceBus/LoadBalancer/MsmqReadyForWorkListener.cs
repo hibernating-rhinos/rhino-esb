@@ -22,7 +22,8 @@ namespace Rhino.ServiceBus.LoadBalancer
 			int threadCount, 
 			IMessageSerializer messageSerializer, 
 			IEndpointRouter endpointRouter, 
-			TransactionalOptions transactional) : base(queueStrategy, endpoint, threadCount, messageSerializer, endpointRouter, transactional)
+			TransactionalOptions transactional,
+            IMessageBuilder<Message> messageBuilder) : base(queueStrategy, endpoint, threadCount, messageSerializer, endpointRouter, transactional, messageBuilder)
 		{}
 
 		protected override void HandlePeekedMessage(OpenedQueue queue, Message message)

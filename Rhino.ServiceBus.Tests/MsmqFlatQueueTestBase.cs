@@ -120,17 +120,19 @@ namespace Rhino.ServiceBus.Tests
             {
                 if (transport == null)
                 {
-                    transport = new MsmqTransport(
+                    var serializer =
                         new XmlMessageSerializer(
-                        	new DefaultReflection(),
-                        	new DefaultKernel()),
+                            new DefaultReflection(),
+                            new DefaultKernel());
+                    transport = new MsmqTransport(serializer,
                             new FlatQueueStrategy(new EndpointRouter(),testQueueEndPoint.Uri),
                             testQueueEndPoint.Uri, 1,
                         DefaultTransportActions(testQueueEndPoint.Uri),
                             new EndpointRouter(),
 							IsolationLevel.Serializable,
 							TransactionalOptions.FigureItOut,
-                            true);
+                            true,
+                            new MsmqMessageBuilder(serializer, new DefaultKernel()));
                     transport.Start();
                 }
                 return transport;
@@ -155,13 +157,15 @@ namespace Rhino.ServiceBus.Tests
             {
                 if (transactionalTransport == null)
                 {
-                    transactionalTransport = new MsmqTransport(
-                        new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()),
+                    var serializer =
+                        new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+                    transactionalTransport = new MsmqTransport(serializer,
                         new FlatQueueStrategy(new EndpointRouter(),transactionalTestQueueEndpoint.Uri),
                         transactionalTestQueueEndpoint.Uri, 1, DefaultTransportActions(transactionalTestQueueEndpoint.Uri),
                             new EndpointRouter(),
 							IsolationLevel.Serializable, TransactionalOptions.FigureItOut,
-                            true);
+                            true,
+                            new MsmqMessageBuilder(serializer, new DefaultKernel()));
                     transactionalTransport.Start();
                 }
                 return transactionalTransport;

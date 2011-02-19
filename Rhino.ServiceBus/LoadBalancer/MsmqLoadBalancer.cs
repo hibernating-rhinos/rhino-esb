@@ -34,8 +34,9 @@ namespace Rhino.ServiceBus.LoadBalancer
 			IEndpointRouter endpointRouter,
 			Uri endpoint,
 			int threadCount,
-			TransactionalOptions transactional)
-			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional)
+			TransactionalOptions transactional,
+            IMessageBuilder<Message> messageBuilder)
+			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional, messageBuilder)
 		{
 			heartBeatTimer = new Timer(SendHeartBeatToSecondaryServer);
 			this.queueStrategy = queueStrategy;
@@ -48,8 +49,9 @@ namespace Rhino.ServiceBus.LoadBalancer
 					Uri endpoint,
 					int threadCount,
 					Uri secondaryLoadBalancer,
-					TransactionalOptions transactional)
-			: this(serializer, queueStrategy, endpointRouter, endpoint, threadCount, transactional)
+					TransactionalOptions transactional,
+                    IMessageBuilder<Message> messageBuilder)
+			: this(serializer, queueStrategy, endpointRouter, endpoint, threadCount, transactional, messageBuilder)
 		{
 			this.secondaryLoadBalancer = secondaryLoadBalancer;
 		}

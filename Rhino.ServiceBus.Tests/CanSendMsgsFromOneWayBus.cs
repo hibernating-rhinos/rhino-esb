@@ -36,7 +36,7 @@ namespace Rhino.ServiceBus.Tests
                         Endpoint = bus.Endpoint.Uri,
                         Name = "System",
                     },
-                }, new MsmqMessageBuilder(container.Resolve<IMessageSerializer>()));
+                }, new MsmqMessageBuilder(container.Resolve<IMessageSerializer>(), container.Kernel));
 
                 oneWay.Send("hello there, one way");
 

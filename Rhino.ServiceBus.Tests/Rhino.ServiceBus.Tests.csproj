@@ -100,6 +100,7 @@
     </Compile>
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
+    <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />

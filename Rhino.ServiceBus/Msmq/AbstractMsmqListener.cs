@@ -10,6 +10,7 @@ using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Transport;
+using Rhino.ServiceBus.Util;
 using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
@@ -38,7 +39,8 @@ namespace Rhino.ServiceBus.Msmq
             int threadCount,
             IMessageSerializer messageSerializer,
             IEndpointRouter endpointRouter, 
-			TransactionalOptions transactional)
+			TransactionalOptions transactional,
+            IMessageBuilder<Message> messageBuilder)
         {
             this.queueStrategy = queueStrategy;
         	this.messageSerializer = messageSerializer;
@@ -62,7 +64,7 @@ namespace Rhino.ServiceBus.Msmq
         		default:
         			throw new ArgumentOutOfRangeException("transactional");
         	}
-            messageBuilder = new MsmqMessageBuilder(this.messageSerializer);
+            this.messageBuilder = messageBuilder;
             this.messageBuilder.Initialize(Endpoint);
         }
 
@@ -240,7 +242,7 @@ namespace Rhino.ServiceBus.Msmq
 
         protected IEndpointRouter endpointRouter;
     	private readonly bool? transactional;
-        private readonly MsmqMessageBuilder messageBuilder;
+        private readonly IMessageBuilder<Message> messageBuilder;
 
         public TransportState TransportState { get; set; }
 
@@ -296,8 +298,10 @@ namespace Rhino.ServiceBus.Msmq
                             Queue = messageQueue,
                             Message = transportMessage,
                             Source = messageQueue.RootUri,
-                            MessageId = transportMessage.GetMessageId()
+                            MessageId = transportMessage.GetMessageId(),
+                            Headers = transportMessage.Extension.DeserializeHeaders(),
                         };
+
                         messageSerializationException(information, e);
                     }
                 }

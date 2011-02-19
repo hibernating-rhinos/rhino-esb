@@ -40,7 +40,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
                 subscriptionStorage.HandleAdministrativeMessage;
 
             Message msg = new MsmqMessageBuilder
-                (serializer).BuildFromMessageBatch(new
+                (serializer, new DefaultKernel()).BuildFromMessageBatch(new
                                                                      AddInstanceSubscription
                 {
                     Endpoint = queueEndpoint.Uri.ToString(),
@@ -52,7 +52,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
             wait.WaitOne();
 
             msg = new MsmqMessageBuilder
-                (serializer).BuildFromMessageBatch(new
+                (serializer, new DefaultKernel()).BuildFromMessageBatch(new
                                                                      RemoveInstanceSubscription
                 {
                     Endpoint = queueEndpoint.Uri.ToString(),

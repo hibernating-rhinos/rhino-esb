@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Messaging;
 using System.Runtime.Serialization;
+using Castle.MicroKernel;
 using log4net;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Msmq
 {
@@ -12,13 +16,17 @@ namespace Rhino.ServiceBus.Msmq
     {
         private readonly ILog logger = LogManager.GetLogger(typeof (MsmqMessageBuilder));
         private readonly IMessageSerializer messageSerializer;
+        private readonly ICustomizeMessageHeaders[] customizeHeaders;
         private Endpoint endpoint;
 
         
-        public MsmqMessageBuilder(IMessageSerializer messageSerializer)
+        public MsmqMessageBuilder(IMessageSerializer messageSerializer, IKernel kernel)
         {
             this.messageSerializer = messageSerializer;
+            customizeHeaders = kernel.ResolveAll<ICustomizeMessageHeaders>().ToArray();
         }
+
+        public event Action<Message> MessageBuilt;
 
         public Message BuildFromMessageBatch(params object[] msgs)
         {
@@ -40,7 +48,28 @@ namespace Rhino.ServiceBus.Msmq
             else
                 message.ResponseQueue = null;
 
-            message.Extension = Guid.NewGuid().ToByteArray();
+            byte[] extension;
+            var messageId = Guid.NewGuid().ToByteArray();
+
+            if (customizeHeaders.Length > 0)
+            {
+                var headers = new NameValueCollection();
+                foreach (var customizeHeader in customizeHeaders)
+                {
+                    customizeHeader.Customize(headers);
+                }
+                var headerBytes = headers.SerializeHeaders();
+                //accounts for existing use of Extension for messageId and deferred messages
+                extension = new byte[24 + headerBytes.Length];
+                Buffer.BlockCopy(messageId, 0, extension, 0, messageId.Length);
+                Buffer.BlockCopy(headerBytes, 0, extension, 24, headerBytes.Length);
+            }
+            else
+            {
+                extension = messageId;
+            }
+
+            message.Extension = extension;
 
             message.AppSpecific = GetAppSpecificMarker(msgs);
 
@@ -54,6 +83,11 @@ namespace Rhino.ServiceBus.Msmq
                     return s;
                 })
                 .FirstOrDefault();
+
+            var copy = MessageBuilt;
+            if (copy != null)
+                copy(message);
+
             return message;
         }
 

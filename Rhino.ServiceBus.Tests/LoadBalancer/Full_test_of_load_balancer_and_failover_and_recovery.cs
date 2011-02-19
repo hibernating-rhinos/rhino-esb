@@ -1,12 +1,15 @@
 using System;
 using System.Messaging;
 using System.Threading;
+using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Serializers;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests.LoadBalancer
@@ -38,7 +41,8 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         threadCount = 1,
                         endpoint = loadBalancerQueuePathUri,
                         secondaryLoadBalancer = loadBalancerQueuePathUri2,
-                        transactional = TransactionalOptions.FigureItOut
+                        transactional = TransactionalOptions.FigureItOut,
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
                     }).LifeStyle.Transient,
                 Component.For<MsmqSecondaryLoadBalancer>()
                     .DependsOn(new
@@ -47,11 +51,12 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         threadCount = 1,
                         endpoint = loadBalancerQueuePathUri2,
                         primaryLoadBalancer = loadBalancerQueuePathUri,
-                        transactional = TransactionalOptions.FigureItOut
+                        transactional = TransactionalOptions.FigureItOut,
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
                     })
                 );
 
-            //New conatainer to more closely mimic as separate app.
+            //New container to more closely mimic as separate app.
             receivingBusContainer = new WindsorContainer(new XmlInterpreter(@"LoadBalancer\ReceivingBusWithLoadBalancer.config"));
             receivingBusContainer.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
             receivingBusContainer.Register(Component.For<TestHandler>());

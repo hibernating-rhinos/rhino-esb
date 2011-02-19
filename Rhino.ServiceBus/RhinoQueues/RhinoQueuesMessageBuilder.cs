@@ -17,6 +17,9 @@ namespace Rhino.ServiceBus.RhinoQueues
         {
             this.messageSerializer = messageSerializer;
         }
+
+        public event Action<MessagePayload> MessageBuilt;
+
         [CLSCompliant(false)]
         public MessagePayload BuildFromMessageBatch(params object[] msgs)
         {
@@ -43,6 +46,11 @@ namespace Rhino.ServiceBus.RhinoQueues
             };
 
             TryCustomizeHeaders(payload.Headers);
+
+            var copy = MessageBuilt;
+            if (copy != null)
+                copy(payload);
+
             return payload;
         }
 

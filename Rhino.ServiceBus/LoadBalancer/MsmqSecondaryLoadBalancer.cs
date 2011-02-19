@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Messaging;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using log4net;
@@ -40,8 +41,9 @@ namespace Rhino.ServiceBus.LoadBalancer
             Uri endpoint,
             Uri primaryLoadBalancer,
             int threadCount,
-			TransactionalOptions transactional)
-			: base(serializer, queueStrategy, endpointRouter, endpoint, threadCount, transactional)
+			TransactionalOptions transactional,
+            IMessageBuilder<Message> messageBuilder)
+			: base(serializer, queueStrategy, endpointRouter, endpoint, threadCount, transactional, messageBuilder)
         {
             TimeoutForHeartBeatFromPrimary = TimeSpan.FromSeconds(10);
             this.primaryLoadBalancer = primaryLoadBalancer;

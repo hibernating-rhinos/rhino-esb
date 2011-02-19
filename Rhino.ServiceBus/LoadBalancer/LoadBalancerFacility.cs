@@ -1,11 +1,14 @@
 using System;
 using System.Configuration;
+using System.Messaging;
 using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
 using log4net;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.LoadBalancer
 {

@@ -1,4 +1,5 @@
 using System;
+using System.Messaging;
 using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
@@ -45,6 +46,9 @@ namespace Rhino.ServiceBus.Config
             }
 
             facility.Kernel.Register(
+                Component.For<IMessageBuilder<Message>>()
+                    .LifeStyle.Is(LifestyleType.Singleton)
+                    .ImplementedBy<MsmqMessageBuilder>(),
                 Component.For<IQueueStrategy>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy(queueStrategyImpl)

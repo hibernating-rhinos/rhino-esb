@@ -228,6 +228,7 @@
     <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
     <Compile Include="Util\CurrentMessage.cs" />
+    <Compile Include="Util\SerializationExtensions.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />
   </ItemGroup>

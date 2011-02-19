@@ -60,6 +60,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 this.inner = inner;
             }
 
+            public event Action<MessagePayload> MessageBuilt;
+
             public MessagePayload BuildFromMessageBatch(params object[] msgs)
             {
                 var payload = inner.BuildFromMessageBatch(msgs);

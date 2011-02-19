@@ -9,6 +9,7 @@ using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.Transport;
+using Rhino.ServiceBus.Util;
 using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
@@ -33,8 +34,17 @@ namespace Rhino.ServiceBus.Msmq
         private readonly IsolationLevel queueIsolationLevel;
         private readonly bool consumeInTransaction;
 
-        public MsmqTransport(IMessageSerializer serializer, IQueueStrategy queueStrategy, Uri endpoint, int threadCount, IMsmqTransportAction[] transportActions, IEndpointRouter endpointRouter, IsolationLevel queueIsolationLevel, TransactionalOptions transactional, bool consumeInTransaction)
-			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional)
+        public MsmqTransport(IMessageSerializer serializer, 
+            IQueueStrategy queueStrategy, 
+            Uri endpoint, 
+            int threadCount, 
+            IMsmqTransportAction[] transportActions, 
+            IEndpointRouter endpointRouter, 
+            IsolationLevel queueIsolationLevel, 
+            TransactionalOptions transactional, 
+            bool consumeInTransaction,
+            IMessageBuilder<Message> messageBuilder)
+			: base(queueStrategy, endpoint, threadCount, serializer, endpointRouter, transactional, messageBuilder)
         {
             this.transportActions = transportActions;
             this.queueIsolationLevel = queueIsolationLevel;
@@ -101,10 +111,20 @@ namespace Rhino.ServiceBus.Msmq
 				throw new InvalidOperationException("Cannot send a message before transport is started");
 			
 			var message = GenerateMsmqMessageFromMessageBatch(msgs);
-	        var bytes = new List<byte>(message.Extension);
-	        bytes.AddRange(BitConverter.GetBytes(processAgainAt.ToBinary()));
-	        message.Extension = bytes.ToArray();
-			message.AppSpecific = (int)MessageType.TimeoutMessageMarker;
+	        var processAgainBytes = BitConverter.GetBytes(processAgainAt.ToBinary());
+            if (message.Extension.Length == 16)
+            {
+                var bytes = new List<byte>(message.Extension);
+                bytes.AddRange(processAgainBytes);
+                message.Extension = bytes.ToArray();
+            }
+            else
+            {
+                var extension = (byte[])message.Extension.Clone();
+                Buffer.BlockCopy(processAgainBytes, 0, extension, 16, processAgainBytes.Length);
+                message.Extension = extension;
+            }
+	        message.AppSpecific = (int)MessageType.TimeoutMessageMarker;
 
             SendMessageToQueue(message, endpoint);
 		}
@@ -235,15 +255,16 @@ namespace Rhino.ServiceBus.Msmq
 	    {
 	        return new MsmqCurrentMessageInformation
 	        {
-                MessageId = message.GetMessageId(),
+	            MessageId = message.GetMessageId(),
 	            AllMessages = messages,
 	            Message = msg,
 	            Queue = queue,
-                TransportMessageId = message.Id,
+	            TransportMessageId = message.Id,
 	            Destination = Endpoint.Uri,
 	            Source = MsmqUtil.GetQueueUri(message.ResponseQueue),
 	            MsmqMessage = message,
-	            TransactionType = queue.GetTransactionType()
+	            TransactionType = queue.GetTransactionType(),
+	            Headers = message.Extension.DeserializeHeaders()
 	        };
 	    }
 
