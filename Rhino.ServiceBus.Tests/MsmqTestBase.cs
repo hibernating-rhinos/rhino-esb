@@ -129,7 +129,7 @@ namespace Rhino.ServiceBus.Tests
                     var serializer =
                         new XmlMessageSerializer(
                             new DefaultReflection(),
-                        	new CastleServiceLocator(new WindsorContainer())),
+                            new CastleServiceLocator(new WindsorContainer()));
                     transport = new MsmqTransport(serializer, 
                             new SubQueueStrategy(),
                             TestQueueUri.Uri, 1, 
@@ -137,7 +137,7 @@ namespace Rhino.ServiceBus.Tests
                             new EndpointRouter(),
 							IsolationLevel.Serializable, TransactionalOptions.FigureItOut,
                             true,
-                            new MsmqMessageBuilder(serializer, new DefaultKernel()));
+                            new MsmqMessageBuilder(serializer, new CastleServiceLocator(new WindsorContainer())));
                     transport.Start();
                 }
                 return transport;
@@ -151,7 +151,8 @@ namespace Rhino.ServiceBus.Tests
                 if (transactionalTransport == null)
                 {
                     var serializer =
-                        new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(new WindsorContainer())), 
+                        new XmlMessageSerializer(new DefaultReflection(),
+                                                 new CastleServiceLocator(new WindsorContainer()));
                     transactionalTransport = new MsmqTransport(serializer, 
                         new SubQueueStrategy(),
                         TransactionalTestQueueUri.Uri, 
@@ -160,7 +161,7 @@ namespace Rhino.ServiceBus.Tests
                             new EndpointRouter(),
 							IsolationLevel.Serializable,TransactionalOptions.FigureItOut,
                             true,
-                            new MsmqMessageBuilder(serializer, new DefaultKernel()));
+                            new MsmqMessageBuilder(serializer, new CastleServiceLocator(new WindsorContainer())));
                     transactionalTransport.Start();
                 }
                 return transactionalTransport;

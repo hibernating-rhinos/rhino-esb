@@ -5,6 +5,7 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
@@ -45,7 +46,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         endpoint = loadBalancerQueuePathUri,
                         secondaryLoadBalancer = loadBalancerQueuePathUri2,
                         transactional = TransactionalOptions.FigureItOut,
-                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(container)), new CastleServiceLocator(container))
                     }).LifeStyle.Transient,
                 Component.For<MsmqSecondaryLoadBalancer>()
                     .DependsOn(new
@@ -55,7 +56,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         endpoint = loadBalancerQueuePathUri2,
                         primaryLoadBalancer = loadBalancerQueuePathUri,
                         transactional = TransactionalOptions.FigureItOut,
-                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(container)), new CastleServiceLocator(container))
                     })
                 );
 

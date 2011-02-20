@@ -141,6 +141,7 @@ namespace Rhino.ServiceBus.StructureMap
             {
                 c.For(typeof (IQueueStrategy)).Singleton().Use(queueStrategyType)
                     .Child("endpoint").Is(config.Endpoint);
+                c.For<IMessageBuilder<Message>>().Singleton().Use<MsmqMessageBuilder>();
                 c.For<IMsmqTransportAction>().Singleton().Use<ErrorAction>()
                     .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries);
                 c.For<ISubscriptionStorage>().Singleton().Use<MsmqSubscriptionStorage>()

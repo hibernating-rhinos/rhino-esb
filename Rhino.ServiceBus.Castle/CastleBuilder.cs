@@ -218,7 +218,10 @@ namespace Rhino.ServiceBus.Castle
                 Component.For<IQueueStrategy>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy(queueStrategyType)
-                    .DependsOn(new { endpoint = config.Endpoint }),
+                    .DependsOn(new {endpoint = config.Endpoint}),
+                Component.For<IMessageBuilder<Message>>()
+                    .LifeStyle.Is(LifestyleType.Singleton)
+                    .ImplementedBy<MsmqMessageBuilder>(),
                 Component.For<IMsmqTransportAction>()
                     .ImplementedBy<ErrorAction>()
                     .DependsOn(new { numberOfRetries = config.NumberOfRetries}),
