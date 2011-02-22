@@ -26,7 +26,11 @@ namespace Rhino.ServiceBus.Tests
 
             messageSerializer = container.Resolve<IMessageSerializer>();
 
+            var innerTransport = container.Resolve<ITransport>();
+            innerTransport.Start();
             transport = MockRepository.GenerateStub<ITransport>();
+            transport.Stub(t => t.Send(null, null)).IgnoreArguments()
+                .Do((Delegates.Action<Endpoint, object[]>)(innerTransport.Send));
         }
 
         [Fact]
@@ -151,6 +155,12 @@ namespace Rhino.ServiceBus.Tests
             Assert.NotEqual(Guid.Empty, failedMessage.MessageId);
             Assert.Equal("System.IndexOutOfRangeException: Index was outside the bounds of the array.", failedMessage.ErrorText);
             Assert.Equal("tst", failedMessage.Message);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            container.Dispose();
         }
     }
 }

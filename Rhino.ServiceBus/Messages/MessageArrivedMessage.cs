@@ -2,7 +2,7 @@ using System;
 
 namespace Rhino.ServiceBus.Messages
 {
-    public class MessageArrivedMessage
+    public class MessageArrivedMessage : ILogMessage
     {
         public Uri Source { get; set; }
 

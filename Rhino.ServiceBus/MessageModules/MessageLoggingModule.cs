@@ -1,60 +1,54 @@
 using System;
-using System.Messaging;
+using System.Linq;
+using System.Transactions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
-using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.MessageModules
 {
     public class MessageLoggingModule : IMessageModule
     {
-        private readonly IMessageSerializer messageSerializer;
-        private readonly IEndpointRouter endpointRouter;
-        private readonly Uri logQueue;
-        private OpenedQueue queue;
+        private readonly Endpoint logEndpoint;
+        private ITransport transport;
 
-        [ThreadStatic] private static DateTime messageArrival;
+        [ThreadStatic]
+        private static DateTime messageArrival;
 
         public Uri LogQueue
         {
-            get { return logQueue; }
+            get { return logEndpoint.Uri; }
         }
 
-        public MessageLoggingModule(IMessageSerializer messageSerializer, IEndpointRouter endpointRouter, Uri logQueue)
+        public MessageLoggingModule(IEndpointRouter endpointRouter, Uri logQueue)
         {
-            this.messageSerializer = messageSerializer;
-            this.endpointRouter = endpointRouter;
-            this.logQueue = logQueue;
+            logEndpoint = endpointRouter.GetRoutedEndpoint(logQueue);
         }
 
-		public void Init(ITransport transport, IServiceBus bus)
+        public void Init(ITransport transport, IServiceBus bus)
         {
-        	var endpoint = endpointRouter.GetRoutedEndpoint(logQueue);
-        	var queueInfo = MsmqUtil.GetQueuePath(endpoint);
-			queueInfo.Create();
-        	queue = queueInfo.Open(QueueAccessMode.Send);
-
+            this.transport = transport;
             transport.MessageArrived += Transport_OnMessageArrived;
             transport.MessageProcessingFailure += Transport_OnMessageProcessingFailure;
             transport.MessageProcessingCompleted += Transport_OnMessageProcessingCompleted;
             transport.MessageSerializationException += Transport_OnMessageSerializationException;
-            transport.MessageSent+=Transport_OnMessageSent;
+            transport.MessageSent += Transport_OnMessageSent;
         }
 
-		public void Stop(ITransport transport, IServiceBus bus)
+        public void Stop(ITransport transport, IServiceBus bus)
         {
             transport.MessageArrived -= Transport_OnMessageArrived;
             transport.MessageProcessingFailure -= Transport_OnMessageProcessingFailure;
             transport.MessageProcessingCompleted -= Transport_OnMessageProcessingCompleted;
             transport.MessageSerializationException -= Transport_OnMessageSerializationException;
             transport.MessageSent -= Transport_OnMessageSent;
-
-            queue.Dispose();
         }
 
         private void Transport_OnMessageSent(CurrentMessageInformation info)
         {
+            if (info.AllMessages.OfType<ILogMessage>().Any())
+                return;
+
             Send(new MessageSentMessage
             {
                 MessageId = info.MessageId,
@@ -68,13 +62,7 @@ namespace Rhino.ServiceBus.MessageModules
 
         private void Send(object obj)
         {
-            var msg = new Message
-            {
-            	Label = obj.ToString(),
-            	Extension = Guid.NewGuid().ToByteArray()
-            };
-            messageSerializer.Serialize(new[] { obj }, msg.BodyStream);
-            queue.Send(msg);
+            transport.Send(logEndpoint, new []{obj});
         }
 
         private void Transport_OnMessageSerializationException(CurrentMessageInformation info, Exception t)
@@ -87,10 +75,10 @@ namespace Rhino.ServiceBus.MessageModules
             });
         }
 
-         private void Transport_OnMessageProcessingCompleted(CurrentMessageInformation info, Exception ex)
-         {
-             var timestamp = DateTime.Now;
-             Send(new MessageProcessingCompletedMessage
+        private void Transport_OnMessageProcessingCompleted(CurrentMessageInformation info, Exception ex)
+        {
+            var timestamp = DateTime.Now;
+            Send(new MessageProcessingCompletedMessage
             {
                 Timestamp = timestamp,
                 Duration = timestamp - messageArrival,
@@ -98,7 +86,7 @@ namespace Rhino.ServiceBus.MessageModules
                 MessageId = info.MessageId,
                 Source = info.Source,
             });
-         }
+        }
 
         internal void Transport_OnMessageProcessingFailure(CurrentMessageInformation info, Exception e)
         {
@@ -115,19 +103,17 @@ namespace Rhino.ServiceBus.MessageModules
         }
 
         private void SendInSingleTransaction(object msg)
-    	{
-    		var message = new Message
-    		{
-                Label = msg.ToString(),
-                Extension = Guid.NewGuid().ToByteArray()
-    		};
-			messageSerializer.Serialize(new[]{msg},message.BodyStream);
-    		queue.SendInSingleTransaction(message);
-    	}
-
-    	private bool Transport_OnMessageArrived(CurrentMessageInformation info)
         {
-    	    messageArrival = DateTime.Now;
+            using (var tx = new TransactionScope(TransactionScopeOption.RequiresNew))
+            {
+                Send(msg);
+                tx.Complete();
+            }
+        }
+
+        private bool Transport_OnMessageArrived(CurrentMessageInformation info)
+        {
+            messageArrival = DateTime.Now;
             Send(new MessageArrivedMessage
             {
                 Timestamp = messageArrival,

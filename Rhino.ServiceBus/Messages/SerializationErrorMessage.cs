@@ -1,9 +1,8 @@
 using System;
-using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Messages
 {
-    public class SerializationErrorMessage
+    public class SerializationErrorMessage : ILogMessage
     {
         public Guid MessageId { get; set; }
 

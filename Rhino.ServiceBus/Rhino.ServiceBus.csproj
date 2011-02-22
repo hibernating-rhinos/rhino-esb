@@ -110,6 +110,7 @@
     <Compile Include="LoadBalancer\MsmqLoadBalancer.cs" />
     <Compile Include="MessageModules\LoadBalancerMessageModule.cs" />
     <Compile Include="Messages\AcceptingWork.cs" />
+    <Compile Include="Messages\ILogMessage.cs" />
     <Compile Include="Messages\LoadBalancerMessage.cs" />
     <Compile Include="Messages\MergeSagaState.cs" />
     <Compile Include="Messages\ReadyToWork.cs" />
