@@ -66,6 +66,9 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             {
                 var payload = inner.BuildFromMessageBatch(msgs);
                 Contextualize(payload);
+
+                if (MessageBuilt != null)
+                    MessageBuilt(payload);
                 return payload;
             }
 
