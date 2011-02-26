@@ -1,37 +1,34 @@
 ﻿using System;
-using System.Linq;
-using Rhino.ServiceBus.Exceptions;
-using Rhino.ServiceBus.Sagas;
+using Rhino.ServiceBus.Config;
+using Rhino.ServiceBus.Internal;
 using StructureMap;
 using StructureMap.Interceptors;
 
 namespace Rhino.ServiceBus.StructureMap
 {
     [CLSCompliant(false)]
-    public  class ConsumerInterceptor : InstanceInterceptor
+    public  class ConsumerInterceptor : TypeInterceptor
     {
+        private readonly IConsumerInterceptor interceptor;
+        private readonly IContainer container;
+
+        public ConsumerInterceptor(IConsumerInterceptor interceptor, IContainer container)
+        {
+            this.interceptor = interceptor;
+            this.container = container;
+        }
+
         public object Process(object target, IContext context)
         {
-            var consumerType = target.GetType();
-            var interfaces = consumerType.GetInterfaces()
-                .Where(x => x.IsGenericType && x.IsGenericTypeDefinition == false)
-                .Select(x => x.GetGenericTypeDefinition())
-                .ToList();
-
-            if (interfaces.Contains(typeof(InitiatedBy<>)) &&
-                interfaces.Contains(typeof(ISaga<>)) == false)
-            {
-                throw new InvalidUsageException("Message consumer: " + consumerType + " implements InitiatedBy<TMsg> but doesn't implment ISaga<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from ISaga<TState> ?");
-            }
-
-            if (interfaces.Contains(typeof(InitiatedBy<>)) == false &&
-                interfaces.Contains(typeof(Orchestrates<>)))
-            {
-                throw new InvalidUsageException("Message consumer: " + consumerType + " implements Orchestrates<TMsg> but doesn't implment InitiatedBy<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from InitiatedBy<TState> ?");
-            }
+            var type = target.GetType();
+            var lifecycle = container.Model.For(type).Lifecycle;
+            interceptor.ItemCreated(type, lifecycle == "Transient"); //got to be a better way for this
             return target;
+        }
+
+        public bool MatchesType(Type type)
+        {
+            return typeof (IMessageConsumer).IsAssignableFrom(type);
         }
     }
 }

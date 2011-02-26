@@ -71,7 +71,9 @@
   <ItemGroup>
     <Compile Include="Config\BusConfigurationSection.cs" />
     <Compile Include="Config\BusElement.cs" />
+    <Compile Include="Config\ConsumerInterceptor.cs" />
     <Compile Include="Config\IBusConfigurationAware.cs" />
+    <Compile Include="Config\IConsumerInterceptor.cs" />
     <Compile Include="Config\KeyElement.cs" />
     <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="Config\LoadBalancerElement.cs" />

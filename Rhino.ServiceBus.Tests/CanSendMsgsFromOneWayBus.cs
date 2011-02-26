@@ -18,7 +18,7 @@ namespace Rhino.ServiceBus.Tests
             new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
-            container.Register(Component.For<StringConsumer>());
+            container.Register(Component.For<StringConsumer>().LifeStyle.Transient);
             StringConsumer.Value = null;
             StringConsumer.Event = new ManualResetEvent(false);
         }

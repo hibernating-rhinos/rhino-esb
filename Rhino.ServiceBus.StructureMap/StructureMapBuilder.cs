@@ -59,10 +59,17 @@ namespace Rhino.ServiceBus.StructureMap
                     c.For(typeof(IMessageModule)).Singleton().Use(module).Named(typeof(IMessageModule).FullName);
                 }
 
-                c.For<IMessageConsumer>().AlwaysUnique().InterceptWith(new ConsumerInterceptor());
                 c.For<IReflection>().Singleton().Use<DefaultReflection>();
                 c.For(typeof(IMessageSerializer)).Singleton().Use(config.SerializerType);
                 c.For<IEndpointRouter>().Singleton().Use<EndpointRouter>();
+            });
+        }
+
+        public void WithInterceptor(IConsumerInterceptor interceptor)
+        {
+            container.Configure(c =>
+            {
+                c.RegisterInterceptor(new ConsumerInterceptor(interceptor, container));
             });
         }
 

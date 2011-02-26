@@ -4,6 +4,7 @@ namespace Rhino.ServiceBus.Config
 {
     public interface IBusContainerBuilder
     {
+        void WithInterceptor(IConsumerInterceptor interceptor);
         void RegisterDefaultServices();
         void RegisterBus();
         void RegisterPrimaryLoadBalancer();

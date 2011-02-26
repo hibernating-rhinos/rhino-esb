@@ -13,7 +13,6 @@ using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Convertors;
 using Rhino.ServiceBus.DataStructures;
-using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
@@ -21,7 +20,6 @@ using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.RhinoQueues;
-using Rhino.ServiceBus.Sagas;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
@@ -38,6 +36,19 @@ namespace Rhino.ServiceBus.Castle
             this.container = container;
             this.config = config;
             this.config.BuildWith(this);
+        }
+
+        public void WithInterceptor(IConsumerInterceptor interceptor)
+        {
+            container.Kernel.ComponentModelCreated +=
+                model =>
+                {
+                    if (typeof(IMessageConsumer).IsAssignableFrom(model.Implementation) == false)
+                        return;
+
+                    model.LifestyleType = LifestyleType.Transient;
+                    interceptor.ItemCreated(model.Implementation, true);
+                };
         }
 
         public void RegisterDefaultServices()
@@ -57,7 +68,6 @@ namespace Rhino.ServiceBus.Castle
                 configurationAware.Configure(config, this);
             }
 
-            container.Kernel.ComponentModelCreated += Kernel_OnComponentModelCreated;
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
 
             foreach (var type in config.MessageModules)
@@ -77,33 +87,6 @@ namespace Rhino.ServiceBus.Castle
                 Component.For<IEndpointRouter>()
                     .ImplementedBy<EndpointRouter>()
                 );
-        }
-
-        private static void Kernel_OnComponentModelCreated(ComponentModel model)
-        {
-            if (typeof(IMessageConsumer).IsAssignableFrom(model.Implementation) == false)
-                return;
-
-            var interfaces = model.Implementation.GetInterfaces()
-                .Where(x => x.IsGenericType && x.IsGenericTypeDefinition == false)
-                .Select(x => x.GetGenericTypeDefinition())
-                .ToList();
-
-            if (interfaces.Contains(typeof(InitiatedBy<>)) &&
-                interfaces.Contains(typeof(ISaga<>)) == false)
-            {
-                throw new InvalidUsageException("Message consumer: " + model.Implementation + " implements InitiatedBy<TMsg> but doesn't implment ISaga<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from ISaga<TState> ?");
-            }
-
-            if (interfaces.Contains(typeof(InitiatedBy<>)) == false &&
-                interfaces.Contains(typeof(Orchestrates<>)))
-            {
-                throw new InvalidUsageException("Message consumer: " + model.Implementation + " implements Orchestrates<TMsg> but doesn't implment InitiatedBy<TState>. " + Environment.NewLine +
-                                                "Did you forget to inherit from InitiatedBy<TState> ?");
-            }
-
-            model.LifestyleType = LifestyleType.Transient;
         }
 
         public void RegisterBus()
