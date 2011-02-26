@@ -92,11 +92,11 @@ namespace Rhino.ServiceBus.StructureMap
             var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Configure(c =>
             {
-                c.For(typeof (MsmqLoadBalancer)).Singleton().Use(loadBalancerConfig.LoadBalancerType)
-                    .Child("threadCount").Is(loadBalancerConfig.ThreadCount)
-                    .Child("primaryLoadBalancer").Is(loadBalancerConfig.PrimaryLoadBalancer)
-                    .Child("transactional").Is(loadBalancerConfig.Transactional)
-                    .Child("endpoint").Is(loadBalancerConfig.Endpoint);
+                c.For<MsmqLoadBalancer>().Singleton().Use<MsmqLoadBalancer>()
+                    .Ctor<int>("threadCount").Is(loadBalancerConfig.ThreadCount)
+                    .Ctor<TransactionalOptions>("transactional").Is(loadBalancerConfig.Transactional)
+                    .Ctor<Uri>("secondaryLoadBalancer").Is(x => loadBalancerConfig.Endpoint)
+                    .Ctor<Uri>("endpoint").Is(loadBalancerConfig.Endpoint);
                 c.Forward<MsmqLoadBalancer, IStartable>();
                 c.For<IDeploymentAction>().Use<CreateLoadBalancerQueuesAction>();
             });
@@ -107,12 +107,12 @@ namespace Rhino.ServiceBus.StructureMap
             var loadBalancerConfig = (LoadBalancerConfiguration) config;
             container.Configure(c =>
             {
-                c.For(typeof (MsmqLoadBalancer)).Singleton().Use(loadBalancerConfig.LoadBalancerType)
-                    .Child("threadCount").Is(loadBalancerConfig.ThreadCount)
-                    .Child("primaryLoadBalancer").Is(loadBalancerConfig.PrimaryLoadBalancer)
-                    .Child("transactional").Is(loadBalancerConfig.Transactional)
-                    .Child("endpoint").Is(loadBalancerConfig.Endpoint)
-                    .Child("secondaryLoadBalancer").Is(loadBalancerConfig.SecondaryLoadBalancer);
+                c.For<MsmqLoadBalancer>().Singleton().Use<MsmqSecondaryLoadBalancer>()
+                    .Ctor<int>("threadCount").Is(loadBalancerConfig.ThreadCount)
+                    .Ctor<Uri>("primaryLoadBalancerUri").Is(x => loadBalancerConfig.PrimaryLoadBalancer)
+                    .Ctor<TransactionalOptions>("transactional").Is(loadBalancerConfig.Transactional)
+                    .Ctor<Uri>("endpoint").Is(loadBalancerConfig.Endpoint);
+                c.Forward<MsmqLoadBalancer, IStartable>();
                 c.For<IDeploymentAction>().Use<CreateLoadBalancerQueuesAction>();
             });
         }

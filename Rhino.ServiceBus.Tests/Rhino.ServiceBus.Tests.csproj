@@ -104,10 +104,8 @@
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
-    <Compile Include="Containers\StructureMap\CanCreateInstancesOfOneWayBusFromContainer.cs" />
-    <Compile Include="Containers\StructureMap\CanCreateInstancesOfServiceBusFromContainer.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
-    <Compile Include="Containers\StructureMap\UsingRhinoQueuesBus.cs" />
+    <Compile Include="Containers\StructureMap\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
@@ -187,6 +185,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="BusOnTransactionalQueue.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="ReceiveOneWayBusRhinoQueues.config">
