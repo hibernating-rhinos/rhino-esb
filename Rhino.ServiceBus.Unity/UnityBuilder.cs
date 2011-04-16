@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.InterceptionExtension;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
 
@@ -19,7 +20,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void WithInterceptor(IConsumerInterceptor interceptor)
         {
-            throw new NotImplementedException();
+            container.AddExtension(new ConsumerExtension(interceptor));
         }
 
         public void RegisterDefaultServices()
