@@ -43,6 +43,21 @@
     <Reference Include="log4net">
       <HintPath>..\SharedLibs\build\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Rhino.DistributedHashTable">
       <HintPath>..\SharedLibs\build\Rhino.DistributedHashTable.dll</HintPath>
     </Reference>
@@ -220,6 +235,9 @@
     <None Include="RhinoQueues\RhinoQueues.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Containers\Unity\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
