@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\SharedLibs\build\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
     </Reference>
@@ -104,6 +107,8 @@
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
+    <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Autofac\ContainerTests.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\StructureMap\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
@@ -162,6 +167,10 @@
     <Compile Include="XmlSerializerTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.ServiceBus.Autofac\Rhino.ServiceBus.Autofac.csproj">
+      <Project>{E18B8442-40AF-4FA2-9FB0-FC05FC994CEA}</Project>
+      <Name>Rhino.ServiceBus.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
       <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
       <Name>Rhino.ServiceBus.Castle</Name>
