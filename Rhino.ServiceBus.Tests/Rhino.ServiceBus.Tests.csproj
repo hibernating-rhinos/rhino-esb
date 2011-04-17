@@ -126,6 +126,8 @@
     <Compile Include="Containers\Autofac\ContainerTests.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\StructureMap\ContainerTests.cs" />
+    <Compile Include="Containers\TestConsumer.cs" />
+    <Compile Include="Containers\Unity\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
@@ -194,6 +196,10 @@
       <Project>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</Project>
       <Name>Rhino.ServiceBus.StructureMap</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Unity\Rhino.ServiceBus.Unity.csproj">
+      <Project>{DB720C4D-1508-4510-AED4-80C905095CE5}</Project>
+      <Name>Rhino.ServiceBus.Unity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>
@@ -245,9 +251,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Containers\Unity\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
