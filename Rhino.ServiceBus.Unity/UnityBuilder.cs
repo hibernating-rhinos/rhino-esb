@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.InterceptionExtension;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Unity
 {
@@ -25,7 +26,28 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterDefaultServices()
         {
-            throw new NotImplementedException();
+            if (!container.IsRegistered(typeof(IUnityContainer)))
+                container.RegisterInstance(container);
+
+            container.RegisterType<IServiceLocator, UnityServiceLocator>();
+
+            var types = typeof (IServiceBus).Assembly.GetTypes().Where(t => typeof (IBusConfigurationAware).IsAssignableFrom(t)).ToList();
+            types.ForEach(t => container.RegisterType(typeof (IBusConfigurationAware), t, new ContainerControlledLifetimeManager()));
+            
+            foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
+            {
+                configurationAware.Configure(configuration, this);
+            }
+
+            foreach (var type in configuration.MessageModules)
+            {
+                if (container.IsRegistered(type) == false)
+                    container.RegisterType(type, type.FullName);
+            }
+
+            container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager());
+            container.RegisterType(typeof(IMessageSerializer), configuration.SerializerType, new ContainerControlledLifetimeManager());
+            container.RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
         }
 
         public void RegisterBus()
