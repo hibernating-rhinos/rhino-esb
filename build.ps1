@@ -30,52 +30,24 @@ task Clean -depends SetDerivedProperties {
 } 
 
 task Init -depends Clean {
-	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+	$infos = (
+		"$base_dir\Rhino.ServiceBus\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Tests\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs"
+	); 
 		
-	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.Tests\Properties\AssemblyInfo.cs" `
+	$infos | foreach { Generate-Assembly-Info `
+		-file $_ `
 		-title "Rhino Service Bus $version" `
 		-description "Developer friendly service bus for .NET" `
 		-company "Hibernating Rhinos" `
 		-product "Rhino Service Bus $version" `
 		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-    
-    	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-
-    	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-
-    	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-		
-		
+		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009" `
+	}
 		
 	new-item $release_dir -itemType directory 
 	new-item $buildartifacts_dir -itemType directory 
