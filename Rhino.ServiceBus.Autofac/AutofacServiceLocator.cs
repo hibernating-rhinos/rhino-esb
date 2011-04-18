@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Autofac;
+using Autofac.Core;
+using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
+using System.Linq;
 
 namespace Rhino.ServiceBus
 {
@@ -36,8 +39,10 @@ namespace Rhino.ServiceBus
 
         public IEnumerable<IHandler> GetAllHandlersFor(Type type)
         {
-            //TODO not sure what Autofac can do for this
-            yield break;
+            var services = container.ComponentRegistry.RegistrationsFor(new TypedService(type))
+                .SelectMany(r => r.Services.OfType<TypedService>());
+
+            return services.Select(service => new DefaultHandler(type, service.ServiceType, () => container.ResolveService(service)));
         }
 
         public void Release(object item)
