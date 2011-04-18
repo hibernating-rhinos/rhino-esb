@@ -6,11 +6,11 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus
 {
-    public class ConsumerModule : Module
+    public class ConsumerInterceptorModule : Module
     {
         private readonly IConsumerInterceptor consumerInterceptor;
 
-        public ConsumerModule(IConsumerInterceptor consumerInterceptor)
+        public ConsumerInterceptorModule(IConsumerInterceptor consumerInterceptor)
         {
             this.consumerInterceptor = consumerInterceptor;
         }
