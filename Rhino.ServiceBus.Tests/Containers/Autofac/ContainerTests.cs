@@ -1,3 +1,4 @@
+using System;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -8,14 +9,26 @@ using Xunit;
 
 namespace Rhino.ServiceBus.Tests.Containers.Autofac
 {
-    public class ContainerTests
+    public class ContainerTests : IDisposable
     {
+        private IContainer container;
+
+        public ContainerTests()
+        {
+            var builder = new ContainerBuilder();
+            container = builder.Build();
+        }
+
         [Fact]
         public void Consumer_must_be_transient()
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<TestConsumer>().AsSelf().SingleInstance();
-            var container = containerBuilder.Build();
+            var builder = new ContainerBuilder();
+            
+            builder.RegisterType<TestConsumer>()
+                .AsSelf()
+                .SingleInstance();
+            builder.Update(container);
+
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .Configure();
@@ -26,8 +39,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void Bus_instance_is_singleton()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .Configure();
@@ -40,8 +51,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void Oneway_bus_is_singleton()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new OnewayRhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .Configure();
@@ -54,8 +63,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void RhinoQueues_bus_is_registered()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
@@ -68,8 +75,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void LoadBalancer_is_singleton()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new LoadBalancerConfiguration()
                 .UseAutofac(container)
                 .UseStandaloneConfigurationFile("LoadBalancer.config")
@@ -83,8 +88,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void Registers_logging_module()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .UseStandaloneConfigurationFile("BusWithLogging.config")
@@ -97,8 +100,6 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void Registers_load_balancer_module()
         {
-            var containerBuilder = new ContainerBuilder();
-            var container = containerBuilder.Build();
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .UseStandaloneConfigurationFile("LoadBalancer/BusWithLoadBalancer.config")
@@ -106,6 +107,21 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
 
             var loadBalancerMessageModule = container.Resolve<LoadBalancerMessageModule>();
             Assert.NotNull(loadBalancerMessageModule);
+        }
+
+        [Fact]
+        public void Dispose_dose_not_throws()
+        {
+            new RhinoServiceBusConfiguration()
+                .UseAutofac(container)
+                .Configure();
+            
+            container.Dispose();
+        }
+
+        public void Dispose()
+        {
+            container.Dispose();
         }
     }
 
