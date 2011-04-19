@@ -14,16 +14,11 @@ namespace Rhino.ServiceBus.Hosting
             get { return GetType().Assembly; }
         }
 
-        public virtual void AfterStart()
-        {
-        }
-
         public virtual void InitializeContainer()
         {
             CreateContainer();
             config = CreateConfiguration();
             ConfigureBusFacility(config);
-            config.Configure();
         }
 
         public virtual void UseConfiguration(BusConfigurationSection configurationSection)
@@ -54,6 +49,11 @@ namespace Rhino.ServiceBus.Hosting
         }
 
         public virtual void BeforeStart()
+        {
+            config.Configure();
+        }
+
+        public virtual void AfterStart()
         {
         }
 
