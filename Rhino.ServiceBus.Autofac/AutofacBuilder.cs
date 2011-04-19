@@ -45,11 +45,13 @@ namespace Rhino.ServiceBus.Autofac
         {
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterInstance(container);
-            containerBuilder.RegisterType<AutofacServiceLocator>().As<IServiceLocator>();
-            containerBuilder.RegisterAssemblyTypes(typeof (IServiceBus).Assembly)
-                .AssignableTo<IBusConfigurationAware>().As<IBusConfigurationAware>();
-
-            containerBuilder.Update(container);
+            containerBuilder.RegisterType<AutofacServiceLocator>()
+                .As<IServiceLocator>()
+                .SingleInstance();
+            containerBuilder.RegisterAssemblyTypes(typeof(IServiceBus).Assembly)
+                .AssignableTo<IBusConfigurationAware>()
+                .As<IBusConfigurationAware>()
+                .SingleInstance();
 
             foreach (var busConfigurationAware in container.Resolve<IEnumerable<IBusConfigurationAware>>())
             {
@@ -58,13 +60,20 @@ namespace Rhino.ServiceBus.Autofac
 
             foreach (var module in config.MessageModules)
             {
-                containerBuilder.RegisterType(module).Named<string>(module.FullName).As(typeof (IMessageModule));
+                containerBuilder.RegisterType(module)
+                    .Named<string>(module.FullName)
+                    .As(typeof(IMessageModule))
+                    .SingleInstance();
             }
-
-            containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<DefaultReflection>().As<IReflection>().SingleInstance();
-            containerBuilder.RegisterType(config.SerializerType).As<IMessageSerializer>().SingleInstance();
-            containerBuilder.RegisterType<EndpointRouter>().As<IEndpointRouter>().SingleInstance();
+            containerBuilder.RegisterType<DefaultReflection>()
+                .As<IReflection>()
+                .SingleInstance();
+            containerBuilder.RegisterType(config.SerializerType)
+                .As<IMessageSerializer>()
+                .SingleInstance();
+            containerBuilder.RegisterType<EndpointRouter>()
+                .As<IEndpointRouter>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -84,9 +93,12 @@ namespace Rhino.ServiceBus.Autofac
                                           ))
                 .AsImplementedInterfaces()
                 .SingleInstance();
-
-            containerBuilder.RegisterType<CreateLogQueueAction>().As<IDeploymentAction>();
-            containerBuilder.RegisterType<CreateQueuesAction>().As<IDeploymentAction>();
+            containerBuilder.RegisterType<CreateLogQueueAction>()
+                .As<IDeploymentAction>()
+                .SingleInstance();
+            containerBuilder.RegisterType<CreateQueuesAction>()
+                .As<IDeploymentAction>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -105,7 +117,9 @@ namespace Rhino.ServiceBus.Autofac
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>().As<IDeploymentAction>();
+            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>()
+                .As<IDeploymentAction>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -124,7 +138,9 @@ namespace Rhino.ServiceBus.Autofac
                 .As<MsmqLoadBalancer>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>().As<IDeploymentAction>();
+            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>()
+                .As<IDeploymentAction>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -139,8 +155,11 @@ namespace Rhino.ServiceBus.Autofac
                                                                         c.Resolve<IEndpointRouter>(),
                                                                         loadBalancerConfig.Transactional,
                                                                         c.Resolve<IMessageBuilder<Message>>()))
-                .AsSelf().SingleInstance();
-            containerBuilder.RegisterType<CreateReadyForWorkQueuesAction>().As<IDeploymentAction>();
+                .AsSelf()
+                .SingleInstance();
+            containerBuilder.RegisterType<CreateReadyForWorkQueuesAction>()
+                .As<IDeploymentAction>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -148,7 +167,9 @@ namespace Rhino.ServiceBus.Autofac
         {
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Register(c => new LoadBalancerMessageModule(loadBalancerEndpoint, c.Resolve<IEndpointRouter>()))
-                .AsSelf().SingleInstance();
+                .As<IMessageModule>()
+                .AsSelf()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -156,7 +177,9 @@ namespace Rhino.ServiceBus.Autofac
         {
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Register(c => new MessageLoggingModule(c.Resolve<IEndpointRouter>(), logEndpoint))
-                .AsSelf().SingleInstance();
+                .As<IMessageModule>()
+                .AsSelf()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -166,16 +189,21 @@ namespace Rhino.ServiceBus.Autofac
             containerBuilder.RegisterType(queueStrategyType)
                 .WithParameter(new NamedParameter("endpoint", config.Endpoint))
                 .WithParameter(new ResolvedParameter((p, c) => p.ParameterType == typeof(IEndpointRouter), (p, c) => c.Resolve<IEndpointRouter>()))
-                .As<IQueueStrategy>().SingleInstance();
-            containerBuilder.RegisterType<MsmqMessageBuilder>().As<IMessageBuilder<Message>>().SingleInstance();
+                .As<IQueueStrategy>()
+                .SingleInstance();
+            containerBuilder.RegisterType<MsmqMessageBuilder>()
+                .As<IMessageBuilder<Message>>()
+                .SingleInstance();
             containerBuilder.Register(c => new ErrorAction(config.NumberOfRetries, c.Resolve<IQueueStrategy>()))
-                .As<IMsmqTransportAction>().SingleInstance();
+                .As<IMsmqTransportAction>()
+                .SingleInstance();
             containerBuilder.Register(c => new MsmqSubscriptionStorage(c.Resolve<IReflection>(),
                                                                        c.Resolve<IMessageSerializer>(),
                                                                        config.Endpoint,
                                                                        c.Resolve<IEndpointRouter>(),
                                                                        c.Resolve<IQueueStrategy>()))
-                .As<ISubscriptionStorage>().SingleInstance();
+                .As<ISubscriptionStorage>()
+                .SingleInstance();
             containerBuilder.Register(c => new MsmqTransport(c.Resolve<IMessageSerializer>(),
                                                              c.Resolve<IQueueStrategy>(),
                                                              config.Endpoint,
@@ -185,7 +213,8 @@ namespace Rhino.ServiceBus.Autofac
                                                              config.IsolationLevel,
                                                              config.Transactional, config.ConsumeInTransaction,
                                                              c.Resolve<IMessageBuilder<Message>>()))
-                .As<ITransport>().SingleInstance();
+                .As<ITransport>()
+                .SingleInstance();
             containerBuilder.RegisterAssemblyTypes(typeof (IMsmqTransportAction).Assembly)
                 .Where(x => typeof(IMsmqTransportAction).IsAssignableFrom(x) && x != typeof(ErrorAction))
                 .SingleInstance();
@@ -195,7 +224,9 @@ namespace Rhino.ServiceBus.Autofac
         public void RegisterQueueCreation()
         {
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<QueueCreationModule>().AsSelf().SingleInstance();
+            containerBuilder.RegisterType<QueueCreationModule>()
+                .AsSelf()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -203,12 +234,14 @@ namespace Rhino.ServiceBus.Autofac
         {
             var containerBuilder = new ContainerBuilder();
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            containerBuilder.RegisterType<MsmqMessageBuilder>().As<IMessageBuilder<Message>>()
+            containerBuilder.RegisterType<MsmqMessageBuilder>()
+                .As<IMessageBuilder<Message>>()
                 .SingleInstance();
             containerBuilder.RegisterType<MsmqOnewayBus>()
                 .WithParameter(new NamedParameter("messageOwners", oneWayConfig.MessageOwners))
                 .WithParameter((p, c) => p.Name == "messgeBuilder", (p, c) => c.Resolve<IMessageBuilder<Message>>())
-                .As<IOnewayBus>().SingleInstance();
+                .As<IOnewayBus>()
+                .SingleInstance();
             containerBuilder.Update(container);
         }
 
@@ -217,7 +250,8 @@ namespace Rhino.ServiceBus.Autofac
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterType<PhtSubscriptionStorage>()
                 .WithParameter(new NamedParameter("path", Path.Combine(path, name + "_subscriptions.esent")))
-                .As<ISubscriptionStorage>().SingleInstance();
+                .As<ISubscriptionStorage>()
+                .SingleInstance();
             containerBuilder.RegisterType<RhinoQueuesTransport>()
                 .WithParameter(new NamedParameter("threadCount", config.ThreadCount))
                 .WithParameter(new NamedParameter("endpoint", config.Endpoint))
