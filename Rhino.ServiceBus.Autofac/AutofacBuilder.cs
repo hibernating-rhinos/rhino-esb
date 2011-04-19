@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Messaging;
 using Autofac;
-using Autofac.Core;
 using Rhino.Queues;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
@@ -43,264 +42,238 @@ namespace Rhino.ServiceBus.Autofac
 
         public void RegisterDefaultServices()
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterInstance(container);
-            containerBuilder.RegisterType<AutofacServiceLocator>()
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance(container);
+            builder.RegisterType<AutofacServiceLocator>()
                 .As<IServiceLocator>()
                 .SingleInstance();
-            containerBuilder.RegisterAssemblyTypes(typeof(IServiceBus).Assembly)
+            builder.RegisterAssemblyTypes(typeof(IServiceBus).Assembly)
                 .AssignableTo<IBusConfigurationAware>()
                 .As<IBusConfigurationAware>()
                 .SingleInstance();
-
-            foreach (var busConfigurationAware in container.Resolve<IEnumerable<IBusConfigurationAware>>())
+            builder.RegisterType<DefaultReflection>()
+                .As<IReflection>()
+                .SingleInstance();
+            builder.RegisterType(config.SerializerType)
+                .As<IMessageSerializer>()
+                .SingleInstance();
+            builder.RegisterType<EndpointRouter>()
+                .As<IEndpointRouter>()
+                .SingleInstance();
+            foreach(var module in config.MessageModules)
             {
-                busConfigurationAware.Configure(config, this);
-            }
-
-            foreach (var module in config.MessageModules)
-            {
-                containerBuilder.RegisterType(module)
+                builder.RegisterType(module)
                     .Named<string>(module.FullName)
                     .As(typeof(IMessageModule))
                     .SingleInstance();
             }
-            containerBuilder.RegisterType<DefaultReflection>()
-                .As<IReflection>()
-                .SingleInstance();
-            containerBuilder.RegisterType(config.SerializerType)
-                .As<IMessageSerializer>()
-                .SingleInstance();
-            containerBuilder.RegisterType<EndpointRouter>()
-                .As<IEndpointRouter>()
-                .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
+
+            foreach(var busConfigurationAware in container.Resolve<IEnumerable<IBusConfigurationAware>>())
+                busConfigurationAware.Configure(config, this);
         }
 
         public void RegisterBus()
         {
-            var containerBuilder = new ContainerBuilder();
-            var busConfig = (RhinoServiceBusConfiguration) config;
-            containerBuilder.Register(c =>
-                                      new DefaultServiceBus(
-                                          c.Resolve<IServiceLocator>(),
-                                          c.Resolve<ITransport>(),
-                                          c.Resolve<ISubscriptionStorage>(),
-                                          c.Resolve<IReflection>(),
-                                          c.Resolve<IEnumerable<IMessageModule>>().ToArray(),
-                                          busConfig.MessageOwners.ToArray(),
-                                          c.Resolve<IEndpointRouter>()
-                                          ))
+            var builder = new ContainerBuilder();
+            var busConfig = (RhinoServiceBusConfiguration)config;
+            builder.RegisterType<DefaultServiceBus>()
+                .WithParameter("messageOwners", busConfig.MessageOwners.ToArray())
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateLogQueueAction>()
+            builder.RegisterType<CreateLogQueueAction>()
                 .As<IDeploymentAction>()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateQueuesAction>()
+            builder.RegisterType<CreateQueuesAction>()
                 .As<IDeploymentAction>()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var containerBuilder = new ContainerBuilder();
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
-            containerBuilder.Register(c => new MsmqLoadBalancer(c.Resolve<IMessageSerializer>(),
-                                                                c.Resolve<IQueueStrategy>(),
-                                                                c.Resolve<IEndpointRouter>(),
-                                                                loadBalancerConfig.Endpoint,
-                                                                loadBalancerConfig.ThreadCount,
-                                                                loadBalancerConfig.Endpoint,
-                                                                loadBalancerConfig.Transactional,
-                                                                c.Resolve<IMessageBuilder<Message>>()))
+            var builder = new ContainerBuilder();
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
+            builder.RegisterType<MsmqLoadBalancer>()
+                .WithParameter("endpoint", loadBalancerConfig.Endpoint)
+                .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
+                .WithParameter("secondaryLoadBalancer", loadBalancerConfig.Endpoint)
+                .WithParameter("transactional", loadBalancerConfig.Transactional)
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>()
+            builder.RegisterType<CreateLoadBalancerQueuesAction>()
                 .As<IDeploymentAction>()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var containerBuilder = new ContainerBuilder();
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
-            containerBuilder.Register(c => new MsmqSecondaryLoadBalancer(c.Resolve<IMessageSerializer>(),
-                                                                         c.Resolve<IQueueStrategy>(),
-                                                                         c.Resolve<IEndpointRouter>(),
-                                                                         loadBalancerConfig.Endpoint,
-                                                                         loadBalancerConfig.PrimaryLoadBalancer,
-                                                                         loadBalancerConfig.ThreadCount,
-                                                                         loadBalancerConfig.Transactional,
-                                                                         c.Resolve<IMessageBuilder<Message>>()))
+            var builder = new ContainerBuilder();
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
+            builder.RegisterType<MsmqSecondaryLoadBalancer>()
+                .WithParameter("endpoint", loadBalancerConfig.Endpoint)
+                .WithParameter("primaryLoadBalancer", loadBalancerConfig.PrimaryLoadBalancer)
+                .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
+                .WithParameter("transactional", loadBalancerConfig.Transactional)
                 .As<MsmqLoadBalancer>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateLoadBalancerQueuesAction>()
+            builder.RegisterType<CreateLoadBalancerQueuesAction>()
                 .As<IDeploymentAction>()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterReadyForWork()
         {
-            var containerBuilder = new ContainerBuilder();
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
-            containerBuilder.Register(c => new MsmqReadyForWorkListener(c.Resolve<IQueueStrategy>(),
-                                                                        loadBalancerConfig.ReadyForWork,
-                                                                        loadBalancerConfig.ThreadCount,
-                                                                        c.Resolve<IMessageSerializer>(),
-                                                                        c.Resolve<IEndpointRouter>(),
-                                                                        loadBalancerConfig.Transactional,
-                                                                        c.Resolve<IMessageBuilder<Message>>()))
+            var builder = new ContainerBuilder();
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
+            builder.RegisterType<MsmqReadyForWorkListener>()
+                .WithParameter("endPoint", loadBalancerConfig.ReadyForWork)
+                .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
+                .WithParameter("transactional", loadBalancerConfig.Transactional)
                 .AsSelf()
                 .SingleInstance();
-            containerBuilder.RegisterType<CreateReadyForWorkQueuesAction>()
+            builder.RegisterType<CreateReadyForWorkQueuesAction>()
                 .As<IDeploymentAction>()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.Register(c => new LoadBalancerMessageModule(loadBalancerEndpoint, c.Resolve<IEndpointRouter>()))
+            var builder = new ContainerBuilder();
+            builder.Register(c => new LoadBalancerMessageModule(loadBalancerEndpoint, c.Resolve<IEndpointRouter>()))
                 .As<IMessageModule>()
                 .AsSelf()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.Register(c => new MessageLoggingModule(c.Resolve<IEndpointRouter>(), logEndpoint))
+            var builder = new ContainerBuilder();
+            builder.Register(c => new MessageLoggingModule(c.Resolve<IEndpointRouter>(), logEndpoint))
                 .As<IMessageModule>()
                 .AsSelf()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterMsmqTransport(Type queueStrategyType)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType(queueStrategyType)
-                .WithParameter(new NamedParameter("endpoint", config.Endpoint))
-                .WithParameter(new ResolvedParameter((p, c) => p.ParameterType == typeof(IEndpointRouter), (p, c) => c.Resolve<IEndpointRouter>()))
+            var builder = new ContainerBuilder();
+            builder.RegisterType(queueStrategyType)
+                .WithParameter("endpoint", config.Endpoint)
                 .As<IQueueStrategy>()
                 .SingleInstance();
-            containerBuilder.RegisterType<MsmqMessageBuilder>()
+            builder.RegisterType<MsmqMessageBuilder>()
                 .As<IMessageBuilder<Message>>()
                 .SingleInstance();
-            containerBuilder.Register(c => new ErrorAction(config.NumberOfRetries, c.Resolve<IQueueStrategy>()))
+            builder.RegisterType<ErrorAction>()
+                .WithParameter("numberOfRetries", config.NumberOfRetries)
                 .As<IMsmqTransportAction>()
                 .SingleInstance();
-            containerBuilder.Register(c => new MsmqSubscriptionStorage(c.Resolve<IReflection>(),
-                                                                       c.Resolve<IMessageSerializer>(),
-                                                                       config.Endpoint,
-                                                                       c.Resolve<IEndpointRouter>(),
-                                                                       c.Resolve<IQueueStrategy>()))
+            builder.RegisterType<MsmqSubscriptionStorage>()
+                .WithParameter("queueBusListensTo", config.Endpoint)
                 .As<ISubscriptionStorage>()
                 .SingleInstance();
-            containerBuilder.Register(c => new MsmqTransport(c.Resolve<IMessageSerializer>(),
-                                                             c.Resolve<IQueueStrategy>(),
-                                                             config.Endpoint,
-                                                             config.ThreadCount,
-                                                             c.Resolve<IEnumerable<IMsmqTransportAction>>().ToArray(),
-                                                             c.Resolve<IEndpointRouter>(),
-                                                             config.IsolationLevel,
-                                                             config.Transactional, config.ConsumeInTransaction,
-                                                             c.Resolve<IMessageBuilder<Message>>()))
+            builder.RegisterType<MsmqTransport>()
+                .WithParameter("endpoint", config.Endpoint)
+                .WithParameter("threadCount", config.ThreadCount)
+                .WithParameter("queueIsolationLevel", config.IsolationLevel)
+                .WithParameter("transactional", config.Transactional)
+                .WithParameter("consumeInTransaction", config.ConsumeInTransaction)
                 .As<ITransport>()
                 .SingleInstance();
-            containerBuilder.RegisterAssemblyTypes(typeof (IMsmqTransportAction).Assembly)
+            builder.RegisterAssemblyTypes(typeof(IMsmqTransportAction).Assembly)
                 .Where(x => typeof(IMsmqTransportAction).IsAssignableFrom(x) && x != typeof(ErrorAction))
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterQueueCreation()
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<QueueCreationModule>()
+            var builder = new ContainerBuilder();
+            builder.RegisterType<QueueCreationModule>()
                 .AsSelf()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterMsmqOneWay()
         {
-            var containerBuilder = new ContainerBuilder();
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            containerBuilder.RegisterType<MsmqMessageBuilder>()
+            var builder = new ContainerBuilder();
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
+            builder.RegisterType<MsmqMessageBuilder>()
                 .As<IMessageBuilder<Message>>()
                 .SingleInstance();
-            containerBuilder.RegisterType<MsmqOnewayBus>()
-                .WithParameter(new NamedParameter("messageOwners", oneWayConfig.MessageOwners))
-                .WithParameter((p, c) => p.Name == "messgeBuilder", (p, c) => c.Resolve<IMessageBuilder<Message>>())
+            builder.RegisterType<MsmqOnewayBus>()
+                .WithParameter("messageOwners", oneWayConfig.MessageOwners)
                 .As<IOnewayBus>()
                 .SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterRhinoQueuesTransport(string path, string name)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<PhtSubscriptionStorage>()
-                .WithParameter(new NamedParameter("path", Path.Combine(path, name + "_subscriptions.esent")))
+            var builder = new ContainerBuilder();
+            builder.RegisterType<PhtSubscriptionStorage>()
+                .WithParameter("subscriptionPath", Path.Combine(path, name + "_subscriptions.esent"))
                 .As<ISubscriptionStorage>()
                 .SingleInstance();
-            containerBuilder.RegisterType<RhinoQueuesTransport>()
-                .WithParameter(new NamedParameter("threadCount", config.ThreadCount))
-                .WithParameter(new NamedParameter("endpoint", config.Endpoint))
-                .WithParameter(new NamedParameter("queueIsolationLevel", config.IsolationLevel))
-                .WithParameter(new NamedParameter("numberOfRetries", config.NumberOfRetries))
-                .WithParameter(new NamedParameter("path", Path.Combine(path, name + ".esent")))
-                .As<ITransport>().SingleInstance();
-            containerBuilder.RegisterType<RhinoQueuesMessageBuilder>()
-                .As<IMessageBuilder<MessagePayload>>().
-                SingleInstance();
-            containerBuilder.Update(container);
+            builder.RegisterType<RhinoQueuesTransport>()
+                .WithParameter("threadCount", config.ThreadCount)
+                .WithParameter("endpoint", config.Endpoint)
+                .WithParameter("queueIsolationLevel", config.IsolationLevel)
+                .WithParameter("numberOfRetries", config.NumberOfRetries)
+                .WithParameter("path", Path.Combine(path, name + ".esent"))
+                .As<ITransport>()
+                .SingleInstance();
+            builder.RegisterType<RhinoQueuesMessageBuilder>()
+                .As<IMessageBuilder<MessagePayload>>()
+                .SingleInstance();
+            builder.Update(container);
         }
 
         public void RegisterRhinoQueuesOneWay()
         {
-            var containerBuilder = new ContainerBuilder();
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            containerBuilder.RegisterType<RhinoQueuesMessageBuilder>()
-                .As<IMessageBuilder<MessagePayload>>().SingleInstance();
-            containerBuilder.RegisterType<RhinoQueuesOneWayBus>()
-                .WithParameter(new NamedParameter("messageOwners", oneWayConfig.MessageOwners))
-                .WithParameter((p, c) => p.Name == "messageSerializer", (p, c) => c.Resolve<IMessageSerializer>())
-                .WithParameter((p, c) => p.Name == "messageBuilder", (p, c) => c.Resolve<IMessageBuilder<MessagePayload>>())
-                .As<IOnewayBus>().SingleInstance();
-            containerBuilder.Update(container);
+            var builder = new ContainerBuilder();
+            var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
+            builder.RegisterType<RhinoQueuesMessageBuilder>()
+                .As<IMessageBuilder<MessagePayload>>()
+                .SingleInstance();
+            builder.RegisterType<RhinoQueuesOneWayBus>()
+                .WithParameter("messageOwners", oneWayConfig.MessageOwners)
+                .As<IOnewayBus>()
+                .SingleInstance();
+            builder.Update(container);
         }
 
         public void RegisterSecurity(byte[] key)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<RijndaelEncryptionService>()
+            var builder = new ContainerBuilder();
+            builder.RegisterType<RijndaelEncryptionService>()
                 .WithParameter(new NamedParameter("key", key))
                 .As<IEncryptionService>().SingleInstance();
-            containerBuilder.RegisterType<WireEcryptedStringConvertor>()
+            builder.RegisterType<WireEcryptedStringConvertor>()
                 .As<IValueConvertor<WireEcryptedString>>()
                 .SingleInstance();
-            containerBuilder.RegisterType<WireEncryptedMessageConvertor>()
+            builder.RegisterType<WireEncryptedMessageConvertor>()
                 .As<IElementSerializationBehavior>().SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
 
         public void RegisterNoSecurity()
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<ThrowingWireEcryptedStringConvertor>()
+            var builder = new ContainerBuilder();
+            builder.RegisterType<ThrowingWireEcryptedStringConvertor>()
                 .As<IValueConvertor<WireEcryptedString>>().SingleInstance();
-            containerBuilder.RegisterType<ThrowingWireEncryptedMessageConvertor>()
+            builder.RegisterType<ThrowingWireEncryptedMessageConvertor>()
                 .As<IElementSerializationBehavior>().SingleInstance();
-            containerBuilder.Update(container);
+            builder.Update(container);
         }
     }
 }
