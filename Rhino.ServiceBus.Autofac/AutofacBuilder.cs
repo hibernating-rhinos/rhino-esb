@@ -35,9 +35,9 @@ namespace Rhino.ServiceBus.Autofac
 
         public void WithInterceptor(IConsumerInterceptor interceptor)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new ConsumerInterceptorModule(interceptor));
-            containerBuilder.Update(container);
+            var builder = new ContainerBuilder();
+            builder.RegisterModule(new ConsumerInterceptorModule(interceptor));
+            builder.Update(container);
         }
 
         public void RegisterDefaultServices()
