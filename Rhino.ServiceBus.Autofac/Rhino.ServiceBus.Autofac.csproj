@@ -37,8 +37,8 @@
     <Reference Include="Autofac">
       <HintPath>..\SharedLibs\build\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Queues">
-      <HintPath>..\SharedLibs\4.0\Rhino.Queues.dll</HintPath>
+    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
