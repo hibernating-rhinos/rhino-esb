@@ -12,9 +12,7 @@ namespace Rhino.ServiceBus.Msmq
 			this.queueStrategy = queueStrategy;
 		}
 
-		#region IServiceBusAware Members
-
-		public void BusStarting(IServiceBus bus)
+	    public void BusStarting(IServiceBus bus)
 		{
 			try
 			{
@@ -39,7 +37,5 @@ namespace Rhino.ServiceBus.Msmq
 		public void BusDisposed(IServiceBus bus)
 		{
 		}
-
-		#endregion
 	}
 }
