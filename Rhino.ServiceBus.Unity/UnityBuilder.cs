@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Practices.Unity;
+using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.MessageModules;
 
 namespace Rhino.ServiceBus.Unity
 {
@@ -31,8 +33,9 @@ namespace Rhino.ServiceBus.Unity
 
             container.RegisterType<IServiceLocator, UnityServiceLocator>();
 
-            var types = typeof (IServiceBus).Assembly.GetTypes().Where(t => typeof (IBusConfigurationAware).IsAssignableFrom(t)).ToList();
-            types.ForEach(t => container.RegisterType(typeof (IBusConfigurationAware), t, new ContainerControlledLifetimeManager()));
+            typeof(IServiceBus).Assembly.GetTypes()
+                .Where(t => typeof (IBusConfigurationAware).IsAssignableFrom(t)).ToList()
+                .ForEach(type => container.RegisterType(typeof (IBusConfigurationAware), type, new ContainerControlledLifetimeManager()));
             
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
             {
@@ -45,14 +48,30 @@ namespace Rhino.ServiceBus.Unity
                     container.RegisterType(type, type.FullName);
             }
 
-            container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager());
-            container.RegisterType(typeof(IMessageSerializer), configuration.SerializerType, new ContainerControlledLifetimeManager());
-            container.RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager())
+                .RegisterType(typeof(IMessageSerializer), configuration.SerializerType, new ContainerControlledLifetimeManager())
+                .RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
         }
 
         public void RegisterBus()
         {
-            throw new NotImplementedException();
+            var busConfig = (RhinoServiceBusConfiguration) configuration;
+
+            container.RegisterType<IDeploymentAction, CreateLogQueueAction>()
+                .RegisterType<IDeploymentAction, CreateQueuesAction>();
+
+            container.RegisterType<DefaultServiceBus>(new ContainerControlledLifetimeManager())
+                .RegisterType<IStartableServiceBus, DefaultServiceBus>(
+                    new InjectionConstructor(
+                        new ResolvedParameter<IServiceLocator>(),
+                        new ResolvedParameter<ITransport>(),
+                        new ResolvedParameter<ISubscriptionStorage>(),
+                        new ResolvedParameter<IReflection>(),
+                        new ResolvedArrayParameter<IMessageModule>(),
+                        new InjectionParameter<MessageOwner[]>(busConfig.MessageOwners.ToArray()),
+                        new ResolvedParameter<IEndpointRouter>()))
+                .RegisterType<IServiceBus, DefaultServiceBus>()
+                .RegisterType<IStartable, DefaultServiceBus>();
         }
 
         public void RegisterPrimaryLoadBalancer()
