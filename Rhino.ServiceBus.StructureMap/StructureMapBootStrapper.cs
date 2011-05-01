@@ -44,9 +44,11 @@ namespace Rhino.ServiceBus.StructureMap
         {
             container.Configure(c => c.Scan(s =>
             {
-                s.Assembly(typeof(StructureMapBootStrapper).Assembly);
-                s.AddAllTypesOf(typeof(IMessageConsumer)).NameBy(t => t.FullName);
-                s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == false);
+                s.AssemblyContainingType(typeof(IServiceBus));
+                s.AssemblyContainingType(GetType());
+                //s.Assembly(typeof(StructureMapBootStrapper).Assembly);
+                s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
+                s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == true);
                 s.AddAllTypesOf<IDeploymentAction>();
                 s.AddAllTypesOf<IEnvironmentValidationAction>();
             }));

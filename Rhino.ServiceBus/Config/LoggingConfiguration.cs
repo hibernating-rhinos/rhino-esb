@@ -7,18 +7,18 @@ namespace Rhino.ServiceBus.Config
 {
     public class LoggingConfiguration : IBusConfigurationAware 
     {
-        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder)
-        {
+        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder) {
             var busConfig = config as RhinoServiceBusConfiguration;
             if (busConfig == null)
                 return;
 
-            Uri logEndpoint;
-
             var uriString = config.ConfigurationSection.Bus.LogEndpoint;
-            if (string.IsNullOrEmpty(uriString))
+            if (string.IsNullOrEmpty(uriString)) {
+                builder.RegisterLoggingEndpoint(null);
                 return;
+            }
 
+            Uri logEndpoint;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out logEndpoint) == false)
             {
                 throw new ConfigurationErrorsException(
