@@ -4,6 +4,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Serializers;
@@ -39,7 +41,8 @@ namespace Rhino.ServiceBus.Tests
         public void Can_serialize_and_deserialize_primitive()
         {
             long ticks = DateTime.Now.Ticks;
-            var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             var stream = new MemoryStream();
             serializer.Serialize(new object[] {ticks}, stream);
             stream.Position = 0;
@@ -50,7 +53,8 @@ namespace Rhino.ServiceBus.Tests
 		[Fact]
 		public void Can_serialize_and_deserialize_byte_array()
 		{
-			var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
 			var stream = new MemoryStream();
 			serializer.Serialize(new object[] { new byte[]{1,2,3,4} }, stream);
 			stream.Position = 0;
@@ -62,7 +66,8 @@ namespace Rhino.ServiceBus.Tests
 		public void Can_serialize_and_deserialize_DateTimeOffset()
 		{
 			var value = DateTimeOffset.Now;
-			var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
 			var stream = new MemoryStream();
 			serializer.Serialize(new object[] { value }, stream);
 			stream.Position = 0;
@@ -73,7 +78,8 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Can_serialize_and_deserialize_array()
         {
-            var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             var stream = new MemoryStream();
             serializer.Serialize(new object[]
             {
@@ -90,14 +96,16 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Trying_to_send_more_than_256_objects_will_fail()
         {
-            var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             Assert.Throws<UnboundedResultSetException>(() => serializer.Serialize(new object[257], new MemoryStream()));
         }
 
         [Fact]
         public void Trying_to_send_message_with_list_of_more_than_256_items_will_fail()
         {
-            var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             var order = new Order
             {
                 OrderLines = new OrderLine[257]
@@ -120,7 +128,8 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Can_deserialize_complex_object_graph()
         {
-            var serializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             var stream = new MemoryStream();
             serializer.Serialize(new[] {sample}, stream);
             stream.Position = 0;

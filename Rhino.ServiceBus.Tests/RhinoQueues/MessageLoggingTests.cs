@@ -4,7 +4,6 @@ using System.Net;
 using System.Transactions;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.Mocks;
 using Rhino.Queues;
 using Rhino.Queues.Model;
@@ -30,9 +29,11 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
 
-            container = new WindsorContainer(new XmlInterpreter("RhinoQueues/RhinoQueues.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.Register(Component.For<MessageLoggingModule>());
+            container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
+                .Configure();
 
             messageSerializer = container.Resolve<IMessageSerializer>();
             queue = new QueueManager(new IPEndPoint(IPAddress.Any, 2202), path);

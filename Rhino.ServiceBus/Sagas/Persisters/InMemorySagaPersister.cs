@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Castle.MicroKernel;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Internal;
 
@@ -10,13 +9,13 @@ namespace Rhino.ServiceBus.Sagas.Persisters
         where TSaga : class, IAccessibleSaga
     {
         private readonly Hashtable<Guid, byte[]> dictionary = new Hashtable<Guid, byte[]>();
-        private readonly IKernel kernel;
+        private readonly IServiceLocator serviceLocator;
         private readonly IReflection reflection;
         private readonly IMessageSerializer messageSerializer;
 
-        public InMemorySagaPersister(IKernel kernel, IReflection reflection, IMessageSerializer  messageSerializer)
+        public InMemorySagaPersister(IServiceLocator serviceLocator, IReflection reflection, IMessageSerializer  messageSerializer)
         {
-            this.kernel = kernel;
+            this.serviceLocator = serviceLocator;
             this.reflection = reflection;
             this.messageSerializer = messageSerializer;
         }
@@ -29,7 +28,7 @@ namespace Rhino.ServiceBus.Sagas.Persisters
                 return null;
             using(var ms = new MemoryStream(val))
             {
-                var saga = kernel.Resolve<TSaga>();
+                var saga = serviceLocator.Resolve<TSaga>();
                 saga.Id = id;
                 var state = messageSerializer.Deserialize(ms)[0];
                 reflection.Set(saga, "State", type => state);

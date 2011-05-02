@@ -56,6 +56,26 @@ task Init -depends Clean {
 		-product "Rhino Service Bus $version" `
 		-version $version `
 		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+
+    	Generate-Assembly-Info `
+		-file "$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs" `
+		-title "Rhino Service Bus $version" `
+		-description "Developer friendly service bus for .NET" `
+		-company "Hibernating Rhinos" `
+		-product "Rhino Service Bus $version" `
+		-version $version `
+		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+
+    	Generate-Assembly-Info `
+		-file "$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs" `
+		-title "Rhino Service Bus $version" `
+		-description "Developer friendly service bus for .NET" `
+		-company "Hibernating Rhinos" `
+		-product "Rhino Service Bus $version" `
+		-version $version `
+		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		
+		
 		
 	new-item $release_dir -itemType directory 
 	new-item $buildartifacts_dir -itemType directory 
@@ -88,6 +108,7 @@ task Release  -depends Test{
     	$build_dir\Castle.Core.xml `
     	$build_dir\Castle.Windsor.dll `
     	$build_dir\Castle.Windsor.xml `
+    	$build_dir\StructureMap.dll `
     	$build_dir\Esent.Interop.dll `
     	$build_dir\Esent.Interop.xml `
     	$build_dir\log4net.dll `
@@ -96,6 +117,10 @@ task Release  -depends Test{
     	$build_dir\Rhino.Queues.dll `
     	$build_dir\Rhino.ServiceBus.dll `
     	$build_dir\Rhino.ServiceBus.xml `
+    	$build_dir\Rhino.ServiceBus.Castle.xml `
+    	$build_dir\Rhino.ServiceBus.Castle.dll `
+    	$build_dir\Rhino.ServiceBus.StructureMap.xml `
+    	$build_dir\Rhino.ServiceBus.StructureMap.dll `
     	$build_dir\Rhino.ServiceBus.Host.exe `
     	$build_dir\Wintellect.Threading.dll `
     	$build_dir\Wintellect.Threading.xml `

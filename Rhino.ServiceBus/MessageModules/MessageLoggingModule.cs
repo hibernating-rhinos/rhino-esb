@@ -15,6 +15,11 @@ namespace Rhino.ServiceBus.MessageModules
         [ThreadStatic]
         private static DateTime messageArrival;
 
+        public bool IsConfigured
+        {
+            get { return logEndpoint.Uri != null; }
+        }
+
         public Uri LogQueue
         {
             get { return logEndpoint.Uri; }
@@ -22,6 +27,10 @@ namespace Rhino.ServiceBus.MessageModules
 
         public MessageLoggingModule(IEndpointRouter endpointRouter, Uri logQueue)
         {
+            if (logQueue == null) {
+                logEndpoint = new Endpoint();
+                return;
+            }
             logEndpoint = endpointRouter.GetRoutedEndpoint(logQueue);
         }
 

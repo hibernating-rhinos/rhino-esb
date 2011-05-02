@@ -21,8 +21,9 @@ namespace Rhino.ServiceBus.Tests
         public MessageLoggingTests()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.Register(Component.For<MessageLoggingModule>());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
 
             messageSerializer = container.Resolve<IMessageSerializer>();
 

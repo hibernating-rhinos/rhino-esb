@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -54,6 +54,9 @@
     </Reference>
     <Reference Include="Rhino.Queues">
       <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -101,6 +104,8 @@
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
+    <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\StructureMap\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
@@ -157,6 +162,14 @@
     <Compile Include="XmlSerializerTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
+      <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
+      <Name>Rhino.ServiceBus.Castle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.StructureMap\Rhino.ServiceBus.StructureMap.csproj">
+      <Project>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</Project>
+      <Name>Rhino.ServiceBus.StructureMap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>
@@ -172,6 +185,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="BusOnTransactionalQueue.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ReceiveOneWayBusRhinoQueues.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="OneWayBusRhinoQueues.config">

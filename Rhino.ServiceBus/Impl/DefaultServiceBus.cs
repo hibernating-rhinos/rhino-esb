@@ -2,23 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Castle.MicroKernel;
-using Castle.MicroKernel.Context;
-using Castle.MicroKernel.Proxy;
 using log4net;
+using Rhino.Queues.Utils;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Sagas;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {
-	using Queues.Utils;
-
-	public class DefaultServiceBus : IStartableServiceBus
+    public class DefaultServiceBus : IStartableServiceBus
     {
-        private readonly IKernel kernel;
+        private readonly IServiceLocator serviceLocator;
 
         private readonly ILog logger = LogManager.GetLogger(typeof(DefaultServiceBus));
         private readonly IMessageModule[] modules;
@@ -29,8 +26,8 @@ namespace Rhino.ServiceBus.Impl
     	[ThreadStatic] public static object currentMessage;
         private readonly IEndpointRouter endpointRouter;
 
-        public DefaultServiceBus(
-            IKernel kernel,
+	    public DefaultServiceBus(
+            IServiceLocator serviceLocator,
             ITransport transport,
             ISubscriptionStorage subscriptionStorage,
             IReflection reflection,
@@ -44,16 +41,13 @@ namespace Rhino.ServiceBus.Impl
             this.subscriptionStorage = subscriptionStorage;
             this.reflection = reflection;
             this.modules = modules;
-            this.kernel = kernel;
+            this.serviceLocator = serviceLocator;
         }
 
-		
         public IMessageModule[] Modules
         {
             get { return modules; }
         }
-
-        #region IStartableServiceBus Members
 
         public event Action<Reroute> ReroutedEndpoint;
 
@@ -208,7 +202,7 @@ namespace Rhino.ServiceBus.Impl
 
         private void FireServiceBusAware(Action<IServiceBusAware> action)
     	{
-    		foreach(var aware in kernel.ResolveAll<IServiceBusAware>())
+    		foreach(var aware in serviceLocator.ResolveAll<IServiceBusAware>())
     		{
     			action(aware);
     		}
@@ -330,10 +324,10 @@ namespace Rhino.ServiceBus.Impl
         
         private void AutomaticallySubscribeConsumerMessages()
         {
-            var handlers = kernel.GetAssignableHandlers(typeof(IMessageConsumer));
+            var handlers = serviceLocator.GetAllHandlersFor(typeof(IMessageConsumer));
             foreach (var handler in handlers)
             {
-                var msgs = reflection.GetMessagesConsumed(handler.ComponentModel.Implementation,
+                var msgs = reflection.GetMessagesConsumed(handler.Implementation,
                                                           type => type == typeof(OccasionalConsumerOf<>)
 														  || type == typeof(Consumer<>.SkipAutomaticSubscription));
                 foreach (var msg in msgs)
@@ -342,8 +336,6 @@ namespace Rhino.ServiceBus.Impl
                 }
             }
         }
-
-        #endregion
 
         private bool PublishInternal(object[] messages)
         {
@@ -372,7 +364,7 @@ namespace Rhino.ServiceBus.Impl
 
         public bool Transport_OnMessageArrived(CurrentMessageInformation msg)
         {
-            object[] consumers = GatherConsumers(msg);
+            var consumers = GatherConsumers(msg);
         	
 			if (consumers.Length == 0)
             {
@@ -427,7 +419,7 @@ namespace Rhino.ServiceBus.Impl
 
                 foreach (var consumer in consumers)
                 {
-                    kernel.ReleaseComponent(consumer);
+                    serviceLocator.Release(consumer);
                 }
             }
         }
@@ -435,7 +427,7 @@ namespace Rhino.ServiceBus.Impl
         private void PersistSagaInstance(IAccessibleSaga saga)
         {
             Type persisterType = reflection.GetGenericTypeOf(typeof(ISagaPersister<>), saga);
-            object persister = kernel.Resolve(persisterType);
+            object persister = serviceLocator.Resolve(persisterType);
 
             if (saga.IsCompleted)
                 reflection.InvokeSagaPersisterComplete(persister, saga);
@@ -445,15 +437,16 @@ namespace Rhino.ServiceBus.Impl
 
         public object[] GatherConsumers(CurrentMessageInformation msg)
         {
-            object[] sagas = GetSagasFor(msg.Message);
-            var sagaMessage = msg.Message as ISagaMessage;
+            var message = msg.Message;
+            object[] sagas = GetSagasFor(message);
+            var sagaMessage = message as ISagaMessage;
 
-            var msgType = msg.Message.GetType();
+            var msgType = message.GetType();
             object[] instanceConsumers = subscriptionStorage
                 .GetInstanceSubscriptions(msgType);
 
-            var consumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), msg.Message);
-            var occasionalConsumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(OccasionalConsumerOf<>), msg.Message);
+            var consumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(ConsumerOf<>), message);
+            var occasionalConsumerTypes = reflection.GetGenericTypesOfWithBaseTypes(typeof(OccasionalConsumerOf<>), message);
             var consumers = GetAllNonOccasionalConsumers(consumerTypes, occasionalConsumerTypes, sagas);
             for (var i = 0; i < consumers.Length; i++)
             {
@@ -465,16 +458,16 @@ namespace Rhino.ServiceBus.Impl
                 var type = saga.GetType();
                 if (sagas.Any(type.IsInstanceOfType))
                 {
-                    kernel.ReleaseComponent(consumers[i]);
+                    serviceLocator.Release(consumers[i]);
                     consumers[i] = null;
                     continue;
                 }
                 // we do not create new sagas if the saga is not initiated by
                 // the message
-                var initiatedBy = reflection.GetGenericTypeOf(typeof(InitiatedBy<>),msgType);
-                if(initiatedBy.IsInstanceOfType(saga)==false)
+                var initiatedBy = reflection.GetGenericTypeOf(typeof(InitiatedBy<>), msgType);
+                if (initiatedBy.IsInstanceOfType(saga) == false)
                 {
-                    kernel.ReleaseComponent(consumers[i]);
+                    serviceLocator.Release(consumers[i]);
                     consumers[i] = null;
                     continue;
                 }
@@ -489,40 +482,27 @@ namespace Rhino.ServiceBus.Impl
                 .ToArray();
         }
 
+
         /// <summary>
         /// Here we don't use ResolveAll from Windsor because we want to get an error
         /// if a component exists which isn't valid
         /// </summary>
-        private object[] GetAllNonOccasionalConsumers(ICollection<Type> consumerTypes, ICollection<Type> occasionalConsumerTypes, IEnumerable<object> instanceOfTypesToSkipResolving)
+        private object[] GetAllNonOccasionalConsumers(IEnumerable<Type> consumerTypes, IEnumerable<Type> occasionalConsumerTypes, IEnumerable<object> instanceOfTypesToSkipResolving)
         {
             var allHandlers = new List<IHandler>();
             foreach (var consumerType in consumerTypes)
             {
-                var handlers = kernel.GetAssignableHandlers(consumerType);
+                var handlers = serviceLocator.GetAllHandlersFor(consumerType);
                 allHandlers.AddRange(handlers);
             }
 
             var consumers = new List<object>(allHandlers.Count);
-            foreach (var handler in allHandlers)
-            {
-                var implementation = handler.ComponentModel.Implementation;
-                var occasionalConsumerFound = false;
-                foreach (var occasionalConsumerType in occasionalConsumerTypes)
-                {
-                    if (occasionalConsumerType.IsAssignableFrom(implementation))
-                    {
-                        occasionalConsumerFound = true;
-                        break;
-                    }
-                }
-                if (occasionalConsumerFound)
-                    continue;
-                
-                if (instanceOfTypesToSkipResolving.Any(x => x.GetType() == implementation))
-                    continue;
-
-                consumers.Add(handler.Resolve(CreationContext.Empty));
-            }
+            consumers.AddRange(from handler in allHandlers
+                               let implementation = handler.Implementation
+                               let occasionalConsumerFound = occasionalConsumerTypes.Any(occasionalConsumerType => occasionalConsumerType.IsAssignableFrom(implementation))
+                               where !occasionalConsumerFound
+                               where !instanceOfTypesToSkipResolving.Any(x => x.GetType() == implementation)
+                               select handler.Resolve());
             return consumers.ToArray();
         }
 
@@ -533,28 +513,28 @@ namespace Rhino.ServiceBus.Impl
             Type orchestratesType = reflection.GetGenericTypeOf(typeof(Orchestrates<>), message);
             Type initiatedByType = reflection.GetGenericTypeOf(typeof(InitiatedBy<>), message);
 
-            var handlers = kernel.GetAssignableHandlers(orchestratesType)
-                                                   .Union(kernel.GetAssignableHandlers(initiatedByType));
+            var handlers = serviceLocator.GetAllHandlersFor(orchestratesType)
+                                                   .Union(serviceLocator.GetAllHandlersFor(initiatedByType));
 
             foreach (IHandler sagaHandler in handlers)
             {
-                Type sagaType = sagaHandler.ComponentModel.Implementation;
-                
+                Type sagaType = sagaHandler.Implementation;
+
                 //first try to execute any saga finders.
-                Type sagaFinderType = reflection.GetGenericTypeOf(typeof (ISagaFinder<,>), sagaType, ProxyUtil.GetUnproxiedType(message));
-                var sagaFinderHandlers = kernel.GetAssignableHandlers(sagaFinderType);
+                Type sagaFinderType = reflection.GetGenericTypeOf(typeof(ISagaFinder<,>), sagaType, ProxyUtil.GetUnproxiedType(message));
+                var sagaFinderHandlers = serviceLocator.GetAllHandlersFor(sagaFinderType);
                 foreach (var sagaFinderHandler in sagaFinderHandlers)
                 {
                     try
                     {
-                        var sagaFinder = kernel.Resolve(sagaFinderHandler.Service);
+                        var sagaFinder = serviceLocator.Resolve(sagaFinderHandler.Service);
                         var saga = reflection.InvokeSagaFinderFindBy(sagaFinder, message);
                         if (saga != null)
                             instances.Add(saga);
                     }
                     finally
                     {
-                        kernel.ReleaseComponent(sagaFinderHandler);
+                        serviceLocator.Release(sagaFinderHandler);
                     }
                 }
 
@@ -566,7 +546,7 @@ namespace Rhino.ServiceBus.Impl
                 Type sagaPersisterType = reflection.GetGenericTypeOf(typeof(ISagaPersister<>),
                                                                      sagaType);
 
-                object sagaPersister = kernel.Resolve(sagaPersisterType);
+                object sagaPersister = serviceLocator.Resolve(sagaPersisterType);
                 try
                 {
                     object sagas = reflection.InvokeSagaPersisterGet(sagaPersister, sagaMessage.CorrelationId);
@@ -576,7 +556,7 @@ namespace Rhino.ServiceBus.Impl
                 }
                 finally
                 {
-                    kernel.ReleaseComponent(sagaPersister);
+                    serviceLocator.Release(sagaPersister);
                 }
             }
             return instances.ToArray();

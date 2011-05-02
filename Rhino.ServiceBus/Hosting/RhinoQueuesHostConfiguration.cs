@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using Castle.Core.Configuration;
+using Rhino.ServiceBus.Config;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -12,12 +11,15 @@ namespace Rhino.ServiceBus.Hosting
             Path = path;
             return this;
         }
-        protected override void PopulateBusConfiguration(MutableConfiguration busConfig)
+
+        public override BusConfigurationSection ToBusConfiguration()
         {
-            base.PopulateBusConfiguration(busConfig);
+            var config = base.ToBusConfiguration();
 
             if (string.IsNullOrEmpty(Path) == false)
-                busConfig.Attribute("path", Path);
+                config.Bus.Path = Path;
+
+            return config;
         }
     }
 }

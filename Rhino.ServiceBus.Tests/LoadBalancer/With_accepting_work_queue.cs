@@ -28,9 +28,11 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
             var acceptingWork = new MessageQueue(acceptingWorkQueuePath);
             acceptingWork.Purge();
 
-            var interpreter = new XmlInterpreter(@"LoadBalancer\BusWithAcceptingWorkLoadBalancer.config");
-            container = new WindsorContainer(interpreter);
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\BusWithAcceptingWorkLoadBalancer.config")
+                .Configure();
 
             container.Register(Component.For<MyHandler>());
 

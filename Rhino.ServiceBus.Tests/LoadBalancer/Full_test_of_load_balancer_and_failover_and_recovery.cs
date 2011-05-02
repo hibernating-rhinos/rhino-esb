@@ -5,6 +5,7 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
@@ -31,8 +32,11 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                 MessageQueue.Delete(loadBalancerQueuePath2);
             MessageQueue.Create(loadBalancerQueuePath2, true);
 
-            container = new WindsorContainer(new XmlInterpreter(@"LoadBalancer\SendingBusToLoadBalancer.config"));
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\SendingBusToLoadBalancer.config")
+                .Configure();
             container.Register(
                 Component.For<MsmqLoadBalancer>()
                     .DependsOn(new
@@ -42,7 +46,7 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         endpoint = loadBalancerQueuePathUri,
                         secondaryLoadBalancer = loadBalancerQueuePathUri2,
                         transactional = TransactionalOptions.FigureItOut,
-                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(container)), new CastleServiceLocator(container))
                     }).LifeStyle.Transient,
                 Component.For<MsmqSecondaryLoadBalancer>()
                     .DependsOn(new
@@ -52,13 +56,16 @@ namespace Rhino.ServiceBus.Tests.LoadBalancer
                         endpoint = loadBalancerQueuePathUri2,
                         primaryLoadBalancer = loadBalancerQueuePathUri,
                         transactional = TransactionalOptions.FigureItOut,
-                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()), new DefaultKernel())
+                        messageBuilder = new MsmqMessageBuilder(new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(container)), new CastleServiceLocator(container))
                     })
                 );
 
-            //New container to more closely mimic as separate app.
-            receivingBusContainer = new WindsorContainer(new XmlInterpreter(@"LoadBalancer\ReceivingBusWithLoadBalancer.config"));
-            receivingBusContainer.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            //New conatainer to more closely mimic as separate app.
+            receivingBusContainer = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(receivingBusContainer)
+                .UseStandaloneConfigurationFile(@"LoadBalancer\ReceivingBusWithLoadBalancer.config")
+                .Configure();
             receivingBusContainer.Register(Component.For<TestHandler>());
         }
 

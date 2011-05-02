@@ -1,17 +1,17 @@
 using Castle.MicroKernel.Registration;
-using Rhino.ServiceBus.Hosting;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Sagas.Persisters;
 
 namespace Starbucks.Customer
 {
-    public class CustomerBootStrapper : AbstractBootStrapper
+    public class CustomerBootStrapper : CastleBootStrapper
     {
         protected override void ConfigureContainer()
         {
             base.ConfigureContainer();
 
-            container.Register(
+            Container.Register(
                 Component.For(typeof(ISagaPersister<>))
                     .ImplementedBy(typeof(InMemorySagaPersister<>))
                 );

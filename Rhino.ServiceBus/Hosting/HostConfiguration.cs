@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Castle.Core.Configuration;
+using Rhino.ServiceBus.Config;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -63,40 +63,20 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
-        public IConfiguration ToIConfiguration()
+        public virtual BusConfigurationSection ToBusConfiguration()
         {
-            var config = new MutableConfiguration("rhino.esb");
-
-            var busConfig = config.CreateChild("bus");
-            PopulateBusConfiguration(busConfig);
-
-            var messagesConfig = config.CreateChild("messages");
-
+            var config = new BusConfigurationSection();
+            config.Bus.Endpoint = Endpoint;
+            config.Bus.ThreadCount = ThreadCount;
+            config.Bus.NumberOfRetries = NumberOfRetries;
+            config.Bus.Name = Name;
+            config.Bus.LoadBalancerEndpoint = LoadBalancerEndpoint;
+            config.Bus.LogEndpoint = LogEndpoint;
             foreach (var message in Messages)
             {
-                messagesConfig.CreateChild("add")
-                    .Attribute("name", message.Key)
-                    .Attribute("endpoint", message.Value);
+                config.MessageOwners.Add(new MessageOwnerElement{Name = message.Key, Endpoint = message.Value});
             }
-
             return config;
         }
-
-        protected virtual void PopulateBusConfiguration(MutableConfiguration busConfig)
-        {
-            busConfig
-                .Attribute("endpoint", Endpoint)
-                .Attribute("threadCount", ThreadCount.ToString())
-                .Attribute("numberOfRetries", NumberOfRetries.ToString());
-
-            if (string.IsNullOrEmpty(Name) == false)
-                busConfig.Attribute("name", Name);
-
-            if (string.IsNullOrEmpty(LoadBalancerEndpoint) == false)
-                busConfig.Attribute("loadBalancerEndpoint", LoadBalancerEndpoint);
-
-            if (string.IsNullOrEmpty(LogEndpoint) == false)
-                busConfig.Attribute("logEndpoint", LogEndpoint);
-        }
-	}
+    }
 }

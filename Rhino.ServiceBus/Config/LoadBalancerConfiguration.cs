@@ -1,41 +1,28 @@
-using System;
-using System.Configuration;
-using Castle.Core.Configuration;
-using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.MessageModules;
+using Rhino.ServiceBus.LoadBalancer;
 
 namespace Rhino.ServiceBus.Config
 {
     public class LoadBalancerConfiguration : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusConfiguration config, IBusContainerBuilder builder)
         {
-            var bus = configuration.Children["bus"];
-            if (bus == null)
+            var loadBalancerConfig = config as LoadBalancer.LoadBalancerConfiguration;
+            if (loadBalancerConfig == null)
                 return;
-            
-            var loadBalancerEndpointAsString = bus.Attributes["loadBalancerEndpoint"];
-
-            if(string.IsNullOrEmpty(loadBalancerEndpointAsString))
-                return;
-
-            Uri loadBalancerEndpoint;
-            if (Uri.TryCreate(
-                loadBalancerEndpointAsString, 
-                UriKind.Absolute, 
-                out loadBalancerEndpoint) == false)
+            if (loadBalancerConfig.SecondaryLoadBalancer != null)
             {
-                throw new ConfigurationErrorsException(
-                    "Attribute 'loadBalancerEndpoint' on 'bus' has an invalid value '" + loadBalancerEndpointAsString + "'");
+                builder.RegisterSecondaryLoadBalancer();
             }
-            var endpoint = new Endpoint {Uri = loadBalancerEndpoint};
-            facility.Kernel.Register(
-                Component.For<LoadBalancerMessageModule>()
-                    .DependsOn(new { loadBalancerEndpoint = endpoint.Uri })
-                );
+            else
+            {
+                builder.RegisterPrimaryLoadBalancer();
+            }
 
-            facility.AddMessageModule<LoadBalancerMessageModule>();
+            if (loadBalancerConfig.ReadyForWork != null)
+            {
+                builder.RegisterReadyForWork();
+            }
         }
     }
 }
