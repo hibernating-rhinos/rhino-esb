@@ -24,7 +24,6 @@ namespace Rhino.ServiceBus.Tests
             new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
                 .Configure();
-            container.Register(Component.For<MessageLoggingModule>());
 
             messageSerializer = container.Resolve<IMessageSerializer>();
 

@@ -34,7 +34,6 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 .UseCastleWindsor(container)
                 .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .Configure();
-            container.Register(Component.For<MessageLoggingModule>());
 
             messageSerializer = container.Resolve<IMessageSerializer>();
             queue = new QueueManager(new IPEndPoint(IPAddress.Any, 2202), path);
