@@ -40,16 +40,21 @@ namespace Rhino.ServiceBus.StructureMap
             ConfigureContainer();
         }
 
-        protected virtual void ConfigureContainer()
-        {
-            container.Configure(c => c.Scan(s =>
-            {
-                s.Assembly(typeof(StructureMapBootStrapper).Assembly);
-                s.AddAllTypesOf(typeof(IMessageConsumer)).NameBy(t => t.FullName);
-                s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == false);
-                s.AddAllTypesOf<IDeploymentAction>();
-                s.AddAllTypesOf<IEnvironmentValidationAction>();
-            }));
+        protected virtual void ConfigureContainer() {
+          container.Configure(c => {
+            c.Scan(s => {
+                      s.Assembly(typeof(IServiceBus).Assembly);
+                      s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
+                      s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == true);
+                    });
+            c.Scan(s => {
+                      s.Assembly(GetType().Assembly);
+                      s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
+                      s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == true);
+                      s.AddAllTypesOf<IDeploymentAction>();
+                      s.AddAllTypesOf<IEnvironmentValidationAction>();
+                    });
+          });
         }
 
         public override void ExecuteDeploymentActions(string user)
