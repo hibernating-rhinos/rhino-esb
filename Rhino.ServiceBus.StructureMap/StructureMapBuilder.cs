@@ -78,7 +78,6 @@ namespace Rhino.ServiceBus.StructureMap
             var busConfig = (RhinoServiceBusConfiguration) config;
             container.Configure(c =>
             {
-                c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
                 c.For<IDeploymentAction>().Use<CreateQueuesAction>();
                 c.For<IStartableServiceBus>().Singleton().Use<DefaultServiceBus>()
                     .Ctor<MessageOwner[]>().Is(busConfig.MessageOwners.ToArray());
@@ -138,8 +137,12 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            container.Configure(c => c.For<MessageLoggingModule>().Singleton().Use<MessageLoggingModule>()
-                                         .Ctor<Uri>().Is(logEndpoint));
+          container.Configure(c =>
+          {
+            c.For<MessageLoggingModule>().Singleton().Use<MessageLoggingModule>()
+              .Ctor<Uri>().Is(logEndpoint);
+            c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
+          });
         }
 
         public void RegisterMsmqTransport(Type queueStrategyType)
