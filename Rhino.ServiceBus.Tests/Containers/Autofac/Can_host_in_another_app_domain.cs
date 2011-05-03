@@ -79,7 +79,8 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         protected override void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<TestRemoteHandler>().As<TestRemoteHandler>();
+            builder.RegisterType<TestRemoteHandler>()
+                .AsImplementedInterfaces();
             builder.Update(Container);
         }
     }

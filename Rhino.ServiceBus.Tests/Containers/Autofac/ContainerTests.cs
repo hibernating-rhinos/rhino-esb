@@ -1,10 +1,12 @@
 using System;
+using System.Messaging;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using Autofac;
+using Rhino.ServiceBus.Msmq;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests.Containers.Autofac
@@ -49,6 +51,18 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         }
 
         [Fact]
+        public void ServiceLocator_can_be_resolved()
+        {
+            new RhinoServiceBusConfiguration()
+                .UseAutofac(container)
+                .Configure();
+
+            var instance = container.Resolve<IServiceLocator>();
+
+            Assert.NotNull(instance);
+        }
+
+        [Fact]
         public void Oneway_bus_is_singleton()
         {
             new OnewayRhinoServiceBusConfiguration()
@@ -75,6 +89,13 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         [Fact]
         public void LoadBalancer_is_singleton()
         {
+            var queuePath = MsmqUtil.GetQueuePath(new Endpoint
+            {
+                Uri = new Uri("msmq://localhost/test.balancer")
+            });
+            if(MessageQueue.Exists(queuePath.QueuePath) == false)
+                MessageQueue.Create(queuePath.QueuePath);
+
             new LoadBalancerConfiguration()
                 .UseAutofac(container)
                 .UseStandaloneConfigurationFile("LoadBalancer.config")

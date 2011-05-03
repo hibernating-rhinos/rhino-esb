@@ -25,6 +25,7 @@ namespace Rhino.ServiceBus.Impl
         private readonly MessageOwnersSelector messageOwners;
     	[ThreadStatic] public static object currentMessage;
         private readonly IEndpointRouter endpointRouter;
+        private IEnumerable<IServiceBusAware> serviceBusAware = new IServiceBusAware[0];
 
 	    public DefaultServiceBus(
             IServiceLocator serviceLocator,
@@ -139,7 +140,9 @@ namespace Rhino.ServiceBus.Impl
 
         public void Dispose()
         {
-			FireServiceBusAware(aware => aware.BusDisposing(this));
+            foreach(var aware in serviceBusAware)
+                aware.BusDisposing(this);
+
             transport.Dispose();
             transport.MessageArrived -= Transport_OnMessageArrived;
 
@@ -154,12 +157,18 @@ namespace Rhino.ServiceBus.Impl
             var disposableSubscriptionStorage = subscriptionStorage as IDisposable;
             if (disposableSubscriptionStorage != null)
                 disposableSubscriptionStorage.Dispose();
-        	FireServiceBusAware(aware => aware.BusDisposed(this));
+
+            foreach(var aware in serviceBusAware)
+                aware.BusDisposed(this);
         }
 
         public void Start()
         {
-        	FireServiceBusAware(aware => aware.BusStarting(this));
+            serviceBusAware = serviceLocator.ResolveAll<IServiceBusAware>();
+
+            foreach(var aware in serviceBusAware)
+                aware.BusStarting(this);
+
             logger.DebugFormat("Starting the bus for {0}", Endpoint);
 
             var subscriptionAsModule = subscriptionStorage as IMessageModule;
@@ -182,7 +191,8 @@ namespace Rhino.ServiceBus.Impl
 
             AutomaticallySubscribeConsumerMessages();
 
-        	FireServiceBusAware(aware => aware.BusStarted(this));
+            foreach(var aware in serviceBusAware)
+                aware.BusStarted(this);
         }
 
         private bool Transport_OnAdministrativeMessageArrived(CurrentMessageInformation info)
@@ -199,14 +209,6 @@ namespace Rhino.ServiceBus.Impl
             
             return true;
         }
-
-        private void FireServiceBusAware(Action<IServiceBusAware> action)
-    	{
-    		foreach(var aware in serviceLocator.ResolveAll<IServiceBusAware>())
-    		{
-    			action(aware);
-    		}
-    	}
 
     	public void Subscribe(Type type)
         {
