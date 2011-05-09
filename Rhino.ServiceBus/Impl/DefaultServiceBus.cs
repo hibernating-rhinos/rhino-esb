@@ -351,9 +351,15 @@ namespace Rhino.ServiceBus.Impl
             var subscriptions = new HashSet<Uri>();
             foreach (var message in messages)
             {
-                foreach (var uri in subscriptionStorage.GetSubscriptionsFor(message.GetType()))
+                Type messageType = message.GetType();
+                while (messageType != null)
                 {
-                    subscriptions.Add(uri);
+                    subscriptions.UnionWith(subscriptionStorage.GetSubscriptionsFor(messageType));
+                    foreach (Type interfaceType in messageType.GetInterfaces())
+                    {
+                        subscriptions.UnionWith(subscriptionStorage.GetSubscriptionsFor(interfaceType));
+                    }
+                    messageType = messageType.BaseType;
                 }
             }
             foreach (Uri subscription in subscriptions)
