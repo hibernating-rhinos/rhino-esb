@@ -68,7 +68,7 @@ task Test -depends Compile {
   $test_runner =  "$tools_dir\xUnit\"
   $old = pwd
   cd $build_dir
-  & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
+  & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\Rhino.ServiceBus.Tests.dll" /noshadow
   cd $old		
 }
 
