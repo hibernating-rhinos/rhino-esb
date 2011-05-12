@@ -3,6 +3,7 @@ using System;
 using Microsoft.Practices.Unity;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Unity;
 using Xunit;
 
@@ -40,6 +41,16 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
             var startable = container.Resolve<IStartableServiceBus>();
             var bus = container.Resolve<IServiceBus>();
             Assert.Same(startable, bus);
+        }
+
+        [Fact]
+        public void QueueStrategyCanBeResolved()
+        {
+            var container = new UnityContainer();
+            new RhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .Configure();
+            var strategy = container.Resolve<IQueueStrategy>();
         }
 
         //[Fact]
