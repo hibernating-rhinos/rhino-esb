@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Messaging;
+using System.Transactions;
 using Microsoft.Practices.Unity;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
+using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Msmq.TransportActions;
 
 namespace Rhino.ServiceBus.Unity
 {
@@ -34,9 +38,9 @@ namespace Rhino.ServiceBus.Unity
             container.RegisterType<IServiceLocator, UnityServiceLocator>();
 
             typeof(IServiceBus).Assembly.GetTypes()
-                .Where(t => typeof (IBusConfigurationAware).IsAssignableFrom(t)).ToList()
-                .ForEach(type => container.RegisterType(typeof (IBusConfigurationAware), type, new ContainerControlledLifetimeManager()));
-            
+                .Where(t => typeof(IBusConfigurationAware).IsAssignableFrom(t) && !(t.Equals(typeof(IBusConfigurationAware)))).ToList()
+                .ForEach(type => container.RegisterType(typeof(IBusConfigurationAware), type, Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager()));
+
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
             {
                 configurationAware.Configure(configuration, this);
@@ -55,7 +59,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusConfiguration) configuration;
+            var busConfig = (RhinoServiceBusConfiguration)configuration;
 
             container.RegisterType<IDeploymentAction, CreateLogQueueAction>()
                 .RegisterType<IDeploymentAction, CreateQueuesAction>();
@@ -101,12 +105,51 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterMsmqTransport(Type queueStrategyType)
         {
-            throw new NotImplementedException();
+            container.RegisterType(typeof(IQueueStrategy), queueStrategyType,
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<IEndpointRouter>(),
+                    new InjectionParameter<Uri>(configuration.Endpoint)));
+            container.RegisterType<IMessageBuilder<Message>, MsmqMessageBuilder>(
+                new ContainerControlledLifetimeManager());
+            container.RegisterType<IMsmqTransportAction, ErrorAction>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new InjectionParameter<int>(configuration.NumberOfRetries),
+                    new ResolvedParameter<IQueueStrategy>()));
+            container.RegisterType<ISubscriptionStorage, MsmqSubscriptionStorage>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<IReflection>(),
+                    new ResolvedParameter<IMessageSerializer>(),
+                    new InjectionParameter<Uri>(configuration.Endpoint),
+                    new ResolvedParameter<IEndpointRouter>(),
+                    new ResolvedParameter<IQueueStrategy>()));
+            container.RegisterType<ITransport, MsmqTransport>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<IMessageSerializer>(),
+                    new ResolvedParameter<IQueueStrategy>(),
+                    new InjectionParameter<Uri>(configuration.Endpoint),
+                    new InjectionParameter<int>(configuration.ThreadCount),
+                    new ResolvedArrayParameter<IMsmqTransportAction>(),
+                    new ResolvedParameter<IEndpointRouter>(),
+                    new InjectionParameter<IsolationLevel>(configuration.IsolationLevel),
+                    new InjectionParameter<TransactionalOptions>(configuration.Transactional),
+                    new InjectionParameter<bool>(configuration.ConsumeInTransaction),
+                    new ResolvedParameter<IMessageBuilder<Message>>()));
+
+            typeof(IMsmqTransportAction).Assembly.GetTypes()
+                .Where(t => typeof(IMsmqTransportAction).IsAssignableFrom(t)
+                            && !(t.Equals(typeof(IMsmqTransportAction)))
+                            && !(t.Equals(typeof(ErrorAction)))).ToList()
+                .ForEach(type => container.RegisterType(typeof(IMsmqTransportAction), type, Guid.NewGuid().ToString(), 
+                                                        new ContainerControlledLifetimeManager()));
         }
 
         public void RegisterQueueCreation()
         {
-            throw new NotImplementedException();
+            container.RegisterType<QueueCreationModule>(new ContainerControlledLifetimeManager());
         }
 
         public void RegisterMsmqOneWay()
