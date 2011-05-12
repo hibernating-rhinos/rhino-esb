@@ -40,6 +40,7 @@ namespace Rhino.ServiceBus.Config
         public string Transactional
         {
             get { return this["transactional"] as string; }
+            set { this["transactional"] = value; }
         }
 
         public string LogEndpoint

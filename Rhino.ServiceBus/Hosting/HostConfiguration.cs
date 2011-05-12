@@ -7,29 +7,35 @@ namespace Rhino.ServiceBus.Hosting
     {
         private string Name { get; set; }
         private string Endpoint { get; set; }
+        private bool Transactional { get; set; }
         private int ThreadCount { get; set; }
         private int NumberOfRetries { get; set; }
         private string LoadBalancerEndpoint { get; set; }
         protected string LogEndpoint { get; set; }
-        private IDictionary<string, string> Messages { get; set; }
+        private IDictionary<string, HostConfigMessageEndpoint> Messages { get; set; }
 
         public HostConfiguration()
         {
             ThreadCount = 1;
             NumberOfRetries = 5;
-            Messages = new Dictionary<string, string>();
+            Messages = new Dictionary<string, HostConfigMessageEndpoint>();
         }
 
         public HostConfiguration Bus(string endpoint)
         {
-            Endpoint = endpoint;
-            return this;
+            return Bus(endpoint, null);
         }
 
         public HostConfiguration Bus(string endpoint, string name)
         {
-            Bus(endpoint);
+            return Bus(endpoint, name, false);
+        }
+
+        public HostConfiguration Bus(string endpoint, string name, bool transactional)
+        {
+            Endpoint = endpoint;
             Name = name;
+            Transactional = transactional;
             return this;
         }
 
@@ -59,7 +65,16 @@ namespace Rhino.ServiceBus.Hosting
 
         public HostConfiguration Receive(string messageName, string endpoint)
         {
-            Messages.Add(messageName, endpoint);
+            return Receive(messageName, endpoint, false);
+        }
+
+        public HostConfiguration Receive(string messageName, string endpoint, bool transactional)
+        {
+            Messages.Add(messageName, new HostConfigMessageEndpoint
+            {
+              Endpoint = endpoint,
+              Transactional = transactional,
+            });
             return this;
         }
 
@@ -72,11 +87,30 @@ namespace Rhino.ServiceBus.Hosting
             config.Bus.Name = Name;
             config.Bus.LoadBalancerEndpoint = LoadBalancerEndpoint;
             config.Bus.LogEndpoint = LogEndpoint;
+            config.Bus.Transactional = Transactional.ToString();
             foreach (var message in Messages)
             {
-                config.MessageOwners.Add(new MessageOwnerElement{Name = message.Key, Endpoint = message.Value});
+              config.MessageOwners.Add(new MessageOwnerElement
+              {
+                Name = message.Key,
+                Endpoint = message.Value.Endpoint,
+                Transactional = message.Value.Transactional.ToString()
+              });
             }
             return config;
+        }
+
+
+        private class HostConfigMessageEndpoint {
+          public string Endpoint {
+            get;
+            set;
+          }
+
+          public bool Transactional {
+            get;
+            set;
+          }
         }
     }
 }

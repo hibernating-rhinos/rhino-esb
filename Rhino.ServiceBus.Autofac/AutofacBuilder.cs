@@ -99,6 +99,7 @@ namespace Rhino.ServiceBus.Autofac
                 .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
                 .WithParameter("secondaryLoadBalancer", loadBalancerConfig.Endpoint)
                 .WithParameter("transactional", loadBalancerConfig.Transactional)
+                .PropertiesAutowired()
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .SingleInstance();
@@ -117,6 +118,7 @@ namespace Rhino.ServiceBus.Autofac
                 .WithParameter("primaryLoadBalancer", loadBalancerConfig.PrimaryLoadBalancer)
                 .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
                 .WithParameter("transactional", loadBalancerConfig.Transactional)
+                .PropertiesAutowired()
                 .As<MsmqLoadBalancer>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
@@ -131,7 +133,7 @@ namespace Rhino.ServiceBus.Autofac
             var builder = new ContainerBuilder();
             var loadBalancerConfig = (LoadBalancerConfiguration)config;
             builder.RegisterType<MsmqReadyForWorkListener>()
-                .WithParameter("endPoint", loadBalancerConfig.ReadyForWork)
+                .WithParameter("endpoint", loadBalancerConfig.ReadyForWork)
                 .WithParameter("threadCount", loadBalancerConfig.ThreadCount)
                 .WithParameter("transactional", loadBalancerConfig.Transactional)
                 .AsSelf()
@@ -190,6 +192,7 @@ namespace Rhino.ServiceBus.Autofac
                 .SingleInstance();
             builder.RegisterAssemblyTypes(typeof(IMsmqTransportAction).Assembly)
                 .Where(x => typeof(IMsmqTransportAction).IsAssignableFrom(x) && x != typeof(ErrorAction))
+                .As<IMsmqTransportAction>()
                 .SingleInstance();
             builder.Update(container);
         }
