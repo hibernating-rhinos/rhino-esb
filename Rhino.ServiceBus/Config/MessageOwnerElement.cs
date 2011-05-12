@@ -22,6 +22,7 @@ namespace Rhino.ServiceBus.Config
         public string Transactional
         {
             get { return (string) this["transactional"]; }
+            set { this["transactional"] = value; }
         }
     }
 }

@@ -93,8 +93,14 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
             {
                 Uri = new Uri("msmq://localhost/test.balancer")
             });
+            var queueAcceptingPath = MsmqUtil.GetQueuePath(new Endpoint
+            {
+                Uri = new Uri("msmq://localhost/test.balancer.acceptingwork")
+            });
             if(MessageQueue.Exists(queuePath.QueuePath) == false)
                 MessageQueue.Create(queuePath.QueuePath);
+            if(MessageQueue.Exists(queueAcceptingPath.QueuePath) == false)
+                MessageQueue.Create(queueAcceptingPath.QueuePath);
 
             new LoadBalancerConfiguration()
                 .UseAutofac(container)
