@@ -153,6 +153,7 @@
     <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
     <Compile Include="RhinoQueues\WhenErrorOccurs.cs" />
     <Compile Include="RhinoQueues\WithDebugging.cs" />
+    <Compile Include="SagaFinderTests.cs" />
     <Compile Include="SagaTests.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Warnings\Warnings_would_be_generated.cs" />
