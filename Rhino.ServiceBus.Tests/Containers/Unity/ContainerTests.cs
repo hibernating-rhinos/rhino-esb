@@ -3,8 +3,9 @@ using System;
 using Microsoft.Practices.Unity;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Msmq;
-using Rhino.ServiceBus.Unity;
+using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.LoadBalancer;
+using Rhino.ServiceBus.MessageModules;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests.Containers.Unity
@@ -42,81 +43,71 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
             var bus = container.Resolve<IServiceBus>();
             Assert.Same(startable, bus);
         }
+        
+        [Fact]
+        public void Oneway_bus_is_singleton()
+        {
+            var container = new UnityContainer();
+            new OnewayRhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .Configure();
+
+            var oneWayBus = container.Resolve<IOnewayBus>();
+            var second = container.Resolve<IOnewayBus>();
+            Assert.Same(oneWayBus, second);
+        }
 
         [Fact]
-        public void QueueStrategyCanBeResolved()
+        public void RhinoQueues_bus_is_registered()
         {
             var container = new UnityContainer();
             new RhinoServiceBusConfiguration()
                 .UseUnity(container)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .Configure();
-            var strategy = container.Resolve<IQueueStrategy>();
+
+            var bus = container.Resolve<IServiceBus>();
+            Assert.NotNull(bus);
         }
 
-        //[Fact]
-        //public void Oneway_bus_is_singleton()
-        //{
-        //    var container = ObjectFactory.Container;
-        //    new OnewayRhinoServiceBusConfiguration()
-        //        .UseStructureMap(container)
-        //        .Configure();
+        [Fact]
+        public void LoadBalancer_is_singleton()
+        {
+            var container = new UnityContainer();
+            new LoadBalancerConfiguration()
+                .UseUnity(container)
+                .UseStandaloneConfigurationFile("LoadBalancer.config")
+                .Configure();
 
-        //    var oneWayBus = container.GetInstance<IOnewayBus>();
-        //    var second = container.GetInstance<IOnewayBus>();
-        //    Assert.Same(oneWayBus, second);
-        //}
+            var startable = container.Resolve<IStartable>();
+            var loadBalancer = container.Resolve<MsmqLoadBalancer>();
+            Assert.Same(startable, loadBalancer);
+        }
 
-        //[Fact]
-        //public void RhinoQueues_bus_is_registered()
-        //{
-        //    var container = new Container();
-        //    new RhinoServiceBusConfiguration()
-        //        .UseStructureMap(container)
-        //        .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
-        //        .Configure();
+        [Fact]
+        public void Registers_logging_module()
+        {
+            var container = new UnityContainer();
+            new RhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
 
-        //    var bus = container.GetInstance<IServiceBus>();
-        //    Assert.NotNull(bus);
-        //}
+            var loggingModule = container.Resolve<MessageLoggingModule>();
+            Assert.NotNull(loggingModule);
+        }
 
-        //[Fact]
-        //public void LoadBalancer_is_singleton()
-        //{
-        //    var container = new Container();
-        //    new LoadBalancerConfiguration()
-        //        .UseStructureMap(container)
-        //        .UseStandaloneConfigurationFile("LoadBalancer.config")
-        //        .Configure();
+        [Fact]
+        public void Registers_load_balancer_module()
+        {
+            var container = new UnityContainer();
+            new RhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .UseStandaloneConfigurationFile("LoadBalancer/BusWithLoadBalancer.config")
+                .Configure();
 
-        //    var startable = container.GetInstance<IStartable>();
-        //    var loadBalancer = container.GetInstance<MsmqLoadBalancer>();
-        //    Assert.Same(startable, loadBalancer);
-        //}
-
-        //[Fact]
-        //public void Registers_logging_module()
-        //{
-        //    var container = new Container();
-        //    new RhinoServiceBusConfiguration()
-        //        .UseStructureMap(container)
-        //        .UseStandaloneConfigurationFile("BusWithLogging.config")
-        //        .Configure();
-
-        //    var loggingModule = container.GetInstance<MessageLoggingModule>();
-        //    Assert.NotNull(loggingModule);
-        //}
-
-        //[Fact]
-        //public void Registers_load_balancer_module()
-        //{
-        //    var container = new Container();
-        //    new RhinoServiceBusConfiguration()
-        //        .UseStructureMap(container)
-        //        .UseStandaloneConfigurationFile("LoadBalancer/BusWithLoadBalancer.config")
-        //        .Configure();
-
-        //    var loadBalancerMessageModule = container.GetInstance<LoadBalancerMessageModule>();
-        //    Assert.NotNull(loadBalancerMessageModule);
-        //}
+            var loadBalancerMessageModule = container.Resolve<LoadBalancerMessageModule>();
+            Assert.NotNull(loadBalancerMessageModule);
+        }
     }
 }
