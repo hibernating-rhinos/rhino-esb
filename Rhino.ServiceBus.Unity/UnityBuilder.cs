@@ -45,10 +45,7 @@ namespace Rhino.ServiceBus.Unity
                 container.RegisterInstance(container);
 
             container.RegisterType<IServiceLocator, UnityServiceLocator>();
-
-            typeof(IServiceBus).Assembly.GetTypes()
-                .Where(t => typeof(IBusConfigurationAware).IsAssignableFrom(t) && !(t.Equals(typeof(IBusConfigurationAware)))).ToList()
-                .ForEach(type => container.RegisterType(typeof(IBusConfigurationAware), type, Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager()));
+            container.RegisterTypesFromAssembly<IBusConfigurationAware>(typeof(IServiceBus).Assembly);
 
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
             {
@@ -57,21 +54,21 @@ namespace Rhino.ServiceBus.Unity
 
             foreach (var type in config.MessageModules)
             {
-                if (container.IsRegistered(type) == false)
+                if (!container.IsRegistered(type))
                     container.RegisterType(type, type.FullName);
             }
 
-            container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager())
-                .RegisterType(typeof(IMessageSerializer), config.SerializerType, new ContainerControlledLifetimeManager())
-                .RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager());
+            container.RegisterType(typeof (IMessageSerializer), config.SerializerType, new ContainerControlledLifetimeManager());
+            container.RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
         }
 
         public void RegisterBus()
         {
             var busConfig = (RhinoServiceBusConfiguration)config;
 
-            container.RegisterType<IDeploymentAction, CreateLogQueueAction>()
-                .RegisterType<IDeploymentAction, CreateQueuesAction>();
+            container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString())
+                .RegisterType<IDeploymentAction, CreateQueuesAction>(Guid.NewGuid().ToString());
 
             container.RegisterType<DefaultServiceBus>(new ContainerControlledLifetimeManager())
                 .RegisterType<IStartableServiceBus, DefaultServiceBus>(
@@ -148,8 +145,7 @@ namespace Rhino.ServiceBus.Unity
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new InjectionParameter<Uri>(loadBalancerEndpoint),
-                    new ResolvedParameter<IEndpointRouter>()
-                    ));
+                    new ResolvedParameter<IEndpointRouter>()));
         }
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
@@ -205,12 +201,7 @@ namespace Rhino.ServiceBus.Unity
                     new InjectionParameter<bool>(config.ConsumeInTransaction),
                     new ResolvedParameter<IMessageBuilder<Message>>()));
 
-            typeof(IMsmqTransportAction).Assembly.GetTypes()
-                .Where(t => typeof(IMsmqTransportAction).IsAssignableFrom(t)
-                            && !(t.Equals(typeof(IMsmqTransportAction)))
-                            && !(t.Equals(typeof(ErrorAction)))).ToList()
-                .ForEach(type => container.RegisterType(typeof(IMsmqTransportAction), type, Guid.NewGuid().ToString(), 
-                                                        new ContainerControlledLifetimeManager()));
+            container.RegisterTypesFromAssembly<IMsmqTransportAction>(typeof(IMsmqTransportAction).Assembly, typeof(ErrorAction));
         }
 
         public void RegisterQueueCreation()

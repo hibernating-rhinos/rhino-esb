@@ -69,8 +69,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsumerExtension.cs" />
+    <Compile Include="ContainerExtensions.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="UnityBootstrapper.cs" />
     <Compile Include="UnityBuilder.cs" />
+    <Compile Include="UnityLoadBalancerBootStrapper.cs" />
     <Compile Include="UnityServiceLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
