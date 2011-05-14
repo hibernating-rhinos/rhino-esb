@@ -121,7 +121,6 @@
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\StructureMap\ContainerTests.cs" />
-    <Compile Include="Containers\TestConsumer.cs" />
     <Compile Include="Containers\Unity\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Unity\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />

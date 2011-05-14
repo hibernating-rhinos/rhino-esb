@@ -110,4 +110,12 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
             Assert.NotNull(loadBalancerMessageModule);
         }
     }
+
+    public class TestConsumer : ConsumerOf<string>
+    {
+        public void Consume(string message)
+        {
+
+        }
+    }
 }
