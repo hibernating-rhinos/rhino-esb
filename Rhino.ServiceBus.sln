@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
+﻿Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Starbucks", "Starbucks", "{64DC50EF-F634-4E75-8375-ACC6D42E2DB4}"
 EndProject
@@ -19,11 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.StructureM
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containers", "Containers", "{2271E8BF-21FF-40B1-A284-F707951F5EA2}"
 EndProject
-<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Autofac", "Rhino.ServiceBus.Autofac\Rhino.ServiceBus.Autofac.csproj", "{E18B8442-40AF-4FA2-9FB0-FC05FC994CEA}"
-=======
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.ServiceBus.Unity", "Rhino.ServiceBus.Unity\Rhino.ServiceBus.Unity.csproj", "{DB720C4D-1508-4510-AED4-80C905095CE5}"
->>>>>>> Unity impl. started
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
