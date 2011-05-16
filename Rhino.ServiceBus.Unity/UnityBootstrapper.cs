@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using Microsoft.Practices.Unity;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Hosting;
@@ -6,15 +7,15 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Unity
 {
-    public class UnityBootStrapper : AbstractBootStrapper
+    public abstract class UnityBootStrapper : AbstractBootStrapper
     {
         private IUnityContainer container;
 
-        public UnityBootStrapper()
+        protected UnityBootStrapper()
         {
         }
 
-        public UnityBootStrapper(IUnityContainer container)
+        protected UnityBootStrapper(IUnityContainer container)
         {
             this.container = container;
         }
@@ -37,7 +38,13 @@ namespace Rhino.ServiceBus.Unity
             container.RegisterTypesFromAssembly<IDeploymentAction>(Assembly);
             container.RegisterTypesFromAssembly<IEnvironmentValidationAction>(Assembly);
 
-            var consumers = Assembly.GetTypes().Where(type =>
+            ConfigureConsumers(typeof(IServiceBus).Assembly);
+            ConfigureConsumers(Assembly);
+        }
+
+        private void ConfigureConsumers(Assembly assemblyToScan)
+        {
+            var consumers = assemblyToScan.GetTypes().Where(type =>
                                                       typeof (IMessageConsumer).IsAssignableFrom(type) &&
                                                       typeof (IOccasionalMessageConsumer).IsAssignableFrom(type) == false &&
                                                       IsTypeAcceptableForThisBootStrapper(type)).ToList();

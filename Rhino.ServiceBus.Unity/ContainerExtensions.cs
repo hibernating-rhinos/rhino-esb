@@ -10,8 +10,17 @@ namespace Rhino.ServiceBus.Unity
         public static void RegisterTypesFromAssembly(this IUnityContainer container, Assembly assemlyToScan, Type basedOn, params Type[] exclude)
         {
             assemlyToScan.GetTypes()
-                .Where(t => basedOn.IsAssignableFrom(t) && !t.Equals(basedOn) && !t.IsInterface && !exclude.Contains(t)).ToList()
+                .Where(t => IsMatch(t, basedOn, exclude)).ToList()
                 .ForEach(type => container.RegisterType(basedOn, type, Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager()));
+        }
+
+        private static bool IsMatch(Type candidate, Type basedOn, Type[] exclude)
+        {
+            return basedOn.IsAssignableFrom(candidate)
+                   && !candidate.Equals(basedOn)
+                   && !candidate.IsInterface
+                   && !candidate.IsAbstract
+                   && !exclude.Contains(candidate);
         }
 
         public static void RegisterTypesFromAssembly<TBasedOn>(this IUnityContainer container, Assembly assemlyToScan, params Type[] exclude)

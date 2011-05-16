@@ -77,7 +77,7 @@ namespace Rhino.ServiceBus.Unity
                         new ResolvedParameter<ITransport>(),
                         new ResolvedParameter<ISubscriptionStorage>(),
                         new ResolvedParameter<IReflection>(),
-                        new ResolvedArrayParameter<IMessageModule>(),
+                        new ResolvedParameter<IMessageModule[]>(),
                         new InjectionParameter<MessageOwner[]>(busConfig.MessageOwners.ToArray()),
                         new ResolvedParameter<IEndpointRouter>()))
                 .RegisterType<IServiceBus, DefaultServiceBus>()
@@ -97,7 +97,8 @@ namespace Rhino.ServiceBus.Unity
                     new InjectionParameter<int>(loadBalancerConfig.ThreadCount),
                     new InjectionParameter<Uri>(loadBalancerConfig.SecondaryLoadBalancer),
                     new InjectionParameter<TransactionalOptions>(loadBalancerConfig.Transactional),
-                    new ResolvedParameter<IMessageBuilder<Message>>()))
+                    new ResolvedParameter<IMessageBuilder<Message>>()),
+                new InjectionProperty("ReadyForWorkListener"))
                 .RegisterType<IStartable, MsmqLoadBalancer>(new ContainerControlledLifetimeManager());
 
             container.RegisterType<IDeploymentAction, CreateLoadBalancerQueuesAction>(Guid.NewGuid().ToString());
@@ -141,7 +142,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
-            container.RegisterType<LoadBalancerMessageModule>(
+            container.RegisterType<IMessageModule, LoadBalancerMessageModule>(Guid.NewGuid().ToString(),
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new InjectionParameter<Uri>(loadBalancerEndpoint),
@@ -150,7 +151,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            container.RegisterType<MessageLoggingModule>(
+            container.RegisterType<IMessageModule, MessageLoggingModule>(Guid.NewGuid().ToString(),
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEndpointRouter>(),
@@ -174,7 +175,7 @@ namespace Rhino.ServiceBus.Unity
 
             container.RegisterType<IMessageBuilder<Message>, MsmqMessageBuilder>(
                 new ContainerControlledLifetimeManager());
-            container.RegisterType<IMsmqTransportAction, ErrorAction>(
+            container.RegisterType<IMsmqTransportAction, ErrorAction>(Guid.NewGuid().ToString(),
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new InjectionParameter<int>(config.NumberOfRetries),
@@ -194,7 +195,7 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IQueueStrategy>(),
                     new InjectionParameter<Uri>(config.Endpoint),
                     new InjectionParameter<int>(config.ThreadCount),
-                    new ResolvedArrayParameter<IMsmqTransportAction>(),
+                    new ResolvedParameter<IMsmqTransportAction[]>(),
                     new ResolvedParameter<IEndpointRouter>(),
                     new InjectionParameter<IsolationLevel>(config.IsolationLevel),
                     new InjectionParameter<TransactionalOptions>(config.Transactional),
