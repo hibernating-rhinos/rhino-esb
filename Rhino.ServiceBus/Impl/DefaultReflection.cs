@@ -269,7 +269,7 @@ namespace Rhino.ServiceBus.Impl
 			try
 			{
 				Type type = sagaFinder.GetType();
-				MethodInfo method = type.GetMethod("FindBy");
+                MethodInfo method = type.GetMethod("FindBy", new[] { msg.GetType()} );
 				return method.Invoke(sagaFinder, new object[] { msg });
 			}
 			catch (TargetInvocationException e)
