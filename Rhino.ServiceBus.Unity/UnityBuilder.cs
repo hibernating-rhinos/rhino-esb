@@ -142,7 +142,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
-            container.RegisterType<IMessageModule, LoadBalancerMessageModule>(Guid.NewGuid().ToString(),
+            container.RegisterType<IMessageModule, LoadBalancerMessageModule>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new InjectionParameter<Uri>(loadBalancerEndpoint),
@@ -151,7 +151,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            container.RegisterType<IMessageModule, MessageLoggingModule>(Guid.NewGuid().ToString(),
+            container.RegisterType<IMessageModule, MessageLoggingModule>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEndpointRouter>(),
