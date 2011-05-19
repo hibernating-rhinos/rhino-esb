@@ -10,3 +10,4 @@ nuget/
 _ReSharper.*/
 AssemblyInfo.cs
 *.user
+push.cmd
