@@ -36,7 +36,8 @@ task Init -depends Clean {
 		"$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs",
-		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs"
+		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Unity\Properties\AssemblyInfo.cs"
 	); 
 		
 	$infos | foreach { Generate-Assembly-Info `
