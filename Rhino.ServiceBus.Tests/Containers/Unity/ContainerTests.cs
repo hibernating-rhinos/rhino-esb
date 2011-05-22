@@ -93,7 +93,7 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
                 .UseStandaloneConfigurationFile("BusWithLogging.config")
                 .Configure();
 
-            var loggingModule = container.Resolve<MessageLoggingModule>();
+            var loggingModule = container.Resolve<MessageLoggingModule>(typeof(MessageLoggingModule).FullName);
             Assert.NotNull(loggingModule);
         }
 
@@ -106,7 +106,7 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
                 .UseStandaloneConfigurationFile("LoadBalancer/BusWithLoadBalancer.config")
                 .Configure();
 
-            var loadBalancerMessageModule = container.Resolve<LoadBalancerMessageModule>();
+            var loadBalancerMessageModule = container.Resolve<LoadBalancerMessageModule>(typeof(LoadBalancerMessageModule).FullName);
             Assert.NotNull(loadBalancerMessageModule);
         }
     }

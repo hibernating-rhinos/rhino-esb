@@ -52,10 +52,11 @@ namespace Rhino.ServiceBus.Unity
                 configurationAware.Configure(config, this);
             }
 
-            foreach (var type in config.MessageModules)
+            foreach (var messageModule in config.MessageModules)
             {
-                if (!container.IsRegistered(type))
-                    container.RegisterType(type, type.FullName);
+                Type module = messageModule;
+                if (!container.IsRegistered(module))
+                    container.RegisterType(typeof(IMessageModule), module, module.FullName, new ContainerControlledLifetimeManager());
             }
 
             container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager());
@@ -142,7 +143,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
-            container.RegisterType<IMessageModule, LoadBalancerMessageModule>(
+            container.RegisterType<LoadBalancerMessageModule>(typeof(LoadBalancerMessageModule).FullName,
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new InjectionParameter<Uri>(loadBalancerEndpoint),
@@ -151,7 +152,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            container.RegisterType<IMessageModule, MessageLoggingModule>(
+            container.RegisterType<MessageLoggingModule>(typeof(MessageLoggingModule).FullName,
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEndpointRouter>(),
