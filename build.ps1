@@ -98,8 +98,20 @@ task Release  -depends Test{
     	$build_dir\Rhino.ServiceBus.xml `
     	$build_dir\Rhino.ServiceBus.Castle.xml `
     	$build_dir\Rhino.ServiceBus.Castle.dll `
+    	$build_dir\Rhino.ServiceBus.Castle.pdb `
     	$build_dir\Rhino.ServiceBus.StructureMap.xml `
+    	$build_dir\StructureMap.dll `
     	$build_dir\Rhino.ServiceBus.StructureMap.dll `
+    	$build_dir\Rhino.ServiceBus.StructureMap.pdb `
+    	$build_dir\Autofac.dll `
+    	$build_dir\Rhino.ServiceBus.Autofac.xml `
+    	$build_dir\Rhino.ServiceBus.Autofac.dll `
+    	$build_dir\Rhino.ServiceBus.Autofac.pdb `
+    	$build_dir\Microsoft.Practices.Unity.dll `
+    	$build_dir\Microsoft.Practices.Unity.Interception.dll `
+    	$build_dir\Rhino.ServiceBus.Unity.xml `
+    	$build_dir\Rhino.ServiceBus.Unity.dll `
+    	$build_dir\Rhino.ServiceBus.Unity.pdb `
     	$build_dir\Rhino.ServiceBus.Host.exe `
     	$build_dir\Rhino.ServiceBus.Host.pdb `
     	$build_dir\Wintellect.Threading.dll `
