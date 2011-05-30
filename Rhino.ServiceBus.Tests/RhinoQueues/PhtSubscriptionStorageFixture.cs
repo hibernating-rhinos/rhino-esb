@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.RhinoQueues;
@@ -20,7 +22,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 Directory.Delete("test.esent", true);
 
             storage = new PhtSubscriptionStorage("test.esent",
-                                                 new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()),
+            new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer())),
                                                  new DefaultReflection());
             storage.Initialize();
         }

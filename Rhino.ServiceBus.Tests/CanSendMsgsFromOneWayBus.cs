@@ -1,7 +1,6 @@
 using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
@@ -15,9 +14,11 @@ namespace Rhino.ServiceBus.Tests
 
         public CanSendMsgsFromOneWayBus()
         {
-            container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container.Register(Component.For<StringConsumer>());
+            container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
+            container.Register(Component.For<StringConsumer>().LifeStyle.Transient);
             StringConsumer.Value = null;
             StringConsumer.Event = new ManualResetEvent(false);
         }
@@ -36,7 +37,7 @@ namespace Rhino.ServiceBus.Tests
                         Endpoint = bus.Endpoint.Uri,
                         Name = "System",
                     },
-                }, new MsmqMessageBuilder(container.Resolve<IMessageSerializer>(), container.Kernel));
+                }, new MsmqMessageBuilder(container.Resolve<IMessageSerializer>(), container.Resolve<IServiceLocator>()));
 
                 oneWay.Send("hello there, one way");
 
@@ -54,9 +55,12 @@ namespace Rhino.ServiceBus.Tests
             {           
                 bus.Start();
 
-                using(var c = new WindsorContainer(new XmlInterpreter("OneWayBus.config")))
+                using (var c = new WindsorContainer())
                 {
-                    c.Kernel.AddFacility("one.way.rhino.esb", new OnewayRhinoServiceBusFacility());
+                    new OnewayRhinoServiceBusConfiguration()
+                        .UseCastleWindsor(c)
+                        .UseStandaloneConfigurationFile("OneWayBus.config")
+                        .Configure();
                     c.Resolve<IOnewayBus>().Send("hello there, one way");
                 }
 

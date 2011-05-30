@@ -7,6 +7,7 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Actions;
 using System.Transactions;
+using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Impl
@@ -24,6 +25,8 @@ namespace Rhino.ServiceBus.Impl
         protected override void RegisterComponents()
         {
             Kernel.Register(
+                Component.For<IConsumerLocator>()
+                    .ImplementedBy<CastleConsumerLocator>(),
                 Component.For<IDeploymentAction>()
                     .ImplementedBy<CreateLogQueueAction>(),
                 Component.For<IDeploymentAction>()

@@ -1,12 +1,7 @@
 using System;
-using System.Messaging;
-using Castle.Core;
-using Castle.Core.Configuration;
-using Castle.MicroKernel.Registration;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
-using Rhino.ServiceBus.Msmq.TransportActions;
 
 namespace Rhino.ServiceBus.Config
 {
@@ -30,58 +25,25 @@ namespace Rhino.ServiceBus.Config
             DetectQueueStrategy();
         }
 
-        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusConfiguration configuration, IBusContainerBuilder builder)
         {
-            if (facility.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
+            if (!(configuration is RhinoServiceBusConfiguration) && !(configuration is LoadBalancer.LoadBalancerConfiguration))
                 return;
 
-            if(facility.UseFlatQueue)
+            if (configuration.Endpoint.Scheme.Equals("msmq", StringComparison.InvariantCultureIgnoreCase) == false)
+                return;
+
+            if (configuration.UseFlatQueue)
             {
                 queueStrategyImpl = typeof (FlatQueueStrategy);
             }
 
-            if(facility.DisableAutoQueueCreation==false)
+            if (configuration.DisableAutoQueueCreation == false)
             {
-                facility.Kernel.Register(Component.For<QueueCreationModule>());
+                builder.RegisterQueueCreation();
             }
 
-            facility.Kernel.Register(
-                Component.For<IMessageBuilder<Message>>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy<MsmqMessageBuilder>(),
-                Component.For<IQueueStrategy>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(queueStrategyImpl)
-                    .DependsOn(new { endpoint = facility.Endpoint }),
-                Component.For<IMsmqTransportAction>()
-                    .ImplementedBy<ErrorAction>()
-                    .DependsOn(new { numberOfRetries = facility.NumberOfRetries }),
-                Component.For<ISubscriptionStorage>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqSubscriptionStorage))
-                    .DependsOn(new
-                    {
-                        queueBusListensTo = facility.Endpoint
-                    }),
-                Component.For<ITransport>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqTransport))
-                    .DependsOn(new
-                    {
-                        threadCount = facility.ThreadCount,
-                        endpoint = facility.Endpoint,
-                        queueIsolationLevel = facility.IsolationLevel,
-                        numberOfRetries = facility.NumberOfRetries,
-                        transactional = facility.Transactional,
-                        consumeInTransaction = facility.ConsumeInTransaction,
-                    }),
-                AllTypes.FromAssembly(typeof(IMsmqTransportAction).Assembly)
-                    .BasedOn<IMsmqTransportAction>()
-                    .Unless(x => x == typeof(ErrorAction))
-                    .WithService.FirstInterface()
-                    .Configure(registration =>
-                               registration.LifeStyle.Is(LifestyleType.Singleton))
-                );
+            builder.RegisterMsmqTransport(queueStrategyImpl);
         }
     }
 }

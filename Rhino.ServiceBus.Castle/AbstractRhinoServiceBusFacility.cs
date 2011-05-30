@@ -44,12 +44,6 @@ namespace Rhino.ServiceBus.Impl
 
 		public TransactionalOptions Transactional { get; set; }
 
-        //yuck
-        public new IKernel Kernel
-        {
-            get { return base.Kernel; }
-        }
-
         public IsolationLevel IsolationLevel
         {
             get { return queueIsolationLevel; }

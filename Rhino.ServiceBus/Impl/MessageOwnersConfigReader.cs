@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using Castle.Core.Configuration;
+using Rhino.ServiceBus.Config;
 
 namespace Rhino.ServiceBus.Impl
 {
     public class MessageOwnersConfigReader
     {
-        private readonly IConfiguration configuration;
+        private readonly BusConfigurationSection configuration;
         private readonly ICollection<MessageOwner> messageOwners;
 
-        public MessageOwnersConfigReader(IConfiguration configuration, ICollection<MessageOwner> messageOwners)
+        public MessageOwnersConfigReader(BusConfigurationSection configuration, ICollection<MessageOwner> messageOwners)
         {
             this.configuration = configuration;
             this.messageOwners = messageOwners;
@@ -18,20 +18,17 @@ namespace Rhino.ServiceBus.Impl
         public string EndpointScheme { get; private set; }
         public void ReadMessageOwners()
         {
-            IConfiguration messageConfig = configuration.Children["messages"];
+            var messageConfig = configuration.MessageOwners;
             if (messageConfig == null)
                 throw new ConfigurationErrorsException("Could not find 'messages' node in configuration");
 
-            foreach (IConfiguration child in messageConfig.Children)
+            foreach (MessageOwnerElement child in messageConfig)
             {
-                if (child.Name != "add")
-                    throw new ConfigurationErrorsException("Unknown node 'messages/" + child.Name + "'");
-
-                string msgName = child.Attributes["name"];
+                string msgName = child.Name;
                 if (string.IsNullOrEmpty(msgName))
                     throw new ConfigurationErrorsException("Invalid name element in the <messages/> element");
 
-                string uriString = child.Attributes["endpoint"];
+                string uriString = child.Endpoint;
                 Uri ownerEndpoint;
                 try
                 {
@@ -47,7 +44,7 @@ namespace Rhino.ServiceBus.Impl
                 }
 
                 bool? transactional = null;
-                string transactionalString = child.Attributes["transactional"];
+                string transactionalString = child.Transactional;
                 if (string.IsNullOrEmpty(transactionalString) == false)
                 {
                     bool temp;

@@ -40,6 +40,11 @@ namespace Rhino.ServiceBus.Hosting
             assemblyLocation = Path.GetDirectoryName(assemblyPath);
         }
 
+        protected string AssemblyName
+        {
+            get { return assemblyName; }
+        }
+
 		public IApplicationHost ApplicationHost { get { return current.ApplicationHost; } }
 
         public void Start()

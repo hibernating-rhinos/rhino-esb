@@ -19,10 +19,12 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void it_should_add_custom_header_to_headers_collection_for_normal_messages()
         {
-            using (var container = new WindsorContainer(new XmlInterpreter()))
+            using (var container = new WindsorContainer())
             {
                 container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
-                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+                new RhinoServiceBusConfiguration()
+                    .UseCastleWindsor(container)
+                    .Configure();
                 var builder = container.Resolve<IMessageBuilder<Message>>();
                 Message afterBuild = null;
                 builder.MessageBuilt += msg => afterBuild = msg;
@@ -44,7 +46,9 @@ namespace Rhino.ServiceBus.Tests
             using (var container = new WindsorContainer(new XmlInterpreter()))
             {
                 container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
-                container.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+                new RhinoServiceBusConfiguration()
+                    .UseCastleWindsor(container)
+                    .Configure();
                 var transport = container.Resolve<ITransport>();
                 MsmqCurrentMessageInformation currentMessageInformation = null;
                 var waitHandle = new ManualResetEvent(false);

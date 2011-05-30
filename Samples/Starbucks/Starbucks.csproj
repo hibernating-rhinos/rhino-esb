@@ -79,6 +79,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
+      <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
+      <Name>Rhino.ServiceBus.Castle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>

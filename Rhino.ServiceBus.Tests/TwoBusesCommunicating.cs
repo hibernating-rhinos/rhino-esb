@@ -17,10 +17,16 @@ namespace Rhino.ServiceBus.Tests
         public TwoBusesCommunicating()
         {
             container1 = new WindsorContainer(new XmlInterpreter());
-            container2 = new WindsorContainer(new XmlInterpreter("AnotherBus.config"));
+            container2 = new WindsorContainer();
 
-            container1.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
-            container2.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container1)
+                .Configure();
+
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container2)
+                .UseStandaloneConfigurationFile("AnotherBus.config")
+                .Configure();
 
             container1.Register(Component.For<PingHandler>());
             container2.Register(Component.For<PongHandler>());

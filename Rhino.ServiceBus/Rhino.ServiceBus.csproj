@@ -39,9 +39,6 @@
     <Reference Include="Castle.Core">
       <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Windsor">
-      <HintPath>..\SharedLibs\build\Castle.Windsor.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\build\Esent.Interop.dll</HintPath>
     </Reference>
@@ -72,9 +69,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\BusConfigurationSection.cs" />
+    <Compile Include="Config\BusElement.cs" />
+    <Compile Include="Config\ConsumerInterceptor.cs" />
     <Compile Include="Config\IBusConfigurationAware.cs" />
+    <Compile Include="Config\IConsumerInterceptor.cs" />
+    <Compile Include="Config\KeyElement.cs" />
+    <Compile Include="Config\LoadBalancerConfiguration.cs" />
+    <Compile Include="Config\LoadBalancerElement.cs" />
+    <Compile Include="Config\LoadBalancerEndpointConfiguration.cs" />
     <Compile Include="Config\LoggingConfiguration.cs" />
+    <Compile Include="Config\MessageOwnerElement.cs" />
+    <Compile Include="Config\MessageOwnerElementCollection.cs" />
+    <Compile Include="Config\OneWayBusConfiguration.cs" />
     <Compile Include="Config\SecurityConfiguration.cs" />
+    <Compile Include="Config\SecurityElement.cs" />
     <Compile Include="ConsumerOf.cs" />
     <Compile Include="Convertors\ThrowingWireEcryptedStringConvertor.cs" />
     <Compile Include="Convertors\WireEcryptedStringConvertor.cs" />
@@ -91,12 +100,16 @@
     <Compile Include="Hosting\AbstractBootStrapper.cs" />
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
-    <Compile Include="Hosting\RemoteAppDomainLoadBalancerHost.cs" />
     <Compile Include="Hosting\RhinoQueuesHostConfiguration.cs" />
     <Compile Include="ICustomizeMessageHeaders.cs" />
+    <Compile Include="Impl\DefaultHandler.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />
     <Compile Include="Endpoint.cs" />
+    <Compile Include="Config\IBusContainerBuilder.cs" />
     <Compile Include="Internal\IEndpointRouter.cs" />
+    <Compile Include="Internal\IHandler.cs" />
+    <Compile Include="Internal\IServiceLocator.cs" />
+    <Compile Include="Internal\IStartable.cs" />
     <Compile Include="IServiceBusAware.cs" />
     <Compile Include="Impl\DefaultServiceBus.cs" />
     <Compile Include="Impl\DisposableAction.cs" />
@@ -106,7 +119,6 @@
     <Compile Include="Exceptions\MessagePublicationException.cs" />
     <Compile Include="Exceptions\SubscriptionException.cs" />
     <Compile Include="Exceptions\TransportException.cs" />
-    <Compile Include="LoadBalancer\LoadBalancerHost.cs" />
     <Compile Include="LoadBalancer\MsmqLoadBalancer.cs" />
     <Compile Include="MessageModules\LoadBalancerMessageModule.cs" />
     <Compile Include="Messages\AcceptingWork.cs" />
@@ -122,7 +134,7 @@
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
     <Compile Include="Msmq\TransportState.cs" />
     <Compile Include="Sagas\Persisters\InMemorySagaPersister.cs" />
-    <Compile Include="Impl\RhinoServiceBusFacility.cs" />
+    <Compile Include="Impl\RhinoServiceBusConfiguration.cs" />
     <Compile Include="Internal\IMessageConsumer.cs" />
     <Compile Include="Impl\DefaultReflection.cs" />
     <Compile Include="Internal\IMsmqTransport.cs" />
@@ -180,7 +192,6 @@
     <Compile Include="Actions\CreateReadyForWorkQueuesAction.cs" />
     <Compile Include="Actions\IDeploymentAction.cs" />
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
-    <Compile Include="Config\LoadBalancerConfiguration.cs" />
     <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
     <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Consumer.cs" />
@@ -192,18 +203,18 @@
     <Compile Include="Exceptions\LoadBalancerException.cs" />
     <Compile Include="Hosting\HostConfiguration.cs" />
     <Compile Include="Hosting\IApplicationHost.cs" />
-    <Compile Include="Impl\AbstractRhinoServiceBusFacility.cs" />
+    <Compile Include="Impl\AbstractRhinoServiceBusConfiguration.cs" />
     <Compile Include="Impl\MessageOwnersConfigReader.cs" />
     <Compile Include="Impl\MessageOwnersSelector.cs" />
     <Compile Include="Msmq\MsmqOnewayBus.cs" />
-    <Compile Include="Impl\OnewayRhinoServiceBusFacility.cs" />
+    <Compile Include="Impl\OnewayRhinoServiceBusConfiguration.cs" />
     <Compile Include="Impl\RijndaelEncryptionService.cs" />
     <Compile Include="Internal\ICustomElementSerializer.cs" />
     <Compile Include="Internal\IElementSerializationBehavior.cs" />
     <Compile Include="Internal\IEncryptionService.cs" />
     <Compile Include="IOnewayBus.cs" />
     <Compile Include="ISagaFinder.cs" />
-    <Compile Include="LoadBalancer\LoadBalancerFacility.cs" />
+    <Compile Include="LoadBalancer\LoadBalancerConfiguration.cs" />
     <Compile Include="LoadBalancer\MsmqReadyForWorkListener.cs" />
     <Compile Include="LoadBalancer\MsmqSecondaryLoadBalancer.cs" />
     <Compile Include="Messages\ReadyForWorkQueueUri.cs" />
@@ -229,6 +240,7 @@
     <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
     <Compile Include="Util\CurrentMessage.cs" />
+    <Compile Include="Util\ProxyUtil.cs" />
     <Compile Include="Util\SerializationExtensions.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />

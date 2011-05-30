@@ -21,7 +21,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             defaultStorageLocation = Directory.GetCurrentDirectory();
             alternateStorageLocation = Path.Combine(Directory.GetCurrentDirectory(), "Alternate");
 
-            storageDirectories = new[] {"test.esent", "test_subscriptions.esent"};
+            storageDirectories = new[] { "test.esent", "test_subscriptions.esent" };
 
             if (Directory.Exists(alternateStorageLocation))
                 Directory.Delete(alternateStorageLocation, true);
@@ -38,8 +38,10 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 .Receive("Rhino.ServiceBus.Tests", "rhino.queues://localhost/test_queue");
 
             container = new WindsorContainer();
-            container.Kernel.ConfigurationStore.AddFacilityConfiguration("rhino.esb", hostConfiguration.ToIConfiguration());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusConfiguration()
+                .UseConfiguration(hostConfiguration.ToBusConfiguration())
+                .UseCastleWindsor(container)
+                .Configure();
             bus = container.Resolve<IStartableServiceBus>();
             bus.Start();
         }

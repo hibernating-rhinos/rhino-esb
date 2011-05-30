@@ -30,32 +30,25 @@ task Clean -depends SetDerivedProperties {
 } 
 
 task Init -depends Clean {
-	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+	$infos = (
+		"$base_dir\Rhino.ServiceBus\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Tests\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Unity\Properties\AssemblyInfo.cs"
+	); 
 		
-	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.Tests\Properties\AssemblyInfo.cs" `
+	$infos | foreach { Generate-Assembly-Info `
+		-file $_ `
 		-title "Rhino Service Bus $version" `
 		-description "Developer friendly service bus for .NET" `
 		-company "Hibernating Rhinos" `
 		-product "Rhino Service Bus $version" `
 		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
-    
-    	Generate-Assembly-Info `
-		-file "$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs" `
-		-title "Rhino Service Bus $version" `
-		-description "Developer friendly service bus for .NET" `
-		-company "Hibernating Rhinos" `
-		-product "Rhino Service Bus $version" `
-		-version $version `
-		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009" `
+	}
 		
 	new-item $release_dir -itemType directory 
 	new-item $buildartifacts_dir -itemType directory 
@@ -76,7 +69,7 @@ task Test -depends Compile {
   $test_runner =  "$tools_dir\xUnit\"
   $old = pwd
   cd $build_dir
-  & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\Rhino.ServiceBus.Tests.dll"
+  & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\Rhino.ServiceBus.Tests.dll" /noshadow
   cd $old		
 }
 
@@ -88,6 +81,7 @@ task Release  -depends Test{
     	$build_dir\Castle.Core.xml `
     	$build_dir\Castle.Windsor.dll `
     	$build_dir\Castle.Windsor.xml `
+    	$build_dir\StructureMap.dll `
     	$build_dir\Esent.Interop.dll `
     	$build_dir\Esent.Interop.xml `
     	$build_dir\log4net.dll `
@@ -96,6 +90,10 @@ task Release  -depends Test{
     	$build_dir\Rhino.Queues.dll `
     	$build_dir\Rhino.ServiceBus.dll `
     	$build_dir\Rhino.ServiceBus.xml `
+    	$build_dir\Rhino.ServiceBus.Castle.xml `
+    	$build_dir\Rhino.ServiceBus.Castle.dll `
+    	$build_dir\Rhino.ServiceBus.StructureMap.xml `
+    	$build_dir\Rhino.ServiceBus.StructureMap.dll `
     	$build_dir\Rhino.ServiceBus.Host.exe `
     	$build_dir\Wintellect.Threading.dll `
     	$build_dir\Wintellect.Threading.xml `

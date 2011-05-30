@@ -1,21 +1,18 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Messaging;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
 using log4net;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Transport;
 using Rhino.ServiceBus.Util;
 using MessageType=Rhino.ServiceBus.Transport.MessageType;
 
 namespace Rhino.ServiceBus.Msmq
 {
-    public abstract class AbstractMsmqListener : IDisposable
+    public abstract class AbstractMsmqListener : IStartable
     {
         private readonly IQueueStrategy queueStrategy;
         private readonly Uri endpoint;

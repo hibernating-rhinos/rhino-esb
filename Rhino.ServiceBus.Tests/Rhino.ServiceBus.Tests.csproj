@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\SharedLibs\build\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
     </Reference>
@@ -42,6 +45,21 @@
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\SharedLibs\build\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.configuration.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.DistributedHashTable">
       <HintPath>..\SharedLibs\build\Rhino.DistributedHashTable.dll</HintPath>
@@ -54,6 +72,9 @@
     </Reference>
     <Reference Include="Rhino.Queues">
       <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -101,6 +122,12 @@
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
+    <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Autofac\ContainerTests.cs" />
+    <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\StructureMap\ContainerTests.cs" />
+    <Compile Include="Containers\Unity\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Unity\ContainerTests.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
@@ -143,6 +170,7 @@
     <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
     <Compile Include="RhinoQueues\WhenErrorOccurs.cs" />
     <Compile Include="RhinoQueues\WithDebugging.cs" />
+    <Compile Include="SagaFinderTests.cs" />
     <Compile Include="SagaTests.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Warnings\Warnings_would_be_generated.cs" />
@@ -157,6 +185,22 @@
     <Compile Include="XmlSerializerTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.ServiceBus.Autofac\Rhino.ServiceBus.Autofac.csproj">
+      <Project>{E18B8442-40AF-4FA2-9FB0-FC05FC994CEA}</Project>
+      <Name>Rhino.ServiceBus.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
+      <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
+      <Name>Rhino.ServiceBus.Castle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.StructureMap\Rhino.ServiceBus.StructureMap.csproj">
+      <Project>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</Project>
+      <Name>Rhino.ServiceBus.StructureMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Unity\Rhino.ServiceBus.Unity.csproj">
+      <Project>{DB720C4D-1508-4510-AED4-80C905095CE5}</Project>
+      <Name>Rhino.ServiceBus.Unity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>
@@ -172,6 +216,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="BusOnTransactionalQueue.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ReceiveOneWayBusRhinoQueues.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="OneWayBusRhinoQueues.config">
@@ -202,6 +252,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

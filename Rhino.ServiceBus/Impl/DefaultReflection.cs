@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using Castle.MicroKernel.Proxy;
 using log4net;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -270,7 +269,7 @@ namespace Rhino.ServiceBus.Impl
 			try
 			{
 				Type type = sagaFinder.GetType();
-				MethodInfo method = type.GetMethod("FindBy");
+                MethodInfo method = type.GetMethod("FindBy", new[] { msg.GetType()} );
 				return method.Invoke(sagaFinder, new object[] { msg });
 			}
 			catch (TargetInvocationException e)
