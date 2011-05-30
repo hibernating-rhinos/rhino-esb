@@ -84,19 +84,26 @@ task Release  -depends Test{
 
 	& $tools_dir\zip.exe -9 -A -j `
 	$release_dir\Rhino.ServiceBus.zip `
-	$build_dir\Castle.Core.dll `
+    	$build_dir\Castle.Core.dll `
+    	$build_dir\Castle.Core.pdb `
     	$build_dir\Castle.Core.xml `
     	$build_dir\Castle.Windsor.dll `
+    	$build_dir\Castle.Windsor.pdb `
     	$build_dir\Castle.Windsor.xml `
     	$build_dir\Esent.Interop.dll `
+    	$build_dir\Esent.Interop.pdb `
     	$build_dir\Esent.Interop.xml `
     	$build_dir\log4net.dll `
     	$build_dir\log4net.xml `
     	$build_dir\Rhino.PersistentHashTable.dll `
+    	$build_dir\Rhino.PersistentHashTable.pdb `
     	$build_dir\Rhino.Queues.dll `
+    	$build_dir\Rhino.Queues.pdb `
     	$build_dir\Rhino.ServiceBus.dll `
+    	$build_dir\Rhino.ServiceBus.pdb `
     	$build_dir\Rhino.ServiceBus.xml `
     	$build_dir\Rhino.ServiceBus.Host.exe `
+    	$build_dir\Rhino.ServiceBus.Host.pdb `
     	$build_dir\Wintellect.Threading.dll `
     	$build_dir\Wintellect.Threading.xml `
     	license.txt `
