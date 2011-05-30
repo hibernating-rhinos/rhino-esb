@@ -4,7 +4,7 @@ properties {
   $lib_for_build_dir = "$lib_dir\build\"
   $target_framework_version = "3.5"
   $sln_file = "$base_dir\Rhino.ServiceBus.sln" 
-  $version = "1.9.0.0"
+  $version = "2.0.0.0"
   $tools_dir = "$base_dir\Tools"
   $config = "Release"
   $run_tests = "false"
