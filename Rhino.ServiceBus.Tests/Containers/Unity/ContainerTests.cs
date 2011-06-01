@@ -1,11 +1,14 @@
 
 using System;
+using System.Linq;
 using Microsoft.Practices.Unity;
+using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
+using Rhino.ServiceBus.Msmq;
 using Xunit;
 
 namespace Rhino.ServiceBus.Tests.Containers.Unity
@@ -108,6 +111,32 @@ namespace Rhino.ServiceBus.Tests.Containers.Unity
 
             var loadBalancerMessageModule = container.Resolve<LoadBalancerMessageModule>(typeof(LoadBalancerMessageModule).FullName);
             Assert.NotNull(loadBalancerMessageModule);
+        }
+
+        [Fact]
+        public void QueueCreationModule_can_be_resolved()
+        {
+            var container = new UnityContainer();
+            new RhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .Configure();
+
+            var allBusAware = container.ResolveAll<IServiceBusAware>().ToList();
+            Assert.NotEmpty(allBusAware);
+            Assert.IsType<QueueCreationModule>(allBusAware.First());
+        }
+
+        [Fact]
+        public void DeploymentActions_can_be_resolved()
+        {
+            var container = new UnityContainer();
+            new RhinoServiceBusConfiguration()
+                .UseUnity(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
+
+            var actions = container.ResolveAll<IDeploymentAction>().ToList();
+            Assert.True(actions.Count >= 2);
         }
     }
 
