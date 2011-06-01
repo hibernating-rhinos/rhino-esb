@@ -60,7 +60,7 @@ namespace Rhino.ServiceBus.Unity
             }
 
             container.RegisterType<IReflection, DefaultReflection>(new ContainerControlledLifetimeManager());
-            container.RegisterType(typeof (IMessageSerializer), config.SerializerType, new ContainerControlledLifetimeManager());
+            container.RegisterType(typeof(IMessageSerializer), config.SerializerType, new ContainerControlledLifetimeManager());
             container.RegisterType<IEndpointRouter, EndpointRouter>(new ContainerControlledLifetimeManager());
         }
 
@@ -68,8 +68,7 @@ namespace Rhino.ServiceBus.Unity
         {
             var busConfig = (RhinoServiceBusConfiguration)config;
 
-            container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString())
-                .RegisterType<IDeploymentAction, CreateQueuesAction>(Guid.NewGuid().ToString());
+            container.RegisterType<IDeploymentAction, CreateQueuesAction>(Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager());
 
             container.RegisterType<DefaultServiceBus>(new ContainerControlledLifetimeManager())
                 .RegisterType<IStartableServiceBus, DefaultServiceBus>(
@@ -87,7 +86,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.RegisterType<MsmqLoadBalancer>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
@@ -102,7 +101,7 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionProperty("ReadyForWorkListener"))
                 .RegisterType<IStartable, MsmqLoadBalancer>(new ContainerControlledLifetimeManager());
 
-            container.RegisterType<IDeploymentAction, CreateLoadBalancerQueuesAction>(Guid.NewGuid().ToString());
+            container.RegisterType<IDeploymentAction, CreateLoadBalancerQueuesAction>(Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager());
         }
 
         public void RegisterSecondaryLoadBalancer()
@@ -121,7 +120,7 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IMessageBuilder<Message>>()))
                 .RegisterType<IStartable, MsmqSecondaryLoadBalancer>(new ContainerControlledLifetimeManager());
 
-            container.RegisterType<IDeploymentAction, CreateLoadBalancerQueuesAction>(Guid.NewGuid().ToString());
+            container.RegisterType<IDeploymentAction, CreateLoadBalancerQueuesAction>(Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager());
         }
 
         public void RegisterReadyForWork()
@@ -138,7 +137,7 @@ namespace Rhino.ServiceBus.Unity
                     new InjectionParameter<TransactionalOptions>(loadBalancerConfig.Transactional),
                     new ResolvedParameter<IMessageBuilder<Message>>()));
 
-            container.RegisterType<IDeploymentAction, CreateReadyForWorkQueuesAction>(Guid.NewGuid().ToString());
+            container.RegisterType<IDeploymentAction, CreateReadyForWorkQueuesAction>(Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager());
         }
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
@@ -157,13 +156,19 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionConstructor(
                     new ResolvedParameter<IEndpointRouter>(),
                     new InjectionParameter<Uri>(logEndpoint)));
+
+            container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString(), 
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<MessageLoggingModule>(typeof(MessageLoggingModule).FullName),
+                    new ResolvedParameter<ITransport>()));
         }
 
         public void RegisterMsmqTransport(Type queueStrategyType)
         {
             if (queueStrategyType.Equals(typeof(FlatQueueStrategy)))
             {
-                container.RegisterType(typeof (IQueueStrategy), queueStrategyType,
+                container.RegisterType(typeof(IQueueStrategy), queueStrategyType,
                                        new ContainerControlledLifetimeManager(),
                                        new InjectionConstructor(
                                            new ResolvedParameter<IEndpointRouter>(),
@@ -171,7 +176,7 @@ namespace Rhino.ServiceBus.Unity
             }
             else
             {
-                container.RegisterType(typeof (IQueueStrategy), queueStrategyType);
+                container.RegisterType(typeof(IQueueStrategy), queueStrategyType);
             }
 
             container.RegisterType<IMessageBuilder<Message>, MsmqMessageBuilder>(
@@ -208,7 +213,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterQueueCreation()
         {
-            container.RegisterType<QueueCreationModule>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IServiceBusAware, QueueCreationModule>(typeof(QueueCreationModule).FullName, new ContainerControlledLifetimeManager());
         }
 
         public void RegisterMsmqOneWay()
