@@ -34,12 +34,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(LibDir)' == '' ">
+    <LibDir>..\SharedLibs\4.0\</LibDir>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
+    <Reference Include="Rhino.Queues">
+      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
-    <Reference Include="StructureMap, Version=2.6.2.0, Culture=neutral, PublicKeyToken=e60ad81abae3c223, processorArchitecture=MSIL">
-      <HintPath>..\SharedLibs\build\StructureMap.dll</HintPath>
+    <Reference Include="StructureMap">
+      <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

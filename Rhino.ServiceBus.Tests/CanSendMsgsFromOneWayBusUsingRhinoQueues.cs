@@ -55,7 +55,7 @@ namespace Rhino.ServiceBus.Tests
                 {
                     oneWay.Send("hello there, one way");
 
-                    StringConsumer.Event.WaitOne();
+                    StringConsumer.Event.WaitOne(TimeSpan.FromSeconds(3));
                 }
 
                 Assert.Equal("hello there, one way", StringConsumer.Value);
@@ -77,7 +77,7 @@ namespace Rhino.ServiceBus.Tests
                         .Configure();
                     var oneway = c.Resolve<IOnewayBus>();
                     oneway.Send("hello there, one way");
-                    StringConsumer.Event.WaitOne();
+                    StringConsumer.Event.WaitOne(TimeSpan.FromSeconds(3));
                     Assert.Equal("hello there, one way", StringConsumer.Value);
                 }
 

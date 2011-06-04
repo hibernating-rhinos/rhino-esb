@@ -34,15 +34,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(LibDir)' == '' ">
+    <LibDir>..\SharedLibs\4.0\</LibDir>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
-      <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
+      <HintPath>$(LibDir)Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor">
-      <HintPath>..\SharedLibs\build\Castle.Windsor.dll</HintPath>
+      <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Queues">
-      <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
+      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

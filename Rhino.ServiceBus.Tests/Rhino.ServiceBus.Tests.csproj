@@ -33,18 +33,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(LibDir)' == '' ">
+    <LibDir>..\SharedLibs\4.0\</LibDir>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac">
-      <HintPath>..\SharedLibs\build\Autofac.dll</HintPath>
+      <HintPath>$(LibDir)Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core">
-      <HintPath>..\SharedLibs\build\Castle.Core.dll</HintPath>
+      <HintPath>$(LibDir)Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor">
-      <HintPath>..\SharedLibs\build\Castle.Windsor.dll</HintPath>
+      <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\SharedLibs\build\log4net.dll</HintPath>
+      <HintPath>..\SharedLibs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -62,16 +65,16 @@
       <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.configuration.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.DistributedHashTable">
-      <HintPath>..\SharedLibs\build\Rhino.DistributedHashTable.dll</HintPath>
+      <HintPath>..\SharedLibs\Rhino.DistributedHashTable.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks">
-      <HintPath>..\SharedLibs\build\Rhino.Mocks.dll</HintPath>
+      <HintPath>..\SharedLibs\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.PersistentHashTable">
-      <HintPath>..\SharedLibs\build\Rhino.PersistentHashTable.dll</HintPath>
+      <HintPath>$(LibDir)Rhino.PersistentHashTable.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Queues">
-      <HintPath>..\SharedLibs\build\Rhino.Queues.dll</HintPath>
+      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
@@ -91,11 +94,14 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="Wintellect.Threading">
+      <HintPath>..\SharedLibs\Wintellect.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="xunit">
-      <HintPath>..\SharedLibs\build\xunit.dll</HintPath>
+      <HintPath>..\SharedLibs\xunit.dll</HintPath>
     </Reference>
     <Reference Include="xunit.extensions">
-      <HintPath>..\SharedLibs\build\xunit.extensions.dll</HintPath>
+      <HintPath>..\SharedLibs\xunit.extensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
