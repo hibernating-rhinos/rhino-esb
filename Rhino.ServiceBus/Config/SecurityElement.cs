@@ -9,14 +9,15 @@ namespace Rhino.ServiceBus.Config
             SetupDefaults();
         }
 
-        private void SetupDefaults()
-        {
-            Properties.Add(new ConfigurationProperty("key", typeof(KeyElement), null));
-        }
-
         public string Key
         {
             get { return ((KeyElement) this["key"]).Value; }
+            set { this["key"] = new KeyElement{Value = value}; }
+        }
+
+        private void SetupDefaults()
+        {
+            Properties.Add(new ConfigurationProperty("key", typeof(KeyElement), null));
         }
     }
 }

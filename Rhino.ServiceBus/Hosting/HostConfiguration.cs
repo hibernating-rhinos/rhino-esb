@@ -11,6 +11,7 @@ namespace Rhino.ServiceBus.Hosting
         private int ThreadCount { get; set; }
         private int NumberOfRetries { get; set; }
         private string LoadBalancerEndpoint { get; set; }
+        private string SecurityKey { get; set; }
         protected string LogEndpoint { get; set; }
         private IDictionary<string, HostConfigMessageEndpoint> Messages { get; set; }
 
@@ -63,6 +64,12 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
+        public HostConfiguration Security(string key)
+        {
+            SecurityKey = key;
+            return this;
+        }
+
         public HostConfiguration Receive(string messageName, string endpoint)
         {
             return Receive(messageName, endpoint, false);
@@ -88,6 +95,7 @@ namespace Rhino.ServiceBus.Hosting
             config.Bus.LoadBalancerEndpoint = LoadBalancerEndpoint;
             config.Bus.LogEndpoint = LogEndpoint;
             config.Bus.Transactional = Transactional.ToString();
+            config.Security.Key = SecurityKey;
             foreach (var message in Messages)
             {
               config.MessageOwners.Add(new MessageOwnerElement
