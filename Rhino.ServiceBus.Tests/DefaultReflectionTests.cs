@@ -15,8 +15,8 @@ namespace Rhino.ServiceBus.Tests
         public void Can_roundtrip_uri()
         {
             object msg = new Uri("http://ayende.com");
-            var typeName = reflection.GetAssemblyQualifiedNameWithoutVersion(msg.GetType());
-            var type = reflection.GetType(typeName);
+            var typeName = reflection.GetNamespaceForXml(msg.GetType());
+            var type = reflection.GetTypeFromXmlNamespace(typeName);
             Assert.NotNull(type);
         }
 
@@ -68,14 +68,14 @@ namespace Rhino.ServiceBus.Tests
         public void Gets_assembly_name_without_version_for_generic_lists()
         {
             var list = new List<SomeMsg>();
-            var output = reflection.GetAssemblyQualifiedNameWithoutVersion(list.GetType());
+            var output = reflection.GetNamespaceForXml(list.GetType());
 
             Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
         }
         [Fact]
         public void Gets_assembly_name_without_version_for_generic_types_in_local_assemblies()
         {
-            var output = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(GenericConsumer<SomeMsg>));
+            var output = reflection.GetNamespaceForXml(typeof(GenericConsumer<SomeMsg>));
 
             Assert.DoesNotContain("Rhino.ServiceBus.Tests,Version=", output.Replace(" ", ""));
             Assert.NotNull(Type.GetType(output));  // still fail!!!
@@ -84,7 +84,7 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Gets_assembly_name_with_more_than_one_type_parameter()
         {
-            string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(Dictionary<object, object>));
+            string name = reflection.GetNamespaceForXml(typeof(Dictionary<object, object>));
             Assert.Equal(
                 typeof(Dictionary<object, object>).AssemblyQualifiedName,
                 name);
@@ -94,7 +94,7 @@ namespace Rhino.ServiceBus.Tests
         [Fact]
         public void Gets_assembly_name_without_version_for_generic_types_with_more_than_one_type_parameter_in_local_assemblies()
         {
-            string name = reflection.GetAssemblyQualifiedNameWithoutVersion(typeof(TestDictionary<string, string>));
+            string name = reflection.GetNamespaceForXml(typeof(TestDictionary<string, string>));
             var type = Type.GetType(name);
             Assert.NotNull(type);   // fail if not apply my fix!!!
         }
