@@ -34,15 +34,15 @@ namespace Rhino.ServiceBus.Internal
 
 		object InvokeSagaFinderFindBy(object sagaFinder, object msg);
 
-        string GetNamespaceForXml(Type type);
+        string GetNamespacePrefixForXml(Type type);
 
-        string GetAssemblyQualifiedNameWithoutVersion(Type type);
+        string GetNamespaceForXml(Type type);
 
         IEnumerable<string> GetProperties(object value);
 
         object Get(object instance, string name);
 
-        Type GetType(string type);
+        Type GetTypeFromXmlNamespace(string xmlNamespace);
 
         void InvokeAdd(object instance, object item);
 
