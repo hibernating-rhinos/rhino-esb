@@ -50,7 +50,7 @@ task Init -depends Clean {
 }
 
 task Compile40 -depends Init {
-  msbuild $sln_file /p:"OutDir=$40_build_dir;Configuration=$config;TargetFrameworkVersion=V4.0"
+  msbuild $sln_file /p:"OutDir=$40_build_dir;Configuration=$config;TargetFrameworkVersion=4.0"
 }
 
 task Compile35 -depends Init {
