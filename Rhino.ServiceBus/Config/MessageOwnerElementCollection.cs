@@ -12,7 +12,8 @@ namespace Rhino.ServiceBus.Config
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((MessageOwnerElement) element).Endpoint;
+            var ownerElement = (MessageOwnerElement) element;
+            return ownerElement.Endpoint + ownerElement.Name;
         }
 
         public void Add(MessageOwnerElement messageOwner)
