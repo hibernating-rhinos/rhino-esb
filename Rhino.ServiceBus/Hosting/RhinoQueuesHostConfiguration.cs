@@ -4,11 +4,23 @@ namespace Rhino.ServiceBus.Hosting
 {
     public class RhinoQueuesHostConfiguration : HostConfiguration
     {
-        private string Path { get; set; }
+        private string path;
+        private bool enablePerformanceCounters;
 
-        public HostConfiguration StoragePath(string path)
+        public RhinoQueuesHostConfiguration()
         {
-            Path = path;
+            enablePerformanceCounters = false;
+        }
+
+        public RhinoQueuesHostConfiguration StoragePath(string path)
+        {
+            this.path = path;
+            return this;
+        }
+
+        public RhinoQueuesHostConfiguration EnablePerformanceCounters()
+        {
+            enablePerformanceCounters = true;
             return this;
         }
 
@@ -16,10 +28,16 @@ namespace Rhino.ServiceBus.Hosting
         {
             var config = base.ToBusConfiguration();
 
-            if (string.IsNullOrEmpty(Path) == false)
-                config.Bus.Path = Path;
+            if (string.IsNullOrEmpty(path) == false)
+                config.Bus.Path = path;
+
+            config.Bus.EnablePerformanceCounters = enablePerformanceCounters;
 
             return config;
+        
         }
     }
 }
+
+
+

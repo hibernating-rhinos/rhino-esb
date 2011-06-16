@@ -188,7 +188,7 @@ namespace Rhino.ServiceBus.StructureMap
             });
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name)
+        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
         {
             container.Configure(c =>
             {
@@ -199,7 +199,8 @@ namespace Rhino.ServiceBus.StructureMap
                     .Ctor<Uri>().Is(config.Endpoint)
                     .Ctor<IsolationLevel>().Is(config.IsolationLevel)
                     .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
-                    .Ctor<string>().Is(Path.Combine(path, name + ".esent"));
+                    .Ctor<string>().Is(Path.Combine(path, name + ".esent"))
+                    .Ctor<bool>().Is(enablePerformanceCounters);
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
             });
         }

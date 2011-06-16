@@ -33,6 +33,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         private bool haveStarted;
         private readonly IsolationLevel queueIsolationLevel;
         private readonly int numberOfRetries;
+        private readonly bool enablePerformanceCounters;
         private readonly IMessageBuilder<MessagePayload> messageBuilder;
 
         [ThreadStatic]
@@ -50,11 +51,13 @@ namespace Rhino.ServiceBus.RhinoQueues
             string path,
             IsolationLevel queueIsolationLevel,
             int numberOfRetries,
+            bool enablePerformanceCounters,
             IMessageBuilder<MessagePayload> messageBuilder)
         {
             this.endpoint = endpoint;
             this.queueIsolationLevel = queueIsolationLevel;
             this.numberOfRetries = numberOfRetries;
+            this.enablePerformanceCounters = enablePerformanceCounters;
             this.messageBuilder = messageBuilder;
             this.endpointRouter = endpointRouter;
             this.messageSerializer = messageSerializer;
@@ -66,7 +69,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             threads = new Thread[threadCount];
 
             // This has to be the first subscriber to the transport events
-            // in order to successfuly handle the errors semantics
+            // in order to successfully handle the errors semantics
             new ErrorAction(numberOfRetries).Init(this);
             messageBuilder.Initialize(this.Endpoint);
         }
@@ -140,6 +143,10 @@ namespace Rhino.ServiceBus.RhinoQueues
                 port = 2200;
             queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
             queueManager.CreateQueues(queueName);
+
+            if (enablePerformanceCounters)
+                queueManager.EnablePerformanceCounters();
+
             queueManager.Start();
 
             queue = queueManager.GetQueue(queueName);

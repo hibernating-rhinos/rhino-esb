@@ -220,7 +220,7 @@ namespace Rhino.ServiceBus.Autofac
             builder.Update(container);
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name)
+        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<PhtSubscriptionStorage>()
@@ -233,6 +233,7 @@ namespace Rhino.ServiceBus.Autofac
                 .WithParameter("queueIsolationLevel", config.IsolationLevel)
                 .WithParameter("numberOfRetries", config.NumberOfRetries)
                 .WithParameter("path", Path.Combine(path, name + ".esent"))
+                .WithParameter("enablePerformanceCounters", enablePerformanceCounters)
                 .As<ITransport>()
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesMessageBuilder>()

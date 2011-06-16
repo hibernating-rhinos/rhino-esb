@@ -12,8 +12,8 @@ namespace Rhino.ServiceBus.RhinoQueues
     {
         private MessageOwnersSelector messageOwners;
         public static readonly Uri NullEndpoint = new Uri("null://nowhere:24689/middle");
-        public RhinoQueuesOneWayBus(MessageOwner[] messageOwners, IMessageSerializer messageSerializer,IMessageBuilder<MessagePayload> messageBuilder)
-            : base(NullEndpoint, new EndpointRouter(), messageSerializer, 1, Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"), IsolationLevel.ReadCommitted,5,messageBuilder)
+        public RhinoQueuesOneWayBus(MessageOwner[] messageOwners, IMessageSerializer messageSerializer, IMessageBuilder<MessagePayload> messageBuilder)
+            : base(NullEndpoint, new EndpointRouter(), messageSerializer, 1, Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"), IsolationLevel.ReadCommitted,5,false,messageBuilder)
 
         {
             this.messageOwners = new MessageOwnersSelector(messageOwners, new EndpointRouter());

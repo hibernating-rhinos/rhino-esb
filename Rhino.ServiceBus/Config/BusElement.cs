@@ -67,6 +67,12 @@ namespace Rhino.ServiceBus.Config
             set { this["path"] = value; }
         }
 
+        public bool EnablePerformanceCounters
+        {
+            get { return (bool)this["enablePerformanceCounters"]; }
+            set { this["enablePerformanceCounters"] = value; }
+        }
+
         private void SetupDefaults()
         {
             Properties.Add(new ConfigurationProperty("transactional", typeof(string), null));
@@ -79,6 +85,7 @@ namespace Rhino.ServiceBus.Config
             Properties.Add(new ConfigurationProperty("loadBalancerEndpoint", typeof(string), null));
             Properties.Add(new ConfigurationProperty("name", typeof(string), null));
             Properties.Add(new ConfigurationProperty("path", typeof(string), null));
+            Properties.Add(new ConfigurationProperty("enablePerformanceCounters", typeof(bool), false));
         }
     }
 }

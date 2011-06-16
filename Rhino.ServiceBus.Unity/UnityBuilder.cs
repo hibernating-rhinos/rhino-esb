@@ -229,7 +229,7 @@ namespace Rhino.ServiceBus.Unity
                     ));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name)
+        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
         {
             container.RegisterType<ISubscriptionStorage, PhtSubscriptionStorage>(
                 new ContainerControlledLifetimeManager(),
@@ -248,6 +248,7 @@ namespace Rhino.ServiceBus.Unity
                     new InjectionParameter<string>(Path.Combine(path, name + ".esent")),
                     new InjectionParameter<IsolationLevel>(config.IsolationLevel),
                     new InjectionParameter<int>(config.NumberOfRetries),
+                    new InjectionParameter<bool>(enablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
 
             container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(
