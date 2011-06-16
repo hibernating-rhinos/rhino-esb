@@ -140,6 +140,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 port = 2200;
             queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
             queueManager.CreateQueues(queueName);
+            queueManager.Start();
 
             queue = queueManager.GetQueue(queueName);
 
