@@ -1,11 +1,11 @@
+using Castle.MicroKernel.Handlers;
 using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Configuration.Interpreters;
 
 namespace Rhino.ServiceBus.Tests.Bugs
 {
     using System;
-    using Castle.MicroKernel.Handlers;
-    using Castle.Windsor;
-    using Castle.Windsor.Configuration.Interpreters;
     using Impl;
     using Xunit;
 
@@ -16,7 +16,9 @@ namespace Rhino.ServiceBus.Tests.Bugs
         public When_cannot_resolve_consumer_because_of_missing_dependecies()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
         }
 
         [Fact]

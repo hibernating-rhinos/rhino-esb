@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading;
 using System.Transactions;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
@@ -28,7 +30,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void Deserialization_Error_Will_Not_Retry()
         {
-            messageSerializer = new ThrowingSerializer(new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel()));
+            messageSerializer = new ThrowingSerializer(new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer())));
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),
@@ -55,7 +58,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void Arrived_Error_Will_Retry_Number_Of_Times_Configured()
         {
-            messageSerializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            messageSerializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),

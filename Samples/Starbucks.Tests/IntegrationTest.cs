@@ -1,5 +1,6 @@
 ﻿using System;
 using Rhino.ServiceBus;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Msmq;
 using Starbucks.Barista;
@@ -12,13 +13,12 @@ namespace Starbucks.Tests
 {
     public class IntegrationTest : IDisposable
     {
-        private RemoteAppDomainLoadBalancerHost baristaLoadBalancer;
-        private RemoteAppDomainHost cashier;
-        private RemoteAppDomainHost barista;
-        private DefaultHost customerHost;
+        private readonly RemoteAppDomainHost baristaLoadBalancer;
+        private readonly RemoteAppDomainHost cashier;
+        private readonly RemoteAppDomainHost barista;
+        private readonly DefaultHost customerHost;
 
-        [Fact]
-        public void Can_by_coffee_from_starbucks()
+        public IntegrationTest()
         {
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer", QueueType.LoadBalancer);
             PrepareQueues.Prepare("msmq://localhost/starbucks.barista.balancer.acceptingwork", QueueType.LoadBalancer);
@@ -26,27 +26,31 @@ namespace Starbucks.Tests
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof (RemoteAppDomainHost).Assembly, "LoadBalancer.config");
-            baristaLoadBalancer.Start();
-
-            Console.WriteLine("Barista load balancer has started");
-
+            baristaLoadBalancer = new RemoteAppDomainHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
             cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))
                 .Configuration("Cashier.config");
+            barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))
+                .Configuration("Barista.config");
+            customerHost = new DefaultHost();
+        }
+
+        [Fact]
+        public void Can_by_coffee_from_starbucks()
+        {
+            baristaLoadBalancer.Start();
+            Console.WriteLine("Barista load balancer has started");
+
             cashier.Start();
 
             Console.WriteLine("Cashier has started");
 
-            barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))
-                .Configuration("Barista.config");
             barista.Start();
 
             Console.WriteLine("Barista has started");
 
-            customerHost = new DefaultHost();
             customerHost.Start<CustomerBootStrapper>();
 
-            var bus = customerHost.Container.Resolve<IServiceBus>();
+            var bus = (IServiceBus)customerHost.Bus;
 
             var userInterface = new MockCustomerUserInterface();
             var customer = new CustomerController(bus)

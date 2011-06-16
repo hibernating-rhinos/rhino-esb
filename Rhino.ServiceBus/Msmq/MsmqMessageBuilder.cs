@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Messaging;
 using System.Runtime.Serialization;
-using Castle.MicroKernel;
 using log4net;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
@@ -20,10 +18,10 @@ namespace Rhino.ServiceBus.Msmq
         private Endpoint endpoint;
 
         
-        public MsmqMessageBuilder(IMessageSerializer messageSerializer, IKernel kernel)
+        public MsmqMessageBuilder(IMessageSerializer messageSerializer, IServiceLocator serviceLocator)
         {
             this.messageSerializer = messageSerializer;
-            customizeHeaders = kernel.ResolveAll<ICustomizeMessageHeaders>().ToArray();
+            customizeHeaders = serviceLocator.ResolveAll<ICustomizeMessageHeaders>().ToArray();
         }
 
         public event Action<Message> MessageBuilt;

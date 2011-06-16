@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading;
 using System.Transactions;
 using Castle.MicroKernel;
+using Castle.Windsor;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.RhinoQueues;
 using Rhino.ServiceBus.Serializers;
@@ -23,7 +25,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists("test.esent"))
                 Directory.Delete("test.esent", true);
 
-            messageSerializer = new XmlMessageSerializer(new DefaultReflection(), new DefaultKernel());
+            messageSerializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),

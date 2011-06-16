@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using Castle.MicroKernel.Proxy;
 using log4net;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -65,16 +64,16 @@ namespace Rhino.ServiceBus.Impl
             }
         }
 
-        public Type GetType(string type)
+        public Type GetTypeFromXmlNamespace(string xmlNamespace)
         {
             Type value;
-            if (wellKnownTypeNameToType.TryGetValue(type, out value))
+            if (wellKnownTypeNameToType.TryGetValue(xmlNamespace, out value))
                 return value;
-            if(type.StartsWith("array_of_"))
+            if(xmlNamespace.StartsWith("array_of_"))
             {
-                return GetType(type.Substring("array_of_".Length));
+                return GetTypeFromXmlNamespace(xmlNamespace.Substring("array_of_".Length));
             }
-            return Type.GetType(type);
+            return Type.GetType(xmlNamespace);
         }
 
         public void InvokeAdd(object instance, object item)
@@ -270,7 +269,7 @@ namespace Rhino.ServiceBus.Impl
 			try
 			{
 				Type type = sagaFinder.GetType();
-				MethodInfo method = type.GetMethod("FindBy");
+                MethodInfo method = type.GetMethod("FindBy", new[] { msg.GetType()} );
 				return method.Invoke(sagaFinder, new object[] { msg });
 			}
 			catch (TargetInvocationException e)
@@ -289,18 +288,18 @@ namespace Rhino.ServiceBus.Impl
             typeName = typeName.Substring(0, indexOf) + "_of_";
             foreach (var argument in type.GetGenericArguments())
             {
-                typeName += GetNamespaceForXml(argument) + "_";
+                typeName += GetNamespacePrefixForXml(argument) + "_";
             }
             return typeName.Substring(0, typeName.Length - 1);
         }
 
-        public string GetNamespaceForXml(Type type)
+        public string GetNamespacePrefixForXml(Type type)
         {
             string value;
             if(typeToWellKnownTypeName.TryGetValue(type, out value))
                 return value;
             if (type.IsArray)
-                return "array_of_" + GetNamespaceForXml(type.GetElementType());
+                return "array_of_" + GetNamespacePrefixForXml(type.GetElementType());
 
             if (type.Namespace == null && type.Name.StartsWith("<>"))
                 throw new InvalidOperationException("Anonymous types are not supported");
@@ -318,13 +317,13 @@ namespace Rhino.ServiceBus.Impl
             typeName = typeName.Substring(0, indexOf)+ "_of_";
             foreach (var argument in type.GetGenericArguments())
             {
-                typeName += GetNamespaceForXml(argument) + "_";
+                typeName += GetNamespacePrefixForXml(argument) + "_";
             }
             return typeName.Substring(0,typeName.Length-1);
         }
 
 
-        public string GetAssemblyQualifiedNameWithoutVersion(Type type)
+        public string GetNamespaceForXml(Type type)
         {
             string value;
             if (typeToWellKnownTypeName.TryGetValue(type, out value))
@@ -340,7 +339,7 @@ namespace Rhino.ServiceBus.Impl
                     .Append("[")
                     .Append(String.Join(",",
                                     type.GetGenericArguments()
-                                        .Select(t => "[" + GetAssemblyQualifiedNameWithoutVersion(t) + "]")
+                                        .Select(t => "[" + GetNamespaceForXml(t) + "]")
                                         .ToArray()))
                     .Append("], ");
                 if (assembly.GlobalAssemblyCache)

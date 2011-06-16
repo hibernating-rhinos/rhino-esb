@@ -1,86 +1,62 @@
 using System;
 using System.Reflection;
-using Castle.Core;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
-using Rhino.ServiceBus.Actions;
+using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Hosting
 {
     public abstract class AbstractBootStrapper : IDisposable
     {
-        protected IWindsorContainer container;
+        private AbstractRhinoServiceBusConfiguration config;
 
         public virtual Assembly Assembly
         {
             get { return GetType().Assembly; }
         }
 
-        public virtual void AfterStart()
+        public virtual void InitializeContainer()
         {
+            CreateContainer();
+            config = CreateConfiguration();
+            ConfigureBusFacility(config);
         }
 
-        public void InitializeContainer(IWindsorContainer windsorContainer)
+        public virtual void UseConfiguration(BusConfigurationSection configurationSection)
         {
-            container = windsorContainer;
-
-            ConfigureContainer();
+            config.UseConfiguration(configurationSection);
         }
 
-        protected virtual void ConfigureContainer()
-        {
-            container.Register(
-                AllTypes.FromAssembly(Assembly)
-                    .BasedOn<IDeploymentAction>(),
-                AllTypes.FromAssembly(Assembly)
-                    .BasedOn<IEnvironmentValidationAction>()
-                );
-			RegisterConsumersFrom (Assembly);
-        }
+        public abstract void CreateContainer();
 
-		protected virtual void RegisterConsumersFrom(Assembly assembly)
-		{
-			container.Register (
-				 AllTypes
-					.FromAssembly (assembly)
-					.Where (type =>
-						typeof (IMessageConsumer).IsAssignableFrom (type) &&
-						typeof (IOccasionalMessageConsumer).IsAssignableFrom (type) == false &&
-						IsTypeAcceptableForThisBootStrapper (type)
-					)
-					.Configure (registration =>
-					{
-						registration.LifeStyle.Is (LifestyleType.Transient);
-						ConfigureConsumer (registration);
-					})
-				);
-		}
+        public abstract void ExecuteDeploymentActions(string user);
 
-    	protected virtual void ConfigureConsumer(ComponentRegistration registration)
-    	{
-    		registration.Named(registration.Implementation.Name);
-    	}
+        public abstract void ExecuteEnvironmentValidationActions();
+
+        public abstract T GetInstance<T>();
 
     	protected virtual bool IsTypeAcceptableForThisBootStrapper(Type t)
         {
             return true;
         }
 
+        protected virtual AbstractRhinoServiceBusConfiguration CreateConfiguration()
+        {
+            return new RhinoServiceBusConfiguration();
+        }
+
+        protected virtual void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
+        {
+        }
+
         public virtual void BeforeStart()
         {
-            
+            config.Configure();
         }
 
-        public virtual void ConfigureBusFacility(RhinoServiceBusFacility facility)
+        public virtual void AfterStart()
         {
-            
         }
 
-        public virtual void Dispose()
-        {
-            container.Dispose();
-        }
+        public abstract void Dispose();
     }
 }

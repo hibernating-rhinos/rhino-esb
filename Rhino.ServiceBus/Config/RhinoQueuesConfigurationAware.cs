@@ -1,58 +1,31 @@
 using System;
 using System.Configuration;
 using System.IO;
-using Castle.Core;
-using Castle.Core.Configuration;
-using Castle.MicroKernel.Registration;
-using Rhino.Queues;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.RhinoQueues;
 
 namespace Rhino.ServiceBus.Config
 {
     public class RhinoQueuesConfigurationAware : IBusConfigurationAware
     {
-        public void Configure(AbstractRhinoServiceBusFacility facility, IConfiguration configuration)
+        public void Configure(AbstractRhinoServiceBusConfiguration configuration, IBusContainerBuilder builder)
         {
-            if (facility.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) == false)
+            var busConfig = configuration as RhinoServiceBusConfiguration;
+            if (busConfig == null)
                 return;
 
-            IConfiguration busConfig = configuration.Children["bus"];
-            if (busConfig == null)
-                throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
-            var name = busConfig.Attributes["name"];
-            if (string.IsNullOrEmpty(name))
-                throw new ConfigurationErrorsException("Could not find attribute 'name' in node 'bus' in configuration");
+            if (configuration.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) ==
+                false)
+                return;
 
-            var path = busConfig.Attributes["path"];
-            if (string.IsNullOrEmpty(path))
-                path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+            var busConfigSection = configuration.ConfigurationSection.Bus;
 
-            facility.Kernel.Register(
-                Component.For<ISubscriptionStorage>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(PhtSubscriptionStorage))
-                    .DependsOn(new
-                    {
-                        subscriptionPath = Path.Combine(path, name + "_subscriptions.esent")
-                    }),
-                Component.For<ITransport>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(RhinoQueuesTransport))
-                    .DependsOn(new
-                    {
-                        threadCount = facility.ThreadCount,
-                        endpoint = facility.Endpoint,
-                        queueIsolationLevel = facility.IsolationLevel,
-                        numberOfRetries = facility.NumberOfRetries,
-                        path = Path.Combine(path, name + ".esent")
-                    }),
-                Component.For<IMessageBuilder<MessagePayload>>()
-                    .ImplementedBy<RhinoQueuesMessageBuilder>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
+            if (string.IsNullOrEmpty(busConfigSection.Name))
+                throw new ConfigurationErrorsException(
+                    "Could not find attribute 'name' in node 'bus' in configuration");
 
-                );
+            var path = busConfigSection.Path ?? Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+
+            builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name);
         }
     }
 }

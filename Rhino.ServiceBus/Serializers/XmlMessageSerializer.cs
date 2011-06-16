@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Castle.MicroKernel;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using System.Linq;
@@ -19,17 +18,17 @@ namespace Rhino.ServiceBus.Serializers
     {
         private const int MaxNumberOfAllowedItemsInCollection = 256;
         private readonly IReflection reflection;
-        private readonly IKernel kernel;
+        private readonly IServiceLocator serviceLocator;
         private readonly Hashtable<Type, bool> typeHasConvertorCache = new Hashtable<Type, bool>();
     	private ICustomElementSerializer[] customElementSerializers;
     	private IElementSerializationBehavior[] elementSerializationBehaviors;
 
-    	public XmlMessageSerializer(IReflection reflection, IKernel kernel )
+    	public XmlMessageSerializer(IReflection reflection, IServiceLocator serviceLocator )
         {
             this.reflection = reflection;
-            this.kernel = kernel;
-        	customElementSerializers = this.kernel.ResolveAll<ICustomElementSerializer>();
-    		elementSerializationBehaviors = this.kernel.ResolveAll<IElementSerializationBehavior>();
+            this.serviceLocator = serviceLocator;
+        	customElementSerializers = this.serviceLocator.ResolveAll<ICustomElementSerializer>().ToArray();
+    		elementSerializationBehaviors = this.serviceLocator.ResolveAll<IElementSerializationBehavior>().ToArray();
         }
 
         public void Serialize(object[] messages, Stream messageStream)
@@ -79,7 +78,7 @@ namespace Rhino.ServiceBus.Serializers
             if(HaveCustomValueConvertor(value.GetType()))
             {
                 var valueConvertorType = reflection.GetGenericTypeOf(typeof (IValueConvertor<>), value);
-                var convertor = kernel.Resolve(valueConvertorType);
+                var convertor = serviceLocator.Resolve(valueConvertorType);
 
                 var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
 
@@ -161,11 +160,11 @@ namespace Rhino.ServiceBus.Serializers
 
         private XNamespace GetXmlNamespace(IDictionary<string, XNamespace> namespaces, Type type)
         {
-            var ns = reflection.GetNamespaceForXml(type);
+            var ns = reflection.GetNamespacePrefixForXml(type);
             XNamespace xmlNs;
             if (namespaces.TryGetValue(ns, out xmlNs) == false)
             {
-                namespaces[ns] = xmlNs = reflection.GetAssemblyQualifiedNameWithoutVersion(type);
+                namespaces[ns] = xmlNs = reflection.GetNamespaceForXml(type);
             }
             return xmlNs;
         }
@@ -190,7 +189,7 @@ namespace Rhino.ServiceBus.Serializers
                 return hasConvertor.Value;
 
             var convertorType = reflection.GetGenericTypeOf(typeof(IValueConvertor<>),type);
-            var component = kernel.HasComponent(convertorType);
+            var component = serviceLocator.CanResolve(convertorType);
             typeHasConvertorCache.Write(writer => writer.Add(type, component));
             return component;
         }
@@ -198,11 +197,11 @@ namespace Rhino.ServiceBus.Serializers
         private XElement GetContentWithNamespace(object value, IDictionary<string, XNamespace> namespaces, string name)
         {
             var type = value.GetType();
-            var xmlNsAlias = reflection.GetNamespaceForXml(type);
+            var xmlNsAlias = reflection.GetNamespacePrefixForXml(type);
             XNamespace xmlNs;
             if (namespaces.TryGetValue(xmlNsAlias, out xmlNs) == false)
             {
-                namespaces[xmlNsAlias] = xmlNs = reflection.GetAssemblyQualifiedNameWithoutVersion(type);
+                namespaces[xmlNsAlias] = xmlNs = reflection.GetNamespaceForXml(type);
             }
 
             return new XElement(xmlNs + name);
@@ -287,7 +286,7 @@ namespace Rhino.ServiceBus.Serializers
                 if (msg == null)
                     continue;
                 var type = msg.GetType();
-                namespaces[reflection.GetNamespaceForXml(type)] = reflection.GetAssemblyQualifiedNameWithoutVersion(type);
+                namespaces[reflection.GetNamespacePrefixForXml(type)] = reflection.GetNamespaceForXml(type);
             }
             return namespaces;
         }
@@ -305,7 +304,7 @@ namespace Rhino.ServiceBus.Serializers
             var msgs = new List<object>();
             foreach (var element in document.Root.Elements())
             {
-                var type = reflection.GetType(element.Name.NamespaceName);
+                var type = reflection.GetTypeFromXmlNamespace(element.Name.NamespaceName);
                 if (type==null)
                 {
                     throw new SerializationException("Cannot find root message type: " + element.Name.Namespace);
@@ -326,7 +325,7 @@ namespace Rhino.ServiceBus.Serializers
             if(HaveCustomValueConvertor(type))
             {
                 var convertorType = reflection.GetGenericTypeOf(typeof(IValueConvertor<>),type);
-                var convertor = kernel.Resolve(convertorType);
+                var convertor = serviceLocator.Resolve(convertorType);
                 return reflection.InvokeFromElement(convertor, element);
             }
 			if(HaveCustomSerializer(type))
@@ -354,7 +353,7 @@ namespace Rhino.ServiceBus.Serializers
                     prop.Name.LocalName,
                     typeFromProperty =>
                     {
-                        var propType = reflection.GetType(property.Name.NamespaceName);
+                        var propType = reflection.GetTypeFromXmlNamespace(property.Name.NamespaceName);
                         return ReadObject(propType ?? typeFromProperty, property);
                     });
             }
@@ -411,7 +410,7 @@ namespace Rhino.ServiceBus.Serializers
             var array = instance as Array;
             foreach (var value in element.Elements())
             {
-                var itemType = reflection.GetType(value.Name.NamespaceName);
+                var itemType = reflection.GetTypeFromXmlNamespace(value.Name.NamespaceName);
                 object o = ReadObject(itemType ?? elementType, value);
                 if (array != null)
                     array.SetValue(o, index);

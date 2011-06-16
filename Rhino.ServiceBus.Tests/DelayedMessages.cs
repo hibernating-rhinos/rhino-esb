@@ -1,11 +1,11 @@
 using Castle.MicroKernel.Registration;
+using Castle.Windsor;
+using Castle.Windsor.Configuration.Interpreters;
 
 namespace Rhino.ServiceBus.Tests
 {
     using System;
     using System.Threading;
-    using Castle.Windsor;
-    using Castle.Windsor.Configuration.Interpreters;
     using Impl;
     using Xunit;
 
@@ -16,7 +16,9 @@ namespace Rhino.ServiceBus.Tests
         public DelayedMessages()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
             container.Register(
                 Component.For<HandleMessageLater>(),
                 Component.For<ProcessInteger>()

@@ -1,5 +1,6 @@
 using System;
 using Rhino.ServiceBus;
+using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Msmq;
 using Starbucks.Barista;
@@ -19,7 +20,7 @@ namespace Starbucks
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            var baristaLoadBalancer = new RemoteAppDomainLoadBalancerHost(typeof(RemoteAppDomainHost).Assembly, "LoadBalancer.config");
+            var baristaLoadBalancer = new RemoteAppDomainHost(typeof(CastleBootStrapper).Assembly, "LoadBalancer.config");
             baristaLoadBalancer.Start();
             
             Console.WriteLine("Barista load balancer has started");
@@ -37,12 +38,13 @@ namespace Starbucks
             Console.WriteLine("Barista has started");
 
             var customerHost = new DefaultHost();
+
             customerHost.BusConfiguration(c => c.Bus("msmq://localhost/starbucks.customer")
                 .Receive("Starbucks.Messages.Cashier", "msmq://localhost/starbucks.cashier")
                 .Receive("Starbucks.Messages.Barista", "msmq://localhost/starbucks.barista.balancer"));
             customerHost.Start<CustomerBootStrapper>();
 
-            var bus = customerHost.Container.Resolve<IServiceBus>();
+            var bus = (IServiceBus)customerHost.Bus;
 
             var customer = new CustomerController(bus)
             {

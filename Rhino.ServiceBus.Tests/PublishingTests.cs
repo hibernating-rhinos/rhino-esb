@@ -17,7 +17,29 @@ namespace Rhino.ServiceBus.Tests
         public PublishingTests()
         {
             container = new WindsorContainer(new XmlInterpreter());
-            container.Kernel.AddFacility("rhino.esb", new RhinoServiceBusFacility());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
+        }
+
+        [Fact]
+        public void Can_publish_to_consumers_of_interface()
+        {
+            container.Register(Component.For<TestMessageConsumer>()
+                .LifeStyle.Transient);
+            using (var bus = container.Resolve<IStartableServiceBus>())
+            {
+                bus.Start();
+                var storage = container.Resolve<ISubscriptionStorage>();
+                var wait = new ManualResetEvent(false);
+                storage.SubscriptionChanged += () =>
+                {
+                    wait.Set();
+                };
+
+                wait.WaitOne(TimeSpan.FromSeconds(5));
+                Assert.DoesNotThrow(() => bus.Publish(new TestMessage { Id = 1 }));
+            }
         }
 
         [Fact]
