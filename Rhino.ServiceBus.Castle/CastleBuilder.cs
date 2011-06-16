@@ -253,7 +253,7 @@ namespace Rhino.ServiceBus.Castle
                        .DependsOn(new { messageOwners = oneWayConfig.MessageOwners }));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name)
+        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
         {
             container.Register(
                 Component.For<ISubscriptionStorage>()
@@ -272,7 +272,8 @@ namespace Rhino.ServiceBus.Castle
                         endpoint = config.Endpoint,
                         queueIsolationLevel = config.IsolationLevel,
                         numberOfRetries = config.NumberOfRetries,
-                        path = Path.Combine(path, name + ".esent")
+                        path = Path.Combine(path, name + ".esent"),
+                        enablePerformanceCounters
                     }),
                 Component.For<IMessageBuilder<MessagePayload>>()
                     .ImplementedBy<RhinoQueuesMessageBuilder>()

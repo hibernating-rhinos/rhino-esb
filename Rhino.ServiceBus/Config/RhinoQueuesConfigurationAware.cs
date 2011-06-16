@@ -25,7 +25,7 @@ namespace Rhino.ServiceBus.Config
 
             var path = busConfigSection.Path ?? Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 
-            builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name);
+            builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name, busConfigSection.EnablePerformanceCounters);
         }
     }
 }

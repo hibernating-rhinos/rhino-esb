@@ -39,6 +39,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             messageSerializer = container.Resolve<IMessageSerializer>();
             queue = new QueueManager(new IPEndPoint(IPAddress.Any, 2202), path);
             queue.CreateQueues("log_endpoint");
+            queue.Start();
             
 
             var innerTransport = container.Resolve<ITransport>();
