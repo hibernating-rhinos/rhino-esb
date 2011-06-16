@@ -40,7 +40,7 @@
     <Reference Include="Autofac">
       <HintPath>$(LibDir)Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Queues, Version=1.3.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+    <Reference Include="Rhino.Queues">
       <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
