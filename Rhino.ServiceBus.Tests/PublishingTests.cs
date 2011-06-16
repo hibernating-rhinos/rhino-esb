@@ -43,26 +43,6 @@ namespace Rhino.ServiceBus.Tests
         }
 
         [Fact]
-        public void Can_publish_to_consumers_of_interface()
-        {
-            container.Register(Component.For<TestMessageConsumer>()
-                .LifeStyle.Transient);
-            using (var bus = container.Resolve<IStartableServiceBus>())
-            {
-                bus.Start();
-                var storage = container.Resolve<ISubscriptionStorage>();
-                var wait = new ManualResetEvent(false);
-                storage.SubscriptionChanged += () =>
-                {
-                    wait.Set();
-                };
-
-                wait.WaitOne(TimeSpan.FromSeconds(5));
-                Assert.DoesNotThrow(() => bus.Publish(new TestMessage { Id = 1 }));
-            }
-        }
-
-        [Fact]
         public void Trying_to_publish_with_no_notifications_will_throw()
         {
             using (var bus = container.Resolve<IStartableServiceBus>())
