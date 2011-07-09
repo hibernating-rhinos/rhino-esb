@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 using Rhino.ServiceBus.Actions;
@@ -13,7 +12,7 @@ using Spring.Objects.Factory.Support;
 
 namespace Rhino.ServiceBus.Spring
 {
-    public class SpringBootStrapper : AbstractBootStrapper
+    public abstract class SpringBootStrapper : AbstractBootStrapper
     {
         private IConfigurableApplicationContext applicationContext;
 

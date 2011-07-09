@@ -2,7 +2,7 @@ using Rhino.ServiceBus.LoadBalancer;
 
 namespace Rhino.ServiceBus.Spring
 {
-    public class SpringLoadBalancerBootStrapper : SpringBootStrapper
+    public sealed class SpringLoadBalancerBootStrapper : SpringBootStrapper
     {
         protected override Impl.AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {

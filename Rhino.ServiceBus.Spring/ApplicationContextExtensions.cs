@@ -41,9 +41,9 @@ namespace Rhino.ServiceBus.Spring
 
         public static void RegisterPrototype<T>(this IConfigurableApplicationContext context)
         {
-            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), typeof(T));
-            definitionBuilder.SetAutowireMode(AutoWiringMode.AutoDetect);
-            definitionBuilder.SetSingleton(false);
+            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), typeof(T))
+                .SetAutowireMode(AutoWiringMode.AutoDetect)
+                .SetSingleton(false);
             context.ObjectFactory.RegisterObjectDefinition(Guid.NewGuid().ToString(), definitionBuilder.ObjectDefinition);
         }
 
@@ -59,17 +59,17 @@ namespace Rhino.ServiceBus.Spring
 
         public static void RegisterSingleton(this IConfigurableApplicationContext context, Type type)
         {
-            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), type);
-            definitionBuilder.SetAutowireMode(AutoWiringMode.AutoDetect);
-            definitionBuilder.SetSingleton(true);
+            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), type)
+                .SetAutowireMode(AutoWiringMode.AutoDetect)
+                .SetSingleton(true);
             context.ObjectFactory.RegisterObjectDefinition(type.FullName, definitionBuilder.ObjectDefinition);
         }
 
         public static void RegisterSingleton(this IConfigurableApplicationContext context, Type type, string name, params object[] constructorArguments)
         {
-            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), type);
-            definitionBuilder.SetAutowireMode(AutoWiringMode.AutoDetect);
-            definitionBuilder.SetSingleton(true);
+            ObjectDefinitionBuilder definitionBuilder = ObjectDefinitionBuilder.RootObjectDefinition(new DefaultObjectDefinitionFactory(), type)
+                .SetAutowireMode(AutoWiringMode.AutoDetect)
+                .SetSingleton(true);
             if (constructorArguments != null && constructorArguments.Length > 0)
             {
                 foreach (object argument in constructorArguments)

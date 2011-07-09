@@ -37,6 +37,9 @@
     <LibDir>..\SharedLibs\4.0\</LibDir>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="Spring.Core">
       <HintPath>$(LibDir)Spring.Core.dll</HintPath>
     </Reference>
