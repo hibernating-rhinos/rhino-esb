@@ -7,7 +7,7 @@ properties {
   $35_lib_dir = "$base_dir\SharedLibs\3.5\"
   $release_dir = "$base_dir\Release"
   $sln_file = "$base_dir\Rhino.ServiceBus.sln"
-  $version = "2.0.0.0"
+  $version = "2.1.0.0"
   $tools_dir = "$base_dir\Tools"
   $config = "Release"
   $run_tests = "true"
