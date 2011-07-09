@@ -46,6 +46,9 @@
     <Reference Include="Castle.Windsor">
       <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\SharedLibs\log4net.dll</HintPath>
     </Reference>
@@ -75,6 +78,9 @@
     </Reference>
     <Reference Include="Rhino.Queues">
       <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\SharedLibs\4.0\Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
@@ -130,6 +136,8 @@
     <Compile Include="CanCustomizeHeadersWithMsmq.cs" />
     <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Autofac\ContainerTests.cs" />
+    <Compile Include="Containers\Spring\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Spring\ContainerTests.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\StructureMap\ContainerTests.cs" />
     <Compile Include="Containers\Unity\Can_host_in_another_app_domain.cs" />
@@ -199,6 +207,10 @@
     <ProjectReference Include="..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
       <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
       <Name>Rhino.ServiceBus.Castle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Spring\Rhino.ServiceBus.Spring.csproj">
+      <Project>{E18B8442-40AF-F3A1-9FB0-F1C5FC994CEA}</Project>
+      <Name>Rhino.ServiceBus.Spring</Name>
     </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus.StructureMap\Rhino.ServiceBus.StructureMap.csproj">
       <Project>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</Project>
