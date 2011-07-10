@@ -32,7 +32,8 @@ task Init -depends Clean {
 		"$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs",
-		"$base_dir\Rhino.ServiceBus.Unity\Properties\AssemblyInfo.cs"
+		"$base_dir\Rhino.ServiceBus.Unity\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.Spring\Properties\AssemblyInfo.cs"
 	);
 
 	$infos | foreach { Generate-Assembly-Info `
@@ -101,6 +102,13 @@ task Release  -depends Test {
     	*\Microsoft.Practices.Unity.Interception.dll `
     	*\Rhino.ServiceBus.Unity.dll `
     	*\Rhino.ServiceBus.Unity.pdb `
+    	*\Common.Logging.dll `
+    	*\Spring.Core.dll `
+    	*\Spring.Core.pdb `
+    	*\Spring.Core.xml `
+		*\Common.Logging.dll `
+    	*\Rhino.ServiceBus.Spring.dll `
+    	*\Rhino.ServiceBus.Spring.pdb `
     	*\Rhino.ServiceBus.Host.exe `
     	*\Rhino.ServiceBus.Host.pdb `
     	*\Wintellect.Threading.dll `
