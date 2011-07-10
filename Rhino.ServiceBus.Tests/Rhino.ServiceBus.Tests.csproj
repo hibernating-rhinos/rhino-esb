@@ -80,7 +80,7 @@
       <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="Spring.Core">
-      <HintPath>..\SharedLibs\4.0\Spring.Core.dll</HintPath>
+      <HintPath>$(LibDir)Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
