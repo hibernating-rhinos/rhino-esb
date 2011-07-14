@@ -242,7 +242,7 @@ namespace Rhino.ServiceBus.Autofac
             builder.Update(container);
         }
 
-        public void RegisterRhinoQueuesOneWay(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesOneWay()
         {
             var builder = new ContainerBuilder();
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
@@ -253,7 +253,7 @@ namespace Rhino.ServiceBus.Autofac
             builder.RegisterType<RhinoQueuesOneWayBus>()
                 .WithParameter("messageOwners", oneWayConfig.MessageOwners)
                 .WithParameter("path", Path.Combine(busConfig.Path, "one_way.esent"))
-                .WithParameter("enablePerformanceCounters", enablePerformanceCounters)
+                .WithParameter("enablePerformanceCounters", busConfig.EnablePerformanceCounters)
                 .As<IOnewayBus>()
                 .SingleInstance();
             builder.Update(container);

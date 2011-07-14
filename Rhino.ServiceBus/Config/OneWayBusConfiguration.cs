@@ -18,8 +18,7 @@ namespace Rhino.ServiceBus.Config
             oneWayConfig.MessageOwners = messageOwners.ToArray();
             if (IsRhinoQueues(messageOwnersReader.EndpointScheme))
             {
-                var busConfigSection = config.ConfigurationSection.Bus;
-                builder.RegisterRhinoQueuesOneWay(busConfigSection.Path, busConfigSection.EnablePerformanceCounters);
+                builder.RegisterRhinoQueuesOneWay();
             }
             else
             {

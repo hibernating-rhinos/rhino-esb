@@ -281,7 +281,7 @@ namespace Rhino.ServiceBus.Castle
                 );
         }
 
-        public void RegisterRhinoQueuesOneWay(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesOneWay()
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
             var busConfig = config.ConfigurationSection.Bus;

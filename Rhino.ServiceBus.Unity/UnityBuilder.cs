@@ -255,7 +255,7 @@ namespace Rhino.ServiceBus.Unity
                 new ContainerControlledLifetimeManager());
         }
 
-        public void RegisterRhinoQueuesOneWay(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesOneWay()
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
             var busConfig = config.ConfigurationSection.Bus;

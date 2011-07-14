@@ -16,7 +16,7 @@ namespace Rhino.ServiceBus.Config
         void RegisterQueueCreation();
         void RegisterMsmqOneWay();
         void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters);
-        void RegisterRhinoQueuesOneWay(string path, bool enablePerformanceCounters);
+        void RegisterRhinoQueuesOneWay();
         void RegisterSecurity(byte[] key);
         void RegisterNoSecurity();
     }

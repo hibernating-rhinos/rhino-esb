@@ -1,6 +1,5 @@
 using System;
 using System.Configuration;
-using System.IO;
 using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.Config
@@ -23,9 +22,7 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Could not find attribute 'name' in node 'bus' in configuration");
 
-            var path = busConfigSection.Path ?? Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
-
-            builder.RegisterRhinoQueuesTransport(path, busConfigSection.Name, busConfigSection.EnablePerformanceCounters);
+            builder.RegisterRhinoQueuesTransport(busConfigSection.Path, busConfigSection.Name, busConfigSection.EnablePerformanceCounters);
         }
     }
 }

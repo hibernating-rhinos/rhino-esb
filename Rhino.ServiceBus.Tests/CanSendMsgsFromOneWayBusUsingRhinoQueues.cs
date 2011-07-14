@@ -1,10 +1,8 @@
 using System;
 using System.IO;
 using System.Threading;
-using System.Transactions;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.RhinoQueues;
@@ -51,7 +49,11 @@ namespace Rhino.ServiceBus.Tests
                                                              Endpoint = bus.Endpoint.Uri,
                                                              Name = "System",
                                                          },
-                                                 }, container.Resolve<IMessageSerializer>(), new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
+                                                 }, 
+                                                 container.Resolve<IMessageSerializer>(),
+                                                 Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"),
+                                                 false,
+                                                 new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
                 {
                     oneWay.Send("hello there, one way");
 

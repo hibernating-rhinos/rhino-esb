@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 
 namespace Rhino.ServiceBus.Config
@@ -63,7 +64,7 @@ namespace Rhino.ServiceBus.Config
 
         public string Path
         {
-            get { return this["path"] as string; }
+            get { return (this["path"] as string) ?? System.IO.Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory); }
             set { this["path"] = value; }
         }
 
