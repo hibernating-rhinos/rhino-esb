@@ -255,9 +255,11 @@ namespace Rhino.ServiceBus.Unity
                 new ContainerControlledLifetimeManager());
         }
 
-        public void RegisterRhinoQueuesOneWay()
+        public void RegisterRhinoQueuesOneWay(string path, bool enablePerformanceCounters)
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
+            var busConfig = config.ConfigurationSection.Bus;
+
             container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(
                 new ContainerControlledLifetimeManager());
             container.RegisterType<IOnewayBus, RhinoQueuesOneWayBus>(
@@ -265,6 +267,8 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionConstructor(
                     new InjectionParameter<MessageOwner[]>(oneWayConfig.MessageOwners),
                     new ResolvedParameter<IMessageSerializer>(),
+                    new InjectionParameter<string>(Path.Combine(busConfig.Path, "one_way.esent")),
+                    new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
         }
 
