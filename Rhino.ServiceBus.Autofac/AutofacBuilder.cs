@@ -246,11 +246,14 @@ namespace Rhino.ServiceBus.Autofac
         {
             var builder = new ContainerBuilder();
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
+            var busConfig = config.ConfigurationSection.Bus;
             builder.RegisterType<RhinoQueuesMessageBuilder>()
                 .As<IMessageBuilder<MessagePayload>>()
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesOneWayBus>()
                 .WithParameter("messageOwners", oneWayConfig.MessageOwners)
+                .WithParameter("path", Path.Combine(busConfig.Path, "one_way.esent"))
+                .WithParameter("enablePerformanceCounters", busConfig.EnablePerformanceCounters)
                 .As<IOnewayBus>()
                 .SingleInstance();
             builder.Update(container);

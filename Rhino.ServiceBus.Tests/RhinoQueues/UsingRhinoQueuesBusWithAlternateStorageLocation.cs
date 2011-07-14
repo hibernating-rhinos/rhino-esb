@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists(alternateStorageLocation))
                 Directory.Delete(alternateStorageLocation, true);
 
-            foreach (var expectedSubDirectory in storageDirectories)
+            foreach (var expectedSubDirectory in storageDirectories.Select(d => Path.Combine(defaultStorageLocation, d)))
             {
                 if (Directory.Exists(expectedSubDirectory))
                     Directory.Delete(expectedSubDirectory, true);

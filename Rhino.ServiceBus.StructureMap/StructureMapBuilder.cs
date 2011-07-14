@@ -208,12 +208,15 @@ namespace Rhino.ServiceBus.StructureMap
         public void RegisterRhinoQueuesOneWay()
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+            var busConfig = config.ConfigurationSection.Bus;
 
             container.Configure(c =>
             {
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
                 c.For<IOnewayBus>().Singleton().Use<RhinoQueuesOneWayBus>()
-                    .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners);
+                    .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners)
+                    .Ctor<string>().Is(Path.Combine(busConfig.Path, "one_way.esent"))
+                    .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
             });
         }
 

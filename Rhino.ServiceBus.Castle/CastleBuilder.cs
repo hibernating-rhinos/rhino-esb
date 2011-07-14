@@ -284,6 +284,7 @@ namespace Rhino.ServiceBus.Castle
         public void RegisterRhinoQueuesOneWay()
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+            var busConfig = config.ConfigurationSection.Bus;
             container.Register(
                      Component.For<IMessageBuilder<MessagePayload>>()
                         .ImplementedBy<RhinoQueuesMessageBuilder>()
@@ -294,6 +295,8 @@ namespace Rhino.ServiceBus.Castle
                         .DependsOn(new
                         {
                             messageOwners = oneWayConfig.MessageOwners.ToArray(),
+                            path = Path.Combine(busConfig.Path,  "one_way.esent"),
+                            enablePerformanceCounters = busConfig.EnablePerformanceCounters
                         })
                     );
         }

@@ -226,9 +226,10 @@ namespace Rhino.ServiceBus.Spring
         public void RegisterRhinoQueuesOneWay()
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+            var busConfig = config.ConfigurationSection.Bus;
 
             applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(applicationContext.Get<IMessageSerializer>()));
-            applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), applicationContext.Get<IMessageBuilder<MessagePayload>>()));
+            applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.Path, busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
         }
 
         public void RegisterSecurity(byte[] key)
