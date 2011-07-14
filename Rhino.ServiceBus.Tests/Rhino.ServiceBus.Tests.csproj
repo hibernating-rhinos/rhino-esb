@@ -180,6 +180,7 @@
     <Compile Include="RhinoQueues\MessageLoggingTests.cs" />
     <Compile Include="RhinoQueues\RhinoQueue_Messages_that_have_no_handlers.cs" />
     <Compile Include="RhinoQueues\PhtSubscriptionStorageFixture.cs" />
+    <Compile Include="RhinoQueues\UsingOneWayBusWithAlternateStorageLocation.cs" />
     <Compile Include="RhinoQueues\UsingRhinoQueuesBus.cs" />
     <Compile Include="RhinoQueues\UsingRhinoQueuesBusWithAlternateStorageLocation.cs" />
     <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
