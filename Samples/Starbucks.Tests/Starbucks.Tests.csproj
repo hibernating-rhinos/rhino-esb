@@ -82,12 +82,11 @@
     <None Include="..\Starbucks\Barista.config">
       <Link>Barista.config</Link>
     </None>
+    <None Include="..\Starbucks\BaristaLoadBalancer.config">
+      <Link>BaristaLoadBalancer.config</Link>
+    </None>
     <None Include="..\Starbucks\Cashier.config">
       <Link>Cashier.config</Link>
-    </None>
-    <None Include="..\Starbucks\LoadBalancer.config">
-      <Link>LoadBalancer.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

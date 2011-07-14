@@ -26,7 +26,7 @@ namespace Starbucks.Tests
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            baristaLoadBalancer = new RemoteAppDomainHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "LoadBalancer.config");
+            baristaLoadBalancer = new RemoteAppDomainHost(typeof (CastleLoadBalancerBootStrapper).Assembly, "BaristaLoadBalancer.config");
             cashier = new RemoteAppDomainHost(typeof(CashierBootStrapper))
                 .Configuration("Cashier.config");
             barista = new RemoteAppDomainHost(typeof(BaristaBootStrapper))

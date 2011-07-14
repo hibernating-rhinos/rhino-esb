@@ -20,7 +20,7 @@ namespace Starbucks
             PrepareQueues.Prepare("msmq://localhost/starbucks.cashier", QueueType.Standard);
             PrepareQueues.Prepare("msmq://localhost/starbucks.customer", QueueType.Standard);
 
-            var baristaLoadBalancer = new RemoteAppDomainHost(typeof(CastleBootStrapper).Assembly, "LoadBalancer.config");
+            var baristaLoadBalancer = new RemoteAppDomainHost(typeof(CastleBootStrapper).Assembly, "BaristaLoadBalancer.config");
             baristaLoadBalancer.Start();
             
             Console.WriteLine("Barista load balancer has started");

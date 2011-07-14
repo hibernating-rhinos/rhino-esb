@@ -98,7 +98,7 @@
     <None Include="Cashier.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="LoadBalancer.config">
+    <None Include="BaristaLoadBalancer.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="log4net.config">
