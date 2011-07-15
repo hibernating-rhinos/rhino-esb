@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading;
 using System.Transactions;
 using System.Xml;
@@ -145,16 +146,11 @@ namespace Rhino.ServiceBus.RhinoQueues
             var port = endpoint.Port;
             if (port == -1)
                 port = 2200;
+
             if (port == ANY_AVAILABLE_PORT)
-                port = SelectAvailablePort();
-
-            queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
-            queueManager.CreateQueues(queueName);
-
-            if (enablePerformanceCounters)
-                queueManager.EnablePerformanceCounters();
-
-            queueManager.Start();
+                ConfigureAndStartPortManagerOnAnyAvailablePort();
+            else
+                ConfigureAndStartQueueManager(port);
 
             queue = queueManager.GetQueue(queueName);
 
@@ -174,6 +170,46 @@ namespace Rhino.ServiceBus.RhinoQueues
             var started = Started;
             if (started != null)
                 started();
+        }
+
+        private void ConfigureAndStartPortManagerOnAnyAvailablePort()
+        {
+            int port;
+            while (true)
+            {
+                port = SelectAvailablePort();
+                try
+                {
+                    ConfigureAndStartQueueManager(port);
+                    break;
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.Message == "Only one usage of each socket address (protocol/network address/port) is normally permitted")
+                    {
+                        try
+                        {
+                            queueManager.Dispose();
+                            Thread.Sleep(1000); //allow time for queue storage to be release
+                        } 
+                        catch{ }
+                        //Another process managed to grab our selected port before we could open it, so try again
+                        continue;
+                    }
+                    throw;
+                }
+            }
+        }
+
+        private void ConfigureAndStartQueueManager(int port)
+        {
+            queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
+            queueManager.CreateQueues(queueName);
+
+            if (enablePerformanceCounters)
+                queueManager.EnablePerformanceCounters();
+
+            queueManager.Start();
         }
 
         private static int SelectAvailablePort()
