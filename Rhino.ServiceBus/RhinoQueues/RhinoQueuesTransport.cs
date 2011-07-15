@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.RhinoQueues
     {
         public const int ANY_AVAILABLE_PORT = 9; //This is the Discard Protocol port.  No bus should ever listen on it, so we will use it for our marker port.
 
-        private readonly Uri endpoint;
+        private Uri endpoint;
         private readonly IEndpointRouter endpointRouter;
         private readonly IMessageSerializer messageSerializer;
         private readonly int threadCount;
@@ -148,7 +148,11 @@ namespace Rhino.ServiceBus.RhinoQueues
                 port = 2200;
 
             if (port == ANY_AVAILABLE_PORT)
+            {
                 ConfigureAndStartPortManagerOnAnyAvailablePort();
+                port = queueManager.Endpoint.Port;
+                endpoint = new Uri(endpoint.OriginalString.Replace(endpoint.Host + ":" + ANY_AVAILABLE_PORT, endpoint.Host + ":" + port));
+            }
             else
                 ConfigureAndStartQueueManager(port);
 
