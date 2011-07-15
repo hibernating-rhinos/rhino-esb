@@ -2,7 +2,9 @@ using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Transactions;
 using System.Xml;
@@ -21,6 +23,8 @@ namespace Rhino.ServiceBus.RhinoQueues
     [CLSCompliant(false)]
     public class RhinoQueuesTransport : ITransport
     {
+        public const int ANY_AVAILABLE_PORT = 9; //This is the Discard Protocol port.  No bus should ever listen on it, so we will use it for our marker port.
+
         private readonly Uri endpoint;
         private readonly IEndpointRouter endpointRouter;
         private readonly IMessageSerializer messageSerializer;
@@ -141,6 +145,9 @@ namespace Rhino.ServiceBus.RhinoQueues
             var port = endpoint.Port;
             if (port == -1)
                 port = 2200;
+            if (port == ANY_AVAILABLE_PORT)
+                port = SelectAvailablePort();
+
             queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
             queueManager.CreateQueues(queueName);
 
@@ -167,6 +174,29 @@ namespace Rhino.ServiceBus.RhinoQueues
             var started = Started;
             if (started != null)
                 started();
+        }
+
+        private static int SelectAvailablePort()
+        {
+            const int START_OF_IANA_PRIVATE_PORT_RANGE = 49152;
+            var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var tcpListeners = ipGlobalProperties.GetActiveTcpListeners();
+            var tcpConnections = ipGlobalProperties.GetActiveTcpConnections();
+
+            var allInUserTcpPorts = tcpListeners.Select(tcpl => tcpl.Port)
+                .Union(tcpConnections.Select(tcpi => tcpi.LocalEndPoint.Port));
+
+            var orderedListOfPrivateInUserTcpPorts = allInUserTcpPorts
+                .Where(p => p >= START_OF_IANA_PRIVATE_PORT_RANGE)
+                .OrderBy(p => p);
+
+            var candidatePort = START_OF_IANA_PRIVATE_PORT_RANGE;
+            foreach (var usedPort in orderedListOfPrivateInUserTcpPorts)
+            {
+                if (usedPort != candidatePort) break;
+                candidatePort++;
+            }
+            return candidatePort;
         }
 
         private void ReceiveMessage(object context)
