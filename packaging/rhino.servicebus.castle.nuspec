@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Rhino.ServiceBus.Castle</id>
+    <version>0.0.0</version>
+    <authors>Corey Kaylor</authors>
+    <owners>Corey Kaylor</owners>
+    <licenseUrl>https://raw.github.com/hibernating-rhinos/rhino-esb/master/license.txt</licenseUrl>
+    <projectUrl>https://github.com/hibernating-rhinos/rhino-esb</projectUrl>
+    <iconUrl>https://github.com/hibernating-rhinos/rhino-esb/wiki/images/rhino-icon.jpg</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Castle Windsor integration with Rhino.ServiceBus</description>
+    <tags>rhino castle windsor servicebus bus msmq messaging cqrs</tags>
+    <dependencies>
+      <dependency id="Rhino-ESB"/>
+      <dependency id="Castle.Windsor"/>
+      <dependency id="Rhino.Queues"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="**\Rhino.ServiceBus.Castle.dll" target="lib" />
+    <file src="**\Rhino.ServiceBus.Castle.xml" target="lib" />
+    <file src="**\Rhino.ServiceBus.Castle.pdb" target="lib" />
+  </files>
+</package>

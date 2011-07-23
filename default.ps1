@@ -1,6 +1,7 @@
 properties { 
   $base_dir  = resolve-path .
   $build_dir = "$base_dir\build"
+  $packageinfo_dir = "$base_dir\packaging"
   $40_build_dir = "$build_dir\4.0\"
   $35_build_dir = "$build_dir\3.5\"
   $lib_dir = "$base_dir\SharedLibs"
@@ -17,7 +18,7 @@ $framework = '4.0'
 
 include .\psake_ext.ps1
 	
-task default -depends Release
+task default -depends Package
 
 task Clean {
   remove-item -force -recurse $build_dir -ErrorAction SilentlyContinue
@@ -58,18 +59,14 @@ task Compile35 -depends Init {
   msbuild $sln_file /p:"OutDir=$35_build_dir;Configuration=$config;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir"
 }
 
-task Test -depends Compile35, Compile40 {
-  if($run_tests -eq "false")
-  {
-    return
-  }
+task Test -depends Compile35, Compile40 -precondition { return $run_tests }{
   $old = pwd
   cd $build_dir
   & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\3.5\Rhino.ServiceBus.Tests.dll" /noshadow
   cd $old		
 }
 
-task Release  -depends Test {
+task Release  -depends Compile35, Compile40, Test {
 
   cd $build_dir
 	& $tools_dir\7za.exe a $release_dir\Rhino.ServiceBus.zip `
@@ -120,3 +117,10 @@ task Release  -depends Test {
     }
 }
 
+task Package -depends Release {
+  $spec_files = @(Get-ChildItem $packageinfo_dir)
+  foreach ($spec in $spec_files)
+  {
+    & $tools_dir\NuGet.exe pack $spec.FullName -o $release_dir -Version $version -Symbols -BasePath $build_dir
+  }
+}
