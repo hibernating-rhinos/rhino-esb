@@ -18,8 +18,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.Castle.dll" target="lib" />
-    <file src="**\Rhino.ServiceBus.Castle.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.Castle.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Castle.dll" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Castle.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Castle.pdb" target="lib" />
+    <file src="Rhino.ServiceBus.Castle\**\*.cs" target="src\Rhino.ServiceBus.Castle" />
   </files>
 </package>

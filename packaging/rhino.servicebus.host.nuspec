@@ -16,8 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.Host.exe" target="lib" />
-    <file src="**\Rhino.ServiceBus.Host.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.Host.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Host.exe" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Host.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Host.pdb" target="lib" />
+    <file src="Rhino.ServiceBus.Host\**\*.cs" target="src\Rhino.ServiceBus.Host" />
   </files>
 </package>

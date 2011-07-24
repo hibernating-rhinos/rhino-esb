@@ -18,8 +18,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.StructureMap.dll" target="lib" />
-    <file src="**\Rhino.ServiceBus.StructureMap.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.StructureMap.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.StructureMap.dll" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.StructureMap.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.StructureMap.pdb" target="lib" />
+    <file src="Rhino.ServiceBus.StructureMap\**\*.cs" target="src\Rhino.ServiceBus.StructureMap" />
   </files>
 </package>

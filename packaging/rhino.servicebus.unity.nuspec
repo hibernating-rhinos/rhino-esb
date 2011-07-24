@@ -19,8 +19,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.Unity.dll" target="lib" />
-    <file src="**\Rhino.ServiceBus.Unity.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.Unity.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Unity.dll" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Unity.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Unity.pdb" target="lib" />
+    <file src="Rhino.ServiceBus.Unity\**\*.cs" target="src\Rhino.ServiceBus.Unity" />
   </files>
 </package>

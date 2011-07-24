@@ -16,8 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.dll" target="lib" />
-    <file src="**\Rhino.ServiceBus.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.dll" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.pdb" target="lib" />
+    <file src="Rhino.ServiceBus\**\*.cs" target="src\Rhino.ServiceBus" />
   </files>
 </package>

@@ -121,6 +121,6 @@ task Package -depends Release {
   $spec_files = @(Get-ChildItem $packageinfo_dir)
   foreach ($spec in $spec_files)
   {
-    & $tools_dir\NuGet.exe pack $spec.FullName -o $release_dir -Version $version -Symbols -BasePath $build_dir
+    & $tools_dir\NuGet.exe pack $spec.FullName -o $release_dir -Version $version -Symbols -BasePath $base_dir
   }
 }

@@ -18,8 +18,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="**\Rhino.ServiceBus.Spring.dll" target="lib" />
-    <file src="**\Rhino.ServiceBus.Spring.xml" target="lib" />
-    <file src="**\Rhino.ServiceBus.Spring.pdb" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Spring.dll" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Spring.xml" target="lib" />
+    <file src="build\**\Rhino.ServiceBus.Spring.pdb" target="lib" />
+    <file src="Rhino.ServiceBus.Spring\**\*.cs" target="src/Rhino.ServiceBus.Spring" />
   </files>
 </package>
