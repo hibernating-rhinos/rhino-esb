@@ -187,18 +187,18 @@ namespace Rhino.ServiceBus.StructureMap
             });
         }
 
-        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
         {
             container.Configure(c =>
             {
                 c.For<ISubscriptionStorage>().Singleton().Use<PhtSubscriptionStorage>()
-                    .Ctor<string>().Is(path + "_subscriptions.esent");
+                    .Ctor<string>().Is(subscriptionPath);
                 c.For<ITransport>().Singleton().Use<RhinoQueuesTransport>()
                     .Ctor<int>("threadCount").Is(config.ThreadCount)
                     .Ctor<Uri>().Is(config.Endpoint)
                     .Ctor<IsolationLevel>().Is(config.IsolationLevel)
                     .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
-                    .Ctor<string>().Is(path + ".esent")
+                    .Ctor<string>().Is(queuePath)
                     .Ctor<bool>().Is(enablePerformanceCounters);
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
             });
@@ -214,7 +214,7 @@ namespace Rhino.ServiceBus.StructureMap
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
                 c.For<IOnewayBus>().Singleton().Use<RhinoQueuesOneWayBus>()
                     .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners)
-                    .Ctor<string>().Is(busConfig.ConstructedPath + ".esent")
+                    .Ctor<string>().Is(busConfig.QueuePath)
                     .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
             });
         }

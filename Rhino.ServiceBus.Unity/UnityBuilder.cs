@@ -228,12 +228,12 @@ namespace Rhino.ServiceBus.Unity
                     ));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
         {
             container.RegisterType<ISubscriptionStorage, PhtSubscriptionStorage>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new InjectionParameter<string>(path + "_subscriptions.esent"),
+                    new InjectionParameter<string>(subscriptionPath),
                     new ResolvedParameter<IMessageSerializer>(),
                     new ResolvedParameter<IReflection>()));
 
@@ -244,7 +244,7 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IEndpointRouter>(),
                     new ResolvedParameter<IMessageSerializer>(),
                     new InjectionParameter<int>(config.ThreadCount),
-                    new InjectionParameter<string>(path + ".esent"),
+                    new InjectionParameter<string>(queuePath),
                     new InjectionParameter<IsolationLevel>(config.IsolationLevel),
                     new InjectionParameter<int>(config.NumberOfRetries),
                     new InjectionParameter<bool>(enablePerformanceCounters),
@@ -266,7 +266,7 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionConstructor(
                     new InjectionParameter<MessageOwner[]>(oneWayConfig.MessageOwners),
                     new ResolvedParameter<IMessageSerializer>(),
-                    new InjectionParameter<string>(busConfig.ConstructedPath + ".esent"),
+                    new InjectionParameter<string>(busConfig.QueuePath),
                     new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
         }

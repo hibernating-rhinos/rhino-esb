@@ -22,7 +22,7 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Could not find attribute 'name' in node 'bus' in configuration");
 
-            builder.RegisterRhinoQueuesTransport(busConfigSection.ConstructedPath, busConfigSection.EnablePerformanceCounters);
+            builder.RegisterRhinoQueuesTransport(busConfigSection.QueuePath, busConfigSection.SubscriptionPath, busConfigSection.EnablePerformanceCounters);
         }
     }
 }

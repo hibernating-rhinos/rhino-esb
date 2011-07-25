@@ -252,7 +252,7 @@ namespace Rhino.ServiceBus.Castle
                        .DependsOn(new { messageOwners = oneWayConfig.MessageOwners }));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
         {
             container.Register(
                 Component.For<ISubscriptionStorage>()
@@ -260,7 +260,7 @@ namespace Rhino.ServiceBus.Castle
                     .ImplementedBy(typeof(PhtSubscriptionStorage))
                     .DependsOn(new
                     {
-                        subscriptionPath = path + "_subscriptions.esent"
+                        subscriptionPath
                     }),
                 Component.For<ITransport>()
                     .LifeStyle.Is(LifestyleType.Singleton)
@@ -271,7 +271,7 @@ namespace Rhino.ServiceBus.Castle
                         endpoint = config.Endpoint,
                         queueIsolationLevel = config.IsolationLevel,
                         numberOfRetries = config.NumberOfRetries,
-                        path = path + ".esent",
+                        path = queuePath,
                         enablePerformanceCounters
                     }),
                 Component.For<IMessageBuilder<MessagePayload>>()
@@ -294,7 +294,7 @@ namespace Rhino.ServiceBus.Castle
                         .DependsOn(new
                         {
                             messageOwners = oneWayConfig.MessageOwners.ToArray(),
-                            path = busConfig.ConstructedPath + ".esent",
+                            path = busConfig.QueuePath,
                             enablePerformanceCounters = busConfig.EnablePerformanceCounters
                         })
                     );

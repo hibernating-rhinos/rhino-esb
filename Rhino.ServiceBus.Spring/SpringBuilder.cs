@@ -203,9 +203,9 @@ namespace Rhino.ServiceBus.Spring
             applicationContext.RegisterSingleton<IOnewayBus>(() => new MsmqOnewayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageBuilder<Message>>()));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
         {
-            applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new PhtSubscriptionStorage(path + "_subscriptions.esent",
+            applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new PhtSubscriptionStorage(subscriptionPath,
                                                                                   applicationContext.Get<IMessageSerializer>(),
                                                                                   applicationContext.Get<IReflection>()));
 
@@ -213,7 +213,7 @@ namespace Rhino.ServiceBus.Spring
                                                                                                                                     applicationContext.Get<IEndpointRouter>(),
                                                                                                                                     applicationContext.Get<IMessageSerializer>(),
                                                                                                                                     config.ThreadCount,
-                                                                                                                                    path + ".esent",
+                                                                                                                                    queuePath,
                                                                                                                                     config.IsolationLevel,
                                                                                                                                     config.NumberOfRetries,
                                                                                                                                     enablePerformanceCounters,
@@ -228,7 +228,7 @@ namespace Rhino.ServiceBus.Spring
             var busConfig = config.ConfigurationSection.Bus;
 
             applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(applicationContext.Get<IMessageSerializer>()));
-            applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.ConstructedPath + ".esent", busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
+            applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.QueuePath, busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
         }
 
         public void RegisterSecurity(byte[] key)
