@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Messaging;
 using Castle.Core;
@@ -253,7 +252,7 @@ namespace Rhino.ServiceBus.Castle
                        .DependsOn(new { messageOwners = oneWayConfig.MessageOwners }));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
         {
             container.Register(
                 Component.For<ISubscriptionStorage>()
@@ -261,7 +260,7 @@ namespace Rhino.ServiceBus.Castle
                     .ImplementedBy(typeof(PhtSubscriptionStorage))
                     .DependsOn(new
                     {
-                        subscriptionPath = Path.Combine(path, name + "_subscriptions.esent")
+                        subscriptionPath = path + "_subscriptions.esent"
                     }),
                 Component.For<ITransport>()
                     .LifeStyle.Is(LifestyleType.Singleton)
@@ -272,7 +271,7 @@ namespace Rhino.ServiceBus.Castle
                         endpoint = config.Endpoint,
                         queueIsolationLevel = config.IsolationLevel,
                         numberOfRetries = config.NumberOfRetries,
-                        path = Path.Combine(path, name + ".esent"),
+                        path = path + ".esent",
                         enablePerformanceCounters
                     }),
                 Component.For<IMessageBuilder<MessagePayload>>()
@@ -295,7 +294,7 @@ namespace Rhino.ServiceBus.Castle
                         .DependsOn(new
                         {
                             messageOwners = oneWayConfig.MessageOwners.ToArray(),
-                            path = Path.Combine(busConfig.Path,  "one_way.esent"),
+                            path = busConfig.ConstructedPath + ".esent",
                             enablePerformanceCounters = busConfig.EnablePerformanceCounters
                         })
                     );

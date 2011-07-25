@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Messaging;
 using Autofac;
@@ -220,11 +219,11 @@ namespace Rhino.ServiceBus.Autofac
             builder.Update(container);
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport(string path, bool enablePerformanceCounters)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<PhtSubscriptionStorage>()
-                .WithParameter("subscriptionPath", Path.Combine(path, name + "_subscriptions.esent"))
+                .WithParameter("subscriptionPath", path + "_subscriptions.esent")
                 .As<ISubscriptionStorage>()
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesTransport>()
@@ -232,7 +231,7 @@ namespace Rhino.ServiceBus.Autofac
                 .WithParameter("endpoint", config.Endpoint)
                 .WithParameter("queueIsolationLevel", config.IsolationLevel)
                 .WithParameter("numberOfRetries", config.NumberOfRetries)
-                .WithParameter("path", Path.Combine(path, name + ".esent"))
+                .WithParameter("path", path + ".esent")
                 .WithParameter("enablePerformanceCounters", enablePerformanceCounters)
                 .As<ITransport>()
                 .SingleInstance();
@@ -252,7 +251,7 @@ namespace Rhino.ServiceBus.Autofac
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesOneWayBus>()
                 .WithParameter("messageOwners", oneWayConfig.MessageOwners)
-                .WithParameter("path", Path.Combine(busConfig.Path, "one_way.esent"))
+                .WithParameter("path", busConfig.ConstructedPath + ".esent")
                 .WithParameter("enablePerformanceCounters", busConfig.EnablePerformanceCounters)
                 .As<IOnewayBus>()
                 .SingleInstance();

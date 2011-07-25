@@ -68,6 +68,15 @@ namespace Rhino.ServiceBus.Config
             set { this["path"] = value; }
         }
 
+        public string ConstructedPath
+        {
+            get
+            {
+                //Due to validation checks elsewhere, path should never be null except in the cases of a one-way bus
+                return System.IO.Path.Combine(Path, Name == null || Name.Trim().Length == 0 ? "one_way" : Name);
+            }
+        }
+
         public bool EnablePerformanceCounters
         {
             get { return (bool)this["enablePerformanceCounters"]; }
