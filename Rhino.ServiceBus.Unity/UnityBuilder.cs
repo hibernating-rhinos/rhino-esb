@@ -228,12 +228,13 @@ namespace Rhino.ServiceBus.Unity
                     ));
         }
 
-        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
+            var busConfig = config.ConfigurationSection.Bus;
             container.RegisterType<ISubscriptionStorage, PhtSubscriptionStorage>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new InjectionParameter<string>(subscriptionPath),
+                    new InjectionParameter<string>(busConfig.SubscriptionPath),
                     new ResolvedParameter<IMessageSerializer>(),
                     new ResolvedParameter<IReflection>()));
 
@@ -244,10 +245,10 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IEndpointRouter>(),
                     new ResolvedParameter<IMessageSerializer>(),
                     new InjectionParameter<int>(config.ThreadCount),
-                    new InjectionParameter<string>(queuePath),
+                    new InjectionParameter<string>(busConfig.QueuePath),
                     new InjectionParameter<IsolationLevel>(config.IsolationLevel),
                     new InjectionParameter<int>(config.NumberOfRetries),
-                    new InjectionParameter<bool>(enablePerformanceCounters),
+                    new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
 
             container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(

@@ -187,19 +187,20 @@ namespace Rhino.ServiceBus.StructureMap
             });
         }
 
-        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
             container.Configure(c =>
             {
+                var busConfig = config.ConfigurationSection.Bus;
                 c.For<ISubscriptionStorage>().Singleton().Use<PhtSubscriptionStorage>()
-                    .Ctor<string>().Is(subscriptionPath);
+                    .Ctor<string>().Is(busConfig.SubscriptionPath);
                 c.For<ITransport>().Singleton().Use<RhinoQueuesTransport>()
                     .Ctor<int>("threadCount").Is(config.ThreadCount)
                     .Ctor<Uri>().Is(config.Endpoint)
                     .Ctor<IsolationLevel>().Is(config.IsolationLevel)
                     .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
-                    .Ctor<string>().Is(queuePath)
-                    .Ctor<bool>().Is(enablePerformanceCounters);
+                    .Ctor<string>().Is(busConfig.QueuePath)
+                    .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
             });
         }

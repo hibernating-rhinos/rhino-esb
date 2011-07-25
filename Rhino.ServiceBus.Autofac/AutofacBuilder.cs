@@ -219,11 +219,12 @@ namespace Rhino.ServiceBus.Autofac
             builder.Update(container);
         }
 
-        public void RegisterRhinoQueuesTransport(string queuePath, string subscriptionPath, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
+            var busConfig = config.ConfigurationSection.Bus;
             var builder = new ContainerBuilder();
             builder.RegisterType<PhtSubscriptionStorage>()
-                .WithParameter("subscriptionPath", subscriptionPath)
+                .WithParameter("subscriptionPath", busConfig.SubscriptionPath)
                 .As<ISubscriptionStorage>()
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesTransport>()
@@ -231,8 +232,8 @@ namespace Rhino.ServiceBus.Autofac
                 .WithParameter("endpoint", config.Endpoint)
                 .WithParameter("queueIsolationLevel", config.IsolationLevel)
                 .WithParameter("numberOfRetries", config.NumberOfRetries)
-                .WithParameter("path", queuePath)
-                .WithParameter("enablePerformanceCounters", enablePerformanceCounters)
+                .WithParameter("path", busConfig.QueuePath)
+                .WithParameter("enablePerformanceCounters", busConfig.EnablePerformanceCounters)
                 .As<ITransport>()
                 .SingleInstance();
             builder.RegisterType<RhinoQueuesMessageBuilder>()
