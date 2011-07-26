@@ -149,7 +149,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 
             if (port == ANY_AVAILABLE_PORT)
             {
-                ConfigureAndStartPortManagerOnAnyAvailablePort();
+                ConfigureAndStartQueueManagerOnAnyAvailablePort();
                 port = queueManager.Endpoint.Port;
                 endpoint = new Uri(endpoint.OriginalString.Replace(endpoint.Host + ":" + ANY_AVAILABLE_PORT, endpoint.Host + ":" + port));
             }
@@ -176,7 +176,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                 started();
         }
 
-        private void ConfigureAndStartPortManagerOnAnyAvailablePort()
+        private void ConfigureAndStartQueueManagerOnAnyAvailablePort()
         {
             int port;
             while (true)

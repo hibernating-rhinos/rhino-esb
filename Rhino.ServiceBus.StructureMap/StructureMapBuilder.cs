@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Messaging;
 using System.Transactions;
@@ -188,19 +187,20 @@ namespace Rhino.ServiceBus.StructureMap
             });
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
             container.Configure(c =>
             {
+                var busConfig = config.ConfigurationSection.Bus;
                 c.For<ISubscriptionStorage>().Singleton().Use<PhtSubscriptionStorage>()
-                    .Ctor<string>().Is(Path.Combine(path, name + "_subscriptions.esent"));
+                    .Ctor<string>().Is(busConfig.SubscriptionPath);
                 c.For<ITransport>().Singleton().Use<RhinoQueuesTransport>()
                     .Ctor<int>("threadCount").Is(config.ThreadCount)
                     .Ctor<Uri>().Is(config.Endpoint)
                     .Ctor<IsolationLevel>().Is(config.IsolationLevel)
                     .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
-                    .Ctor<string>().Is(Path.Combine(path, name + ".esent"))
-                    .Ctor<bool>().Is(enablePerformanceCounters);
+                    .Ctor<string>().Is(busConfig.QueuePath)
+                    .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
             });
         }
@@ -215,7 +215,7 @@ namespace Rhino.ServiceBus.StructureMap
                 c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
                 c.For<IOnewayBus>().Singleton().Use<RhinoQueuesOneWayBus>()
                     .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners)
-                    .Ctor<string>().Is(Path.Combine(busConfig.Path, "one_way.esent"))
+                    .Ctor<string>().Is(busConfig.QueuePath)
                     .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
             });
         }

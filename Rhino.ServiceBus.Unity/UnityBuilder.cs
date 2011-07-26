@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Messaging;
 using System.Transactions;
@@ -229,12 +228,13 @@ namespace Rhino.ServiceBus.Unity
                     ));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
+            var busConfig = config.ConfigurationSection.Bus;
             container.RegisterType<ISubscriptionStorage, PhtSubscriptionStorage>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new InjectionParameter<string>(Path.Combine(path, name + "_subscriptions.esent")),
+                    new InjectionParameter<string>(busConfig.SubscriptionPath),
                     new ResolvedParameter<IMessageSerializer>(),
                     new ResolvedParameter<IReflection>()));
 
@@ -245,10 +245,10 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IEndpointRouter>(),
                     new ResolvedParameter<IMessageSerializer>(),
                     new InjectionParameter<int>(config.ThreadCount),
-                    new InjectionParameter<string>(Path.Combine(path, name + ".esent")),
+                    new InjectionParameter<string>(busConfig.QueuePath),
                     new InjectionParameter<IsolationLevel>(config.IsolationLevel),
                     new InjectionParameter<int>(config.NumberOfRetries),
-                    new InjectionParameter<bool>(enablePerformanceCounters),
+                    new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
 
             container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(
@@ -267,7 +267,7 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionConstructor(
                     new InjectionParameter<MessageOwner[]>(oneWayConfig.MessageOwners),
                     new ResolvedParameter<IMessageSerializer>(),
-                    new InjectionParameter<string>(Path.Combine(busConfig.Path, "one_way.esent")),
+                    new InjectionParameter<string>(busConfig.QueuePath),
                     new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
                     new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
         }

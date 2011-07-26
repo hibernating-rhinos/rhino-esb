@@ -64,8 +64,31 @@ namespace Rhino.ServiceBus.Config
 
         public string Path
         {
-            get { return (this["path"] as string) ?? System.IO.Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory); }
+            get { return this["path"] as string; }
             set { this["path"] = value; }
+        }
+        
+        private string BasePath
+        {
+            get
+            {
+                var basePath = Path ?? System.IO.Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+                
+                //Due to validation checks elsewhere, path should never be null except in the cases of a one-way bus
+                var folderName = Name == null || Name.Trim().Length == 0 ? "one_way" : Name;
+
+                return System.IO.Path.Combine(basePath, folderName);
+            }
+        }
+
+        public string QueuePath
+        {
+            get { return BasePath + ".esent"; }
+        }
+
+        public string SubscriptionPath
+        {
+            get { return BasePath + "_subscriptions.esent"; }
         }
 
         public bool EnablePerformanceCounters

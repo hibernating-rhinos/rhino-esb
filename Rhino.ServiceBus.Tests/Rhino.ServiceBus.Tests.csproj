@@ -142,6 +142,7 @@
     <Compile Include="Containers\StructureMap\ContainerTests.cs" />
     <Compile Include="Containers\Unity\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Unity\ContainerTests.cs" />
+    <Compile Include="RhinoQueues\UsingOneWayBusWithBusNameSpecified.cs" />
     <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />

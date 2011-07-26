@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Messaging;
 using Castle.Core;
@@ -253,15 +252,16 @@ namespace Rhino.ServiceBus.Castle
                        .DependsOn(new { messageOwners = oneWayConfig.MessageOwners }));
         }
 
-        public void RegisterRhinoQueuesTransport(string path, string name, bool enablePerformanceCounters)
+        public void RegisterRhinoQueuesTransport()
         {
+            var busConfig = config.ConfigurationSection.Bus;
             container.Register(
                 Component.For<ISubscriptionStorage>()
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy(typeof(PhtSubscriptionStorage))
                     .DependsOn(new
                     {
-                        subscriptionPath = Path.Combine(path, name + "_subscriptions.esent")
+                        subscriptionPath = busConfig.SubscriptionPath
                     }),
                 Component.For<ITransport>()
                     .LifeStyle.Is(LifestyleType.Singleton)
@@ -272,8 +272,8 @@ namespace Rhino.ServiceBus.Castle
                         endpoint = config.Endpoint,
                         queueIsolationLevel = config.IsolationLevel,
                         numberOfRetries = config.NumberOfRetries,
-                        path = Path.Combine(path, name + ".esent"),
-                        enablePerformanceCounters
+                        path = busConfig.QueuePath,
+                        enablePerformanceCounters = busConfig.EnablePerformanceCounters
                     }),
                 Component.For<IMessageBuilder<MessagePayload>>()
                     .ImplementedBy<RhinoQueuesMessageBuilder>()
@@ -295,7 +295,7 @@ namespace Rhino.ServiceBus.Castle
                         .DependsOn(new
                         {
                             messageOwners = oneWayConfig.MessageOwners.ToArray(),
-                            path = Path.Combine(busConfig.Path,  "one_way.esent"),
+                            path = busConfig.QueuePath,
                             enablePerformanceCounters = busConfig.EnablePerformanceCounters
                         })
                     );
