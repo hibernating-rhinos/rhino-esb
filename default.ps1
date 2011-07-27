@@ -11,7 +11,7 @@ properties {
   $version = Get-Version-From-Git-Tag
   $tools_dir = "$base_dir\Tools"
   $config = "Release"
-  $run_tests = "true"
+  $run_tests = $true
 }
 
 $framework = '4.0'
