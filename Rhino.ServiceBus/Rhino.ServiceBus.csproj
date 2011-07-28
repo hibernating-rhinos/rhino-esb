@@ -136,6 +136,7 @@
     <Compile Include="Msmq\QueueCreationModule.cs" />
     <Compile Include="RhinoQueues\RhinoQueuesMessageBuilder.cs" />
     <Compile Include="RhinoQueues\RhinoQueuesOneWayBus.cs" />
+    <Compile Include="ServiceBusExtensions.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
     <Compile Include="Msmq\TransportState.cs" />

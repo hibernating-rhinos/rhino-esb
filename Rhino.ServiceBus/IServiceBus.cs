@@ -49,11 +49,6 @@ namespace Rhino.ServiceBus
         /// </summary>
         void Send(params object[] messages);
 
-        /// <summary>
-        /// Send the message to this bus endpoint
-        /// </summary>
-        void SendToSelf(params object[] messages);
-
 		/// <summary>
 		/// Invoke consumers for the relevant messages managed by the current
 		/// service bus instance. This happens immediately and on the current thread.
@@ -100,11 +95,6 @@ namespace Rhino.ServiceBus
         void Unsubscribe(Type type);
 
 		/// <summary>
-		/// Handles the current message later.
-		/// </summary>
-    	void HandleCurrentMessageLater();
-
-		/// <summary>
 		/// Send the message with a built in delay in its processing
 		/// </summary>
 		/// <param name="endpoint">The endpoint.</param>
@@ -118,12 +108,5 @@ namespace Rhino.ServiceBus
         /// <param name="time">The time.</param>
         /// <param name="msgs">The messages.</param>
         void DelaySend(DateTime time, params object[] msgs);
-
-        /// <summary>
-        /// Send the message with a built in delay in its processing to this bus endpoint
-        /// </summary>
-        /// <param name="time">The time.</param>
-        /// <param name="msgs">The messages.</param>
-        void DelaySendToSelf(DateTime time, params object[] msgs);
     }
 }
