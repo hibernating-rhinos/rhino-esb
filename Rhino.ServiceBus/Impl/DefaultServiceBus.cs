@@ -92,6 +92,11 @@ namespace Rhino.ServiceBus.Impl
             Send(messageOwners.GetEndpointForMessageBatch(messages), messages);
         }
 
+        public void SendToSelf(params object[] messages)
+        {
+            Send(Endpoint, messages);
+        }
+
 		public void ConsumeMessages(params object[] messages)
 		{
 			foreach (var message in messages)
@@ -322,6 +327,16 @@ namespace Rhino.ServiceBus.Impl
         public void DelaySend(DateTime time, params object[] msgs)
         {
             DelaySend(messageOwners.GetEndpointForMessageBatch(msgs), time, msgs);
+        }
+
+        /// <summary>
+        /// Send the message with a built in delay in its processing to this bus endpoint
+        /// </summary>
+        /// <param name="time">The time.</param>
+        /// <param name="msgs">The messages.</param>
+        public void DelaySendToSelf(DateTime time, params object[] msgs)
+        {
+            DelaySend(Endpoint, time, msgs);
         }
         
         private void AutomaticallySubscribeConsumerMessages()
