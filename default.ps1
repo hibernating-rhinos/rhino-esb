@@ -51,22 +51,19 @@ task Init -depends Clean {
 	new-item $build_dir -itemType directory 
 }
 
-task Compile40 -depends Init {
-  msbuild $sln_file /p:"OutDir=$40_build_dir;Configuration=$config;TargetFrameworkVersion=4.0"
-}
-
-task Compile35 -depends Init {
+task Compile -depends Init {
   msbuild $sln_file /p:"OutDir=$35_build_dir;Configuration=$config;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir;Configuration=$config;TargetFrameworkVersion=4.0"
 }
 
-task Test -depends Compile35, Compile40 -precondition { return $run_tests }{
+task Test -depends Compile -precondition { return $run_tests }{
   $old = pwd
   cd $build_dir
   & $tools_dir\xUnit\xunit.console.clr4.exe "$build_dir\3.5\Rhino.ServiceBus.Tests.dll" /noshadow
   cd $old		
 }
 
-task Release  -depends Compile35, Compile40, Test {
+task Release  -depends Compile, Test {
 
   cd $build_dir
 	& $tools_dir\7za.exe a $release_dir\Rhino.ServiceBus.zip `
