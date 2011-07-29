@@ -18,9 +18,12 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="build\**\Rhino.ServiceBus.Autofac.dll" target="lib" />
-    <file src="build\**\Rhino.ServiceBus.Autofac.xml" target="lib" />
-    <file src="build\**\Rhino.ServiceBus.Autofac.pdb" target="lib" />
+    <file src="build\3.5\Rhino.ServiceBus.Autofac.dll" target="lib\3.5" />
+    <file src="build\3.5\Rhino.ServiceBus.Autofac.xml" target="lib\3.5" />
+    <file src="build\3.5\Rhino.ServiceBus.Autofac.pdb" target="lib\3.5" />
+    <file src="build\4.0\Rhino.ServiceBus.Autofac.dll" target="lib\4.0" />
+    <file src="build\4.0\Rhino.ServiceBus.Autofac.xml" target="lib\4.0" />
+    <file src="build\4.0\Rhino.ServiceBus.Autofac.pdb" target="lib\4.0" />
     <file src="Rhino.ServiceBus.Autofac\**\*.cs" target="src\Rhino.ServiceBus.Autofac" />
   </files>
 </package>
