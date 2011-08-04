@@ -296,14 +296,6 @@ namespace Rhino.ServiceBus.Impl
         }
 
         /// <summary>
-    	/// Handles the current message later.
-    	/// </summary>
-    	public void HandleCurrentMessageLater()
-    	{
-            transport.Send(Endpoint, DateTime.Now, new[] { currentMessage });
-    	}
-
-        /// <summary>
     	/// Send the message with a built in delay in its processing
     	/// </summary>
     	/// <param name="endpoint">The endpoint.</param>
@@ -323,7 +315,7 @@ namespace Rhino.ServiceBus.Impl
         {
             DelaySend(messageOwners.GetEndpointForMessageBatch(msgs), time, msgs);
         }
-        
+
         private void AutomaticallySubscribeConsumerMessages()
         {
             var handlers = serviceLocator.GetAllHandlersFor(typeof(IMessageConsumer));

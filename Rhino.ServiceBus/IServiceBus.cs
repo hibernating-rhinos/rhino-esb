@@ -95,11 +95,6 @@ namespace Rhino.ServiceBus
         void Unsubscribe(Type type);
 
 		/// <summary>
-		/// Handles the current message later.
-		/// </summary>
-    	void HandleCurrentMessageLater();
-
-		/// <summary>
 		/// Send the message with a built in delay in its processing
 		/// </summary>
 		/// <param name="endpoint">The endpoint.</param>
