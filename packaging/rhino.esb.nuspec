@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Rhino.ServiceBus.Host</id>
+    <id>Rhino-ESB</id>
+    <title>Rhino-ESB (Use Rhino.ServiceBus)</title>
     <version>0.0.0</version>
     <authors>Ayende Rahien, Corey Kaylor</authors>
     <owners>Corey Kaylor</owners>
@@ -9,19 +10,12 @@
     <projectUrl>https://github.com/hibernating-rhinos/rhino-esb</projectUrl>
     <iconUrl>https://github.com/hibernating-rhinos/rhino-esb/wiki/images/rhino-icon.jpg</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Host for Rhino.ServiceBus</description>
-    <tags>rhino host servicebus bus msmq messaging cqrs</tags>
+    <description>A developer friendly service bus for .NET</description>
     <dependencies>
       <dependency id="Rhino.ServiceBus"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="build\3.5\Rhino.ServiceBus.Host.exe" target="lib\3.5" />
-    <file src="build\3.5\Rhino.ServiceBus.Host.xml" target="lib\3.5" />
-    <file src="build\3.5\Rhino.ServiceBus.Host.pdb" target="lib\3.5" />
-    <file src="build\4.0\Rhino.ServiceBus.Host.exe" target="lib\4.0" />
-    <file src="build\4.0\Rhino.ServiceBus.Host.xml" target="lib\4.0" />
-    <file src="build\4.0\Rhino.ServiceBus.Host.pdb" target="lib\4.0" />
-    <file src="Rhino.ServiceBus.Host\**\*.cs" target="src\Rhino.ServiceBus.Host" />
+    <file src="license.txt" target="lib" />
   </files>
 </package>

@@ -12,7 +12,7 @@
     <description>StructureMap integration with Rhino.ServiceBus</description>
     <tags>rhino structuremap servicebus bus msmq messaging cqrs</tags>
     <dependencies>
-      <dependency id="Rhino-ESB"/>
+      <dependency id="Rhino.ServiceBus"/>
       <dependency id="structuremap"/>
       <dependency id="Rhino.Queues"/>
     </dependencies>

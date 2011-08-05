@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Rhino-ESB</id>
+    <id>Rhino.ServiceBus</id>
     <title>Rhino.ServiceBus</title>
     <version>0.0.0</version>
     <authors>Ayende Rahien, Corey Kaylor</authors>
@@ -15,6 +15,7 @@
     <dependencies>
       <dependency id="Rhino.ServiceBus.References"/>
       <dependency id="Rhino.PersistentHashTable"/>
+      <dependency id="Castle.Core"/>
     </dependencies>
   </metadata>
   <files>

@@ -12,8 +12,8 @@
     <description>Autofac integration with Rhino.ServiceBus</description>
     <tags>rhino autofac servicebus bus msmq messaging cqrs</tags>
     <dependencies>
-      <dependency id="Rhino-ESB"/>
-      <dependency id="Autofac"/>
+      <dependency id="Rhino.ServiceBus"/>
+      <dependency id="Autofac" version="2.4.4.705"/>
       <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
