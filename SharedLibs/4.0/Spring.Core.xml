@@ -13802,6 +13802,14 @@
             A new <see cref="T:Spring.Core.PropertyChangeEventArgs"/>.
             </returns>
         </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConversionUtils.TypeImplementsGenericInterface(System.Type,System.Type)">
+            <summary>
+            Determines if a Type implements a specific generic interface.
+            </summary>
+            <param name="candidateType">Candidate <see lang="Type"/> to evaluate.</param>
+            <param name="matchingInterface">The <see lang="interface"/> to test for in the Candidate <see lang="Type"/>.</param>
+            <returns><see lang="true" /> if a match, else <see lang="false"/></returns>
+        </member>
         <member name="T:Spring.Core.TypeConversion.TypeConverterRegistry">
             <summary>
             Registry class that allows users to register and retrieve type converters.
@@ -23359,6 +23367,45 @@
             <value>
             A section to read properties from.
             </value>
+        </member>
+        <member name="T:Spring.Objects.Factory.Config.ConfigurableVariableSource">
+            <summary>
+            Implementation of <see cref="T:Spring.Objects.Factory.Config.IVariableSource"/> that
+            resolves variable name against provided variables.
+            </summary>
+            <remarks>
+            Variable name resolution is case insensitive.
+            </remarks>
+            <author>Bruno Baia</author>
+        </member>
+        <member name="M:Spring.Objects.Factory.Config.ConfigurableVariableSource.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Spring.Objects.Factory.Config.ConfigurableVariableSource"/>.
+            </summary>
+        </member>
+        <member name="M:Spring.Objects.Factory.Config.ConfigurableVariableSource.CanResolveVariable(System.String)">
+            <summary>
+            Before requesting a variable resolution, a client should
+            ask, whether the source can resolve a particular variable name.
+            </summary>
+            <param name="name">the name of the variable to resolve</param>
+            <returns><c>true</c> if the variable can be resolved, <c>false</c> otherwise</returns>
+        </member>
+        <member name="M:Spring.Objects.Factory.Config.ConfigurableVariableSource.ResolveVariable(System.String)">
+            <summary>
+            Resolves variable value for the specified variable name.
+            </summary>
+            <param name="name">
+            The name of the variable to resolve.
+            </param>
+            <returns>
+            The variable value if able to resolve, <c>null</c> otherwise.
+            </returns>
+        </member>
+        <member name="P:Spring.Objects.Factory.Config.ConfigurableVariableSource.Variables">
+            <summary>
+            Gets or sets variables.
+            </summary>
         </member>
         <member name="T:Spring.Objects.Factory.Config.ConfigurationReader">
             <summary>
@@ -46822,6 +46869,15 @@
             <returns>
             <see langword="true"/> if the type can be accessed outside the assembly;
             Otherwise <see langword="false"/>.
+            </returns>
+        </member>
+        <member name="M:Spring.Util.ReflectionUtils.IsTypeNullable(System.Type)">
+            <summary>
+            Determines whether the specified type is nullable.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>
+            	<c>true</c> if the specified type is ullable]; otherwise, <c>false</c>.
             </returns>
         </member>
         <member name="M:Spring.Util.ReflectionUtils.IsTypeVisible(System.Type,System.String)">
