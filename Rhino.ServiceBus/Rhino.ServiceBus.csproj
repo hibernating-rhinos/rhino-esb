@@ -106,7 +106,6 @@
     <Compile Include="Hosting\AbstractBootStrapper.cs" />
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
-    <Compile Include="Hosting\RhinoQueuesHostConfiguration.cs" />
     <Compile Include="ICustomizeMessageHeaders.cs" />
     <Compile Include="Impl\DefaultHandler.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />

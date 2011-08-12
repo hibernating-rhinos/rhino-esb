@@ -32,7 +32,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                     Directory.Delete(expectedSubDirectory, true);
             }
 
-            var hostConfiguration = new RhinoQueuesHostConfiguration()
+            var hostConfiguration = new HostConfiguration()
                 .StoragePath(alternateStorageLocation)
                 .Bus("rhino.queues://localhost/test_queue2", "test")
                 .Receive("Rhino.ServiceBus.Tests", "rhino.queues://localhost/test_queue");

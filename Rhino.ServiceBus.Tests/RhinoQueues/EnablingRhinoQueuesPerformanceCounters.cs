@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             Assert.Empty(outboundIntances);
             Assert.Empty(inboundIntances);
 
-            var hostConfiguration = new RhinoQueuesHostConfiguration()
+            var hostConfiguration = new HostConfiguration()
                 .EnablePerformanceCounters()
                 .Bus("rhino.queues://localhost/test_queue2", "test");
 

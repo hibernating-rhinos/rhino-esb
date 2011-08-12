@@ -30,7 +30,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists(alternateOneWayDirectory))
                 Directory.Delete(alternateOneWayDirectory, true);
 
-            var hostConfiguration = new RhinoQueuesHostConfiguration()
+            var hostConfiguration = new HostConfiguration()
                 .Bus(null, ALTERNATE_BUS_NAME)
                 .Receive("System.string", "rhino.queues://nowhere/no_queue");
 

@@ -102,11 +102,11 @@ namespace Rhino.ServiceBus.Tests
             {
                 bus.Start();
 
-                var config1 = new RhinoQueuesHostConfiguration()
+                var config1 = new HostConfiguration()
                     .Receive("System.Int", "rhino.queues://localhost/test_queue");
                 
                 //Must specify an alternate storage path since we are running both out of same base directory.
-                var config2 = new RhinoQueuesHostConfiguration()
+                var config2 = new HostConfiguration()
                     .StoragePath(Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way2.esent"))
                     .Receive("System.Int", "rhino.queues://localhost/test_queue");
                 

@@ -26,7 +26,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists(defaultOneWayDirectory))
                 Directory.Delete(defaultOneWayDirectory, true);
 
-            var hostConfiguration = new RhinoQueuesHostConfiguration()
+            var hostConfiguration = new HostConfiguration()
                 .StoragePath(alternateStorageLocation)
                 .Receive("System.string", "rhino.queues://nowhere/no_queue");
 
