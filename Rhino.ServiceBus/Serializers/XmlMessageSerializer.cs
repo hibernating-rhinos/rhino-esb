@@ -271,7 +271,13 @@ namespace Rhino.ServiceBus.Serializers
 
             if (value is decimal)
                 return ((decimal) value).ToString(CultureInfo.InvariantCulture);
-            
+
+            if (value is double)
+                return ((double)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is float)
+                return ((float)value).ToString(CultureInfo.InvariantCulture);
+
             return value.ToString();
         }
 

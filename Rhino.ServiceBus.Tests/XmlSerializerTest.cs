@@ -50,6 +50,30 @@ namespace Rhino.ServiceBus.Tests
             Assert.Equal(ticks, actual);
         }
 
+        [Fact]
+        public void Can_serialize_and_deserialize_double()
+        {
+            double aDouble = 1.12;
+            var serializer = new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(new WindsorContainer()));
+            var stream = new MemoryStream();
+            serializer.Serialize(new object[] { aDouble }, stream);
+            stream.Position = 0;
+            var actual = (double)serializer.Deserialize(stream)[0];
+            Assert.Equal(aDouble, actual);
+        }
+
+        [Fact]
+        public void Can_serialize_and_deserialize_float()
+        {
+            float aFloat = 1.12f;
+            var serializer = new XmlMessageSerializer(new DefaultReflection(), new CastleServiceLocator(new WindsorContainer()));
+            var stream = new MemoryStream();
+            serializer.Serialize(new object[] { aFloat }, stream);
+            stream.Position = 0;
+            var actual = (float)serializer.Deserialize(stream)[0];
+            Assert.Equal(aFloat, actual);
+        }
+
 		[Fact]
 		public void Can_serialize_and_deserialize_byte_array()
 		{

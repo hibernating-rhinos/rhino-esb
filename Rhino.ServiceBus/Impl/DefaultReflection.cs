@@ -56,7 +56,7 @@ namespace Rhino.ServiceBus.Impl
         {
             try
             {
-                return Activator.CreateInstance(type, args);
+                return Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, args, null);
             }
             catch (Exception e)
             {

@@ -112,6 +112,13 @@ namespace Rhino.ServiceBus.Tests
             Assert.Contains(typeof(ConsumerOf<object>), consumers);
         }
 
+        [Fact]
+        public void Can_CreateInstance_when_type_has_private_constructor()
+        {
+            object objectFromClassWithPrivateConstructor = reflection.CreateInstance(typeof(ClassWithPrivateConstructor), new object[] { });
+            Assert.NotNull(objectFromClassWithPrivateConstructor);
+        }
+
         public class SomeMsg { }
         public class SomeMsgConsumer : GenericConsumer<SomeMsg> { }
         public class GenericConsumer<T> : ConsumerOf<T>
@@ -179,6 +186,12 @@ namespace Rhino.ServiceBus.Tests
                 throw new System.NotImplementedException();
             }
         }
+
+        public class ClassWithPrivateConstructor
+        {
+            private ClassWithPrivateConstructor() { }
+        }
+
     }
     public class TestDictionary<T, TK> : Dictionary<T, TK>
     {
