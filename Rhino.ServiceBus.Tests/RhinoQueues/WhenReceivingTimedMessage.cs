@@ -72,7 +72,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         public void Dispose()
         {
             transport.Dispose();
-            wait.Dispose();
+            wait.Close();
         }
 
         private bool SendTimedMessage()
