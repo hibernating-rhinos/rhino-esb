@@ -186,6 +186,7 @@
     <Compile Include="RhinoQueues\UsingRhinoQueuesBusWithAlternateStorageLocation.cs" />
     <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
     <Compile Include="RhinoQueues\WhenErrorOccurs.cs" />
+    <Compile Include="RhinoQueues\WhenReceivingTimedMessage.cs" />
     <Compile Include="RhinoQueues\WithDebugging.cs" />
     <Compile Include="SagaFinderTests.cs" />
     <Compile Include="SagaTests.cs" />

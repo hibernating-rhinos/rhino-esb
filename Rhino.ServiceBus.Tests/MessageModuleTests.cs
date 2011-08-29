@@ -132,20 +132,44 @@ namespace Rhino.ServiceBus.Tests
     		Assert.True(Module1.Completion);
     	}
 
+        [Fact]
+        public void Can_register_to_get_transaction_commit_notification()
+        {
+            using (var serviceBus = (DefaultServiceBus)container.Resolve<IServiceBus>())
+            {
+                serviceBus.Start();
+                Module1.TransactionCommitResetEvent = new ManualResetEvent(false);
+                Module1.TransactionCommit = false;
+
+                serviceBus.Send(serviceBus.Endpoint, "transaction");
+                Module1.TransactionCommitResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+            }
+            Assert.True(Module1.TransactionCommit);
+        }
+
     	public class Module1 : IMessageModule
         {
             public static Exception Exception;
             public static ManualResetEvent ErrorResetEvent;
             public static ManualResetEvent CompletionResetEvent;
+            public static ManualResetEvent TransactionCommitResetEvent;
             public static bool Completion = true;
+            public static bool TransactionCommit;
 
-			public void Init(ITransport transport, IServiceBus bus)
+    	    public void Init(ITransport transport, IServiceBus bus)
             {
+                transport.BeforeMessageTransactionCommit += Transport_BeforeMessageTransactionCommit;
                 transport.MessageProcessingFailure+=Transport_OnMessageProcessingFailure;
                 transport.MessageProcessingCompleted+=Transport_OnMessageProcessingCompleted;
             }
 
-            private static void Transport_OnMessageProcessingCompleted(CurrentMessageInformation t, Exception e)
+    	    private void Transport_BeforeMessageTransactionCommit(CurrentMessageInformation obj)
+    	    {
+                TransactionCommit = true;
+                TransactionCommitResetEvent.Set();
+    	    }
+
+    	    private static void Transport_OnMessageProcessingCompleted(CurrentMessageInformation t, Exception e)
             {
             	Completion = true;
             	CompletionResetEvent.Set();

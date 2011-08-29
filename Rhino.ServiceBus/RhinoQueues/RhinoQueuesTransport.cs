@@ -335,7 +335,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                                     ProcessMessage(message, tx,
                                                    MessageArrived,
                                                    MessageProcessingCompleted,
-                                                   null);
+                                                   BeforeMessageTransactionCommit);
                                 }
                                 break;
                             default:
