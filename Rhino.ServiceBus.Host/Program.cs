@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Host
 
     	private static ILog log = LogManager.GetLogger(typeof (Program));
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             var executingOptions = new ExecutingOptions();
             if (Parser.ParseArguments(args, executingOptions) == false)
@@ -30,12 +30,15 @@ namespace Rhino.ServiceBus.Host
                     string.Join(" ",args));
                 Console.WriteLine();
                 Console.WriteLine(Parser.ArgumentsUsage(typeof(ExecutingOptions)));
-                return;
+
+                return 1;
             }
 
             try
             {
                 actions[executingOptions.Action].Execute(executingOptions);
+
+                return 0;
             }
             catch (Exception e)
             {
@@ -43,6 +46,8 @@ namespace Rhino.ServiceBus.Host
 				// want to put the error in the error log
 				if(executingOptions.Action == Action.Server)
 					throw;
+
+                return 2;
             }
         }
     }
