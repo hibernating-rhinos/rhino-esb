@@ -15,7 +15,17 @@ namespace Rhino.ServiceBus.Host.Actions
                 Description = options.Name,
                 Context = new InstallContext()
             };
-			
+
+            if (!string.IsNullOrEmpty(options.Account))
+            {
+                if (string.IsNullOrEmpty(options.Password))
+                {
+                    throw new InvalidOperationException("When /Action is Install and /Account is set /Password is required.");
+                }
+
+                installer.SetUserAccount(options.Account, options.Password);
+            }
+
 			installer.Context.Parameters.Add("assemblypath", GetType().Assembly.Location);
 			
 			installer.Install(new Hashtable());

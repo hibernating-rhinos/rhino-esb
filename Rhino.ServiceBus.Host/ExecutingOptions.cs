@@ -14,6 +14,7 @@ namespace Rhino.ServiceBus.Host
         [Argument(ArgumentType.Required, HelpText = "Service name", ShortName = "name")] public string Name;
 
         [Argument(ArgumentType.AtMostOnce, LongName = "Account")] public string Account;
+        [Argument(ArgumentType.AtMostOnce, HelpText="Password for account used when installing service")]public string Password;
 
         [Argument(ArgumentType.AtMostOnce, LongName = "Host")] public string Host;
         [Argument(ArgumentType.AtMostOnce, LongName = "BootStrapper")] public string BootStrapper;
@@ -25,12 +26,6 @@ namespace Rhino.ServiceBus.Host
                 .Append(" /Name:\"")
                 .Append(Name)
 				.Append("\"");
-
-            if(string.IsNullOrEmpty(Account)==false)
-            {
-                sb.Append(" /Account:")
-                .Append(Account);
-            }
 
             if (string.IsNullOrEmpty(Host)==false)
             {

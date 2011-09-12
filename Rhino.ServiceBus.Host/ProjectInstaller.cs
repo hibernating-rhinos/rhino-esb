@@ -20,13 +20,12 @@ namespace Rhino.ServiceBus.Host
 			}
 		}
 
-	    public ServiceAccount Account
-	    {
-	        get
-	        {
-	            return serviceProcessInstaller1.Account;
-	        }
-	    }
+		public void SetUserAccount(string username, string password)
+		{
+			serviceProcessInstaller1.Account = ServiceAccount.User;
+			serviceProcessInstaller1.Username = username;
+			serviceProcessInstaller1.Password = password;
+		}
 
 		public ProjectInstaller()
 		{
