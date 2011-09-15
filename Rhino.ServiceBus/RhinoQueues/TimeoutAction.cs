@@ -67,8 +67,8 @@ namespace Rhino.ServiceBus.RhinoQueues
                         using (var tx = new TransactionScope())
                         {
                             var message = queue.PeekById(pair.Value);
-                            if(message==null)
-                                return;
+                            if (message==null)
+                                continue;
                             queue.MoveTo(null, message);
                             tx.Complete();
                         }
