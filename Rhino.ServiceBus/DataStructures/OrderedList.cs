@@ -9,7 +9,7 @@ namespace Rhino.ServiceBus.DataStructures
     public class OrderedList<TKey, TVal> 
         where TKey : IComparable<TKey>
     {
-        private readonly SortedList<TKey, TVal> innerList = new SortedList<TKey, TVal>();
+        private readonly SortedList<TKey, List<TVal>> innerList = new SortedList<TKey, List<TVal>>();
         private readonly ReaderWriterLockSlim readerWriterLockSlim = new ReaderWriterLockSlim();
 
         public class Reader
@@ -21,7 +21,7 @@ namespace Rhino.ServiceBus.DataStructures
                 this.parent = parent;
             }
 
-            public bool TryGetValue(TKey key, out TVal val)
+            public bool TryGetValue(TKey key, out List<TVal> val)
             {
                 return parent.innerList.TryGetValue(key, out val);
             }
@@ -32,7 +32,8 @@ namespace Rhino.ServiceBus.DataStructures
                 {
                     if(kvp.Key.CompareTo(key)>=0)
                         yield break;
-                    yield return kvp.Value;
+                    foreach (TVal val in kvp.Value)
+                        yield return val;
                 }
             }
 
@@ -53,7 +54,14 @@ namespace Rhino.ServiceBus.DataStructures
 
             public void Add(TKey key, TVal val)
             {
-                parent.innerList[key] = val;
+                List<TVal> list;
+                if (parent.innerList.TryGetValue(key, out list) == false)
+                {
+                    list = new List<TVal>();
+                    parent.innerList.Add(key, list);
+                }
+
+                list.Add(val);
             }
 
             public bool Remove(TKey key)
@@ -61,14 +69,16 @@ namespace Rhino.ServiceBus.DataStructures
                 return parent.innerList.Remove(key);
             }
 
-            public bool TryRemoveFirstUntil(TKey key, out KeyValuePair<TKey,TVal> pair)
+            public bool TryRemoveFirstUntil(TKey key, out KeyValuePair<TKey, List<TVal>> pair)
             {
-                pair = new KeyValuePair<TKey, TVal>();
-                if(parent.innerList.Count==0)
+                pair = new KeyValuePair<TKey, List<TVal>>();
+                if (parent.innerList.Count == 0)
                     return false;
+
                 pair = parent.innerList.First();
                 if (pair.Key.CompareTo(key) >= 0)
                     return false;
+
                 parent.innerList.RemoveAt(0);
                 return true;
             }

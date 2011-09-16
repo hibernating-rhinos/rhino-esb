@@ -55,42 +55,45 @@ namespace Rhino.ServiceBus.RhinoQueues
 
             timeoutMessageIds.Write(writer =>
             {
-                KeyValuePair<DateTime, MessageId> pair;
-                while (writer.TryRemoveFirstUntil(CurrentTime,out pair))
+                KeyValuePair<DateTime, List<MessageId>> pair;
+                while (writer.TryRemoveFirstUntil(CurrentTime, out pair))
                 {
                     if (pair.Key > CurrentTime)
                         return;
-                    try
+                    foreach (var messageId in pair.Value)
                     {
-                        logger.DebugFormat("Moving message {0} to main queue: {1}",
-                                           pair.Value, queue.QueueName);
-                        using (var tx = new TransactionScope())
+                        try
                         {
-                            var message = queue.PeekById(pair.Value);
-                            if (message==null)
+                            logger.DebugFormat("Moving message {0} to main queue: {1}",
+                                               messageId, queue.QueueName);
+                            using (var tx = new TransactionScope())
+                            {
+                                var message = queue.PeekById(messageId);
+                                if (message == null)
+                                    continue;
+                                queue.MoveTo(null, message);
+                                tx.Complete();
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            logger.DebugFormat(
+                                "Could not move message {0} to main queue: {1}",
+                                messageId,
+                                queue.QueueName);
+
+                            if ((CurrentTime - pair.Key).TotalMinutes >= 1.0D)
+                            {
+                                logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
+                                                   messageId);
                                 continue;
-                            queue.MoveTo(null, message);
-                            tx.Complete();
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        logger.DebugFormat(
-                            "Could not move message {0} to main queue: {1}",
-                            pair.Value,
-                            queue.QueueName);
+                            }
 
-                        if((CurrentTime - pair.Key).TotalMinutes >= 1.0D)
-                        {
-                            logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
-                                               pair.Value);
-                            continue;
-                        }
-
-                        writer.Add(pair.Key, pair.Value);
-                        logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second", 
-                                           pair.Value,
-                                           queue.QueueName);
+                            writer.Add(pair.Key, messageId);
+                            logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second",
+                                               messageId,
+                                               queue.QueueName);
+                        } 
                     }
                 } 
             });
