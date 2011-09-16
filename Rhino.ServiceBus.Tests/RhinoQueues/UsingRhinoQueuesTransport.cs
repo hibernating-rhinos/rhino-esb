@@ -141,6 +141,29 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             Assert.InRange(val - sendTime, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
         }
 
+        [Fact]
+        public void Can_send_multiple_timed_messages_for_the_same_time()
+        {
+            int receivedCount = 0;
+            transport.MessageArrived += information =>
+            {
+                receivedCount++;
+                if (receivedCount == 2)
+                    wait.Set();
+                return true;
+            };
+
+            DateTime sendTime = DateTime.Now.AddSeconds(2);
+            using (var tx = new TransactionScope())
+            {
+                transport.Send(transport.Endpoint, sendTime, new object[] { "test1" });
+                transport.Send(transport.Endpoint, sendTime, new object[] { "test2" });
+                tx.Complete();
+            }
+
+            Assert.True(wait.WaitOne(TimeSpan.FromSeconds(10), false));
+        }
+
         public void Dispose()
         {
             transport.Dispose();

@@ -87,48 +87,51 @@ namespace Rhino.ServiceBus.Msmq.TransportActions
 
             timeoutMessageIds.Write(writer =>
             {
-                KeyValuePair<DateTime, string> pair;
-                while (writer.TryRemoveFirstUntil(CurrentTime,out pair))
+                KeyValuePair<DateTime, List<string>> pair;
+                while (writer.TryRemoveFirstUntil(CurrentTime, out pair))
                 {
                     if (pair.Key > CurrentTime)
                         return;
-                    Uri queueUri = null;
-                    try
+                    foreach (string messageId in pair.Value)
                     {
-                        using(var queue = parentTransport.CreateQueue())
-                        using (var tx = new TransactionScope())
+                        Uri queueUri = null;
+                        try
                         {
-                            queueUri = queue.RootUri;
-                            logger.DebugFormat("Moving message {0} to main queue: {1}",
-                                           pair.Value,
-                                           queueUri);
-                            queueStrategy.MoveTimeoutToMainQueue(queue, pair.Value);
-                            tx.Complete();
+                            using (var queue = parentTransport.CreateQueue())
+                            using (var tx = new TransactionScope())
+                            {
+                                queueUri = queue.RootUri;
+                                logger.DebugFormat("Moving message {0} to main queue: {1}",
+                                               messageId,
+                                               queueUri);
+                                queueStrategy.MoveTimeoutToMainQueue(queue, messageId);
+                                tx.Complete();
+                            }
                         }
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        logger.DebugFormat(
-                            "Could not move message {0} to main queue: {1}",
-                            pair.Value,
-                            queueUri);
-
-                        if((CurrentTime - pair.Key).TotalMinutes >= 1.0D)
+                        catch (InvalidOperationException)
                         {
-                            logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
-                                               pair.Value);
-                            continue;
-                        }
-
-                        writer.Add(pair.Key, pair.Value);
-                        logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second", 
-                                pair.Value,
+                            logger.DebugFormat(
+                                "Could not move message {0} to main queue: {1}",
+                                messageId,
                                 queueUri);
-                    }
-                    catch(Exception e)
-                    {
-                        logger.Error("Could not move message " + pair.Value + 
-                            " from timeout queue", e);
+
+                            if ((CurrentTime - pair.Key).TotalMinutes >= 1.0D)
+                            {
+                                logger.DebugFormat("Tried to send message {0} for over a minute, giving up",
+                                                   messageId);
+                                continue;
+                            }
+
+                            writer.Add(pair.Key, messageId);
+                            logger.DebugFormat("Will retry moving message {0} to main queue {1} in 1 second",
+                                    messageId,
+                                    queueUri);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error("Could not move message " + messageId +
+                                " from timeout queue", e);
+                        } 
                     }
                 } 
             });
