@@ -13,7 +13,7 @@
     <tags>rhino structuremap servicebus bus msmq messaging cqrs</tags>
     <dependencies>
       <dependency id="Rhino.ServiceBus"/>
-      <dependency id="structuremap"/>
+      <dependency id="structuremap" version="2.6.3" />
       <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>

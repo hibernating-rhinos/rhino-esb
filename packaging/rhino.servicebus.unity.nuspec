@@ -13,8 +13,8 @@
     <tags>rhino unity servicebus bus msmq messaging cqrs</tags>
     <dependencies>
       <dependency id="Rhino.ServiceBus"/>
-      <dependency id="Unity"/>
-      <dependency id="Unity.Interception"/>
+      <dependency id="Unity" version="2.1.505.0" />
+      <dependency id="Unity.Interception" version="2.1.505.0" />
       <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>

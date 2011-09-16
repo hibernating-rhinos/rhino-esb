@@ -15,7 +15,5 @@
   <files>
     <file src="build\3.5\Esent.Interop.dll" target="lib" />
     <file src="build\3.5\Esent.Interop.xml" target="lib" />
-    <file src="build\3.5\Wintellect.Threading.dll" target="lib" />
-    <file src="build\3.5\Wintellect.Threading.xml" target="lib" />
   </files>
 </package>
