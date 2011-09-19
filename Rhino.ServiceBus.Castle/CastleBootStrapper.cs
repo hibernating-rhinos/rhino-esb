@@ -97,7 +97,7 @@ namespace Rhino.ServiceBus.Castle
 
     	protected virtual void ConfigureConsumer(ComponentRegistration registration)
     	{
-    		registration.Named(registration.Implementation.Name);
+    		registration.Named(registration.Implementation.FullName);
     	}
     }
 }
