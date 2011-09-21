@@ -13,7 +13,7 @@
     <tags>rhino autofac servicebus bus msmq messaging cqrs</tags>
     <dependencies>
       <dependency id="Rhino.ServiceBus"/>
-      <dependency id="Autofac" version="[2.4.4.705]"/>
+      <dependency id="Autofac" version="[2.5.2.830]"/>
       <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
