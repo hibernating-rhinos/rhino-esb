@@ -1,7 +1,5 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
@@ -34,11 +32,11 @@ namespace Rhino.ServiceBus.Tests.Hosting
         }
 
         [Fact]
-        public void Components_are_registered_using_name_only()
+        public void Components_are_registered_using_their_full_name()
         {
             var windsorContainer = new WindsorContainer(new XmlInterpreter());
             new SimpleBootStrapper(windsorContainer).InitializeContainer();
-            var handler = windsorContainer.Kernel.GetHandler(typeof(TestRemoteHandler).Name);
+            var handler = windsorContainer.Kernel.GetHandler(typeof(TestRemoteHandler).FullName);
             Assert.NotNull(handler);
         }
 
