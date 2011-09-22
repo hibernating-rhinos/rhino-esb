@@ -1,5 +1,6 @@
 using System;
 using System.Messaging;
+using Autofac.Core;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -8,6 +9,7 @@ using Rhino.ServiceBus.MessageModules;
 using Autofac;
 using Rhino.ServiceBus.Msmq;
 using Xunit;
+using IStartable = Rhino.ServiceBus.Internal.IStartable;
 
 namespace Rhino.ServiceBus.Tests.Containers.Autofac
 {
@@ -35,7 +37,10 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
                 .UseAutofac(container)
                 .Configure();
 
-            Assert.Throws<InvalidUsageException>(() => container.Resolve<TestConsumer>());
+            var resolutionException = Assert.Throws<DependencyResolutionException>(() => container.Resolve<TestConsumer>());
+
+            Assert.NotNull(resolutionException.InnerException);
+            Assert.IsType<InvalidUsageException>(resolutionException.InnerException);
         }
 
         [Fact]
