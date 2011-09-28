@@ -227,7 +227,7 @@ namespace Rhino.ServiceBus.Serializers
                 return new Guid(value);
 
             if (type == typeof(DateTime))
-                return XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.Utc);
+                return DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
 			if (type == typeof(DateTimeOffset))
 				return XmlConvert.ToDateTimeOffset(value);
@@ -256,7 +256,7 @@ namespace Rhino.ServiceBus.Serializers
                 return value.ToString();
 
             if (value is DateTime)
-                return ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+                return ((DateTime)value).ToString("o", CultureInfo.InvariantCulture);
 
 			if(value is DateTimeOffset)
 				return XmlConvert.ToString((DateTimeOffset)value);

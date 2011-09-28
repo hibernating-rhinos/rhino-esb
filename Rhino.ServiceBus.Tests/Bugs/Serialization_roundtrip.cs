@@ -40,13 +40,32 @@ namespace Rhino.ServiceBus.Tests.Bugs
                                                       new CastleServiceLocator(new WindsorContainer()));
 
             var stream = new MemoryStream();
-            serializer.Serialize(new object[] {new Foo {Name = "abc"}}, stream);
+            serializer.Serialize(new object[] { new Foo { Name = "abc" } }, stream);
 
             stream.Position = 0;
 
             var foo = (Foo)serializer.Deserialize(stream)[0];
             Assert.Equal("abc", foo.Name);
             Assert.Equal("ABC", foo.UName);
+        }
+
+        [Theory]
+        [InlineData(DateTimeKind.Local)]
+        [InlineData(DateTimeKind.Unspecified)]
+        [InlineData(DateTimeKind.Utc)]
+        public void Roundtrip_with_datetime_should_preserved_DateTimeKind(DateTimeKind kind)
+        {
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                           new CastleServiceLocator(new WindsorContainer()));
+            var stream = new MemoryStream();
+            var date = new DateTime(DateTime.Now.Ticks, kind);
+            serializer.Serialize(new object[] { new Bar { Date = date } }, stream);
+
+            stream.Position = 0;
+            
+            var bar = (Bar)serializer.Deserialize(stream)[0];
+            Assert.Equal(date, bar.Date);  //This passes 
+            Assert.Equal(kind, bar.Date.Kind); //This fails date.Kind is local, bar.Date.Kind is UTC 
         }
 
         [Theory]
