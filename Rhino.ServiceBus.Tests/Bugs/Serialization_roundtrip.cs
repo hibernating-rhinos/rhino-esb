@@ -64,8 +64,8 @@ namespace Rhino.ServiceBus.Tests.Bugs
             stream.Position = 0;
             
             var bar = (Bar)serializer.Deserialize(stream)[0];
-            Assert.Equal(date, bar.Date);  //This passes 
-            Assert.Equal(kind, bar.Date.Kind); //This fails date.Kind is local, bar.Date.Kind is UTC 
+            Assert.Equal(date, bar.Date);  
+            Assert.Equal(kind, bar.Date.Kind);
         }
 
         [Theory]
