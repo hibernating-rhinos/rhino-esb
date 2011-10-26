@@ -200,7 +200,7 @@ namespace Rhino.ServiceBus.Autofac
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<QueueCreationModule>()
-                .AsSelf()
+                .As<IServiceBusAware>()
                 .SingleInstance();
             builder.Update(container);
         }
