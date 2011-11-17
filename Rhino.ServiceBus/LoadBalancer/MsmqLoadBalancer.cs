@@ -16,6 +16,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 {
 	public class MsmqLoadBalancer : AbstractMsmqListener
 	{
+        private int continuousDeliveryFailures = 0;
 		private readonly Uri secondaryLoadBalancer;
 		private readonly IQueueStrategy queueStrategy;
 		private readonly ILog logger = LogManager.GetLogger(typeof(MsmqLoadBalancer));
@@ -322,9 +323,18 @@ namespace Rhino.ServiceBus.LoadBalancer
 			if (worker == null) // handle message later
 			{
 				queue.Send(message);
+
+                continuousDeliveryFailures++;
+
+                if (continuousDeliveryFailures >= 100)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    continuousDeliveryFailures = 0;
+                }
 			}
 			else
 			{
+                continuousDeliveryFailures = 0;
 				var workerEndpoint = endpointRouter.GetRoutedEndpoint(worker);
 				using (var workerQueue = MsmqUtil.GetQueuePath(workerEndpoint).Open(QueueAccessMode.Send))
 				{
