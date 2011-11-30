@@ -34,9 +34,11 @@ namespace Rhino.ServiceBus.Host
                 return 1;
             }
 
-            try
+        	var action = executingOptions.Action ??
+        	             (Environment.UserInteractive ? Action.Debug : Action.Server);
+        	try
             {
-                actions[executingOptions.Action].Execute(executingOptions);
+                actions[action].Execute(executingOptions);
 
                 return 0;
             }
@@ -44,7 +46,7 @@ namespace Rhino.ServiceBus.Host
             {
                 log.Fatal("Host has crashed because of an error",e);
 				// want to put the error in the error log
-				if(executingOptions.Action == Action.Server)
+				if(action == Action.Server)
 					throw;
 
                 return 2;

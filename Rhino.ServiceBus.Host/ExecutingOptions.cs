@@ -5,7 +5,7 @@ namespace Rhino.ServiceBus.Host
 {
     public class ExecutingOptions
     {
-        [Argument(ArgumentType.Required, HelpText = "Choose an action", ShortName = "action")] public Action Action;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Choose an action", ShortName = "action")] public Action? Action;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Assembly to execute", ShortName = "asm")] public string Assembly;
 
