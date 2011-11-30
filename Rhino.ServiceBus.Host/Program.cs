@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using CommandLine;
 using log4net;
 using Rhino.ServiceBus.Host.Actions;
@@ -36,6 +37,9 @@ namespace Rhino.ServiceBus.Host
 
         	var action = executingOptions.Action ??
         	             (Environment.UserInteractive ? Action.Debug : Action.Server);
+
+        	executingOptions.Name = executingOptions.Name ?? Path.GetFileNameWithoutExtension(executingOptions.Assembly);
+
         	try
             {
                 actions[action].Execute(executingOptions);

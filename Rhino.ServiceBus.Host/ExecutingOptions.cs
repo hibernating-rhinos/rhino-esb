@@ -11,7 +11,7 @@ namespace Rhino.ServiceBus.Host
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Configuration file", ShortName = "config")] public string ConfigFile;
 
-        [Argument(ArgumentType.Required, HelpText = "Service name", ShortName = "name")] public string Name;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Service name", ShortName = "name")] public string Name;
 
         [Argument(ArgumentType.AtMostOnce, LongName = "Account")] public string Account;
         [Argument(ArgumentType.AtMostOnce, HelpText="Password for account used when installing service")]public string Password;
