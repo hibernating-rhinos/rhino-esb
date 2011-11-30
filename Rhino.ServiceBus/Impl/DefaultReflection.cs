@@ -90,6 +90,19 @@ namespace Rhino.ServiceBus.Impl
             }
         }
 
+		public void InvokeAdd(object instance, object key, object value)
+		{
+			try
+			{
+				Type type = instance.GetType();
+				type.InvokeMember("Add", BindingFlags.Public| BindingFlags.InvokeMethod | BindingFlags.Instance, null, instance, new[] {key, value});
+			}
+			catch (TargetInvocationException e)
+			{
+				throw InnerExceptionWhilePreservingStackTrace(e);
+			}
+		}
+
         public XElement InvokeToElement(object instance, object item, Func<Type, XNamespace> getNamespace)
         {
             try

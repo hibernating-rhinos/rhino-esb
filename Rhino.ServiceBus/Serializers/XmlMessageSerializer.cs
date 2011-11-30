@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
@@ -107,6 +108,33 @@ namespace Rhino.ServiceBus.Serializers
 				var elementName = GetXmlNamespace(namespaces, typeof(byte[])) + name;
 				parent.Add(new XElement(elementName, Convert.ToBase64String((byte[]) value)));
 			}
+			else if (ShouldTreatAsDictionary(value.GetType()))
+			{
+				XElement list = GetContentWithNamespace(value, namespaces, name);
+				parent.Add(list);
+				var itemCount = 0;
+				foreach (var item in ((IEnumerable)value))
+				{
+					if (item == null)
+						continue;
+					itemCount += 1;
+					if (itemCount > MaxNumberOfAllowedItemsInCollection)
+						throw new UnboundedResultSetException("You cannot send collections with more than 256 items (" + value + " " + name + ")");
+
+					var entry = new XElement("entry");
+					var keyProp = reflection.Get(item, "Key");
+					if (keyProp == null)
+						continue;
+					WriteObject("Key", keyProp, entry, namespaces);
+					var propVal = reflection.Get(item, "Value");
+					if (propVal != null)
+					{
+						WriteObject("Value", propVal, entry, namespaces);
+					}
+					
+					list.Add(entry);
+				}
+			}
 			else if (value is IEnumerable)
             {
                 XElement list = GetContentWithNamespace(value, namespaces, name);
@@ -138,7 +166,24 @@ namespace Rhino.ServiceBus.Serializers
             }
         }
 
-		private XElement ApplyMessageSerializationBehaviorIfNecessary(Type messageType, XElement element)
+    	private static bool ShouldTreatAsDictionary(Type type)
+    	{
+    		if (type.IsGenericType == false)
+				return false;
+
+    		var genericArguments = type.GetGenericArguments();
+			if (genericArguments.Length != 2)
+				return false;
+
+    		var interfaceType = typeof (IDictionary<,>).MakeGenericType(genericArguments);
+			if (interfaceType.IsAssignableFrom(type) == false)
+				return false;
+
+    		return true;
+
+    	}
+
+    	private XElement ApplyMessageSerializationBehaviorIfNecessary(Type messageType, XElement element)
 		{
 			foreach (var afterSerializedBehavior in elementSerializationBehaviors)
 			{
@@ -347,6 +392,10 @@ namespace Rhino.ServiceBus.Serializers
             {
                 return FromString(type, element.Value);
             }
+			if(ShouldTreatAsDictionary(type))
+			{
+				return ReadDictionary(type, element);
+			}
             if (typeof(IEnumerable).IsAssignableFrom(type))
             {
                 return ReadList(type, element);
@@ -427,5 +476,29 @@ namespace Rhino.ServiceBus.Serializers
             }
             return instance;
         }
+
+		private object ReadDictionary(Type type, XContainer element)
+		{
+			object instance = reflection.CreateInstance(type);
+			var genericArguments = type.GetGenericArguments();
+			var keyType = genericArguments[0];
+			var valueType = genericArguments[1];
+			int index = 0;
+			var array = instance as Array;
+			foreach (var entry in element.Elements())
+			{
+				var elements = entry.Elements().ToArray();
+				var itemKeyType = reflection.GetTypeFromXmlNamespace(elements[0].Name.NamespaceName);
+				object key = ReadObject(itemKeyType ?? keyType, elements[0]);
+
+				var itemValueType = reflection.GetTypeFromXmlNamespace(elements[1].Name.NamespaceName);
+				object value = ReadObject(itemValueType ?? valueType, elements[1]);
+
+				reflection.InvokeAdd(instance, key, value);
+
+				index += 1;
+			}
+			return instance;
+		}
     }
 }

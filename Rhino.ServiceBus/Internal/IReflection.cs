@@ -45,6 +45,8 @@ namespace Rhino.ServiceBus.Internal
         Type GetTypeFromXmlNamespace(string xmlNamespace);
 
         void InvokeAdd(object instance, object item);
+    	
+		void InvokeAdd(object instance, object key, object value);
 
         object InvokeFromElement(object covertor, XElement value);
 

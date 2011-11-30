@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
@@ -32,6 +33,64 @@ namespace Rhino.ServiceBus.Tests.Bugs
         {
             public DateTime Date { get; set; }
         }
+
+		public class ItemWithInitDictionary
+		{
+			public string Name { get; set; }
+			public Dictionary<string, string> Arguments { get; set; }
+
+			public ItemWithInitDictionary()
+			{
+				Arguments = new Dictionary<string, string>();
+			}
+		}
+
+		public class ItemWithoutInitDictionary
+		{
+			public string Name { get; set; }
+			public Dictionary<string, string> Arguments { get; set; }
+		}
+
+		[Fact]
+		public void Can_use_dictionaries_initialized()
+		{
+			var serializer = new XmlMessageSerializer(new DefaultReflection(),
+													new CastleServiceLocator(new WindsorContainer()));
+
+			var stream = new MemoryStream();
+			serializer.Serialize(new object[] { new ItemWithInitDictionary { Name = "abc", Arguments = new Dictionary<string, string>
+			{
+				{"abc","cdef"}
+			}} }, stream);
+
+			stream.Position = 0;
+
+			var foo = (ItemWithInitDictionary)serializer.Deserialize(stream)[0];
+			Assert.Equal("abc", foo.Name);
+			Assert.Equal("cdef", foo.Arguments["abc"]);
+		}
+
+		[Fact]
+		public void Can_use_dictionaries_uninitialized()
+		{
+			var serializer = new XmlMessageSerializer(new DefaultReflection(),
+													new CastleServiceLocator(new WindsorContainer()));
+
+			var stream = new MemoryStream();
+			serializer.Serialize(new object[] { new ItemWithoutInitDictionary { Name = "abc", Arguments = new Dictionary<string, string>
+			{
+				{"abc","cdef"}
+			}} }, stream);
+
+			stream.Position = 0;
+
+			stream.Position = 0;
+
+
+			var foo = (ItemWithoutInitDictionary)serializer.Deserialize(stream)[0];
+			Assert.Equal("abc", foo.Name);
+			Assert.Equal("cdef", foo.Arguments["abc"]);
+		}
 
         [Fact]
         public void Can_roundtrip()
