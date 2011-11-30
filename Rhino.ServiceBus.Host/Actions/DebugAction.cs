@@ -10,9 +10,23 @@ namespace Rhino.ServiceBus.Host.Actions
             host.SetArguments(options);
             try
             {
-                host.DebugStart(new string[0]);
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
+				host.DebugStart(new string[0]);
+            	bool keepGoing = true;
+				while (keepGoing)
+            	{
+					Console.WriteLine("Enter 'cls' to clear the screen, 'q' to exit");
+            		var op = Console.ReadLine() ?? "";
+            		switch (op.ToLowerInvariant())
+            		{
+						case "q":
+            				keepGoing = false;
+            				break;
+						case "cls":
+							Console.Clear();
+            				break;
+            		}
+
+            	}
                 host.Stop();
             }
             catch (Exception e)
