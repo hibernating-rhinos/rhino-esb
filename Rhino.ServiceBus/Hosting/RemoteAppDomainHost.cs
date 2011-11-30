@@ -37,10 +37,27 @@ namespace Rhino.ServiceBus.Hosting
         {
             configurationFile = configuration;
             assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-            assemblyLocation = Path.GetDirectoryName(assemblyPath);
+			assemblyLocation = GetAssemblyLocation(assemblyPath);
         }
 
-        protected string AssemblyName
+    	private static string GetAssemblyLocation(string assemblyPath)
+    	{
+    		if (Path.IsPathRooted(assemblyPath))
+    			return Path.GetDirectoryName(assemblyPath);
+
+    		var currentDirPath = Path.Combine(Environment.CurrentDirectory, assemblyPath);
+			if (File.Exists(currentDirPath))
+				return Path.GetDirectoryName(currentDirPath);
+
+    		var basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyPath);
+			if (File.Exists(basePath))
+				return Path.GetDirectoryName(basePath);
+
+			// no idea, use the default
+			return Path.GetDirectoryName(assemblyPath);
+    	}
+
+    	protected string AssemblyName
         {
             get { return assemblyName; }
         }
