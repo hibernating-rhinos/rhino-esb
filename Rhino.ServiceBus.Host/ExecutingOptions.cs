@@ -5,9 +5,9 @@ namespace Rhino.ServiceBus.Host
 {
     public class ExecutingOptions
     {
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Choose an action", ShortName = "action")] public Action? Action;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Choose an action", ShortName = "action")] public Action Action;
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Assembly to execute", ShortName = "asm")] public string Assembly;
+        [Argument(ArgumentType.Required, HelpText = "Assembly to execute", ShortName = "asm")] public string Assembly;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Configuration file", ShortName = "config")] public string ConfigFile;
 

@@ -35,8 +35,9 @@ namespace Rhino.ServiceBus.Host
                 return 1;
             }
 
-        	var action = executingOptions.Action ??
-        	             (Environment.UserInteractive ? Action.Debug : Action.Server);
+        	var action = executingOptions.Action == Action.None
+        	             	? (Environment.UserInteractive ? Action.Debug : Action.Server)
+        	             	: executingOptions.Action;
 
         	executingOptions.Name = executingOptions.Name ?? Path.GetFileNameWithoutExtension(executingOptions.Assembly);
 
