@@ -41,7 +41,7 @@ namespace Rhino.ServiceBus.Hosting
 
             startable.Start();
 
-            bootStrapper.AfterStart();
+            bootStrapper.EndStart();
         }
 
         private void InitailizeBus(string asmName)
@@ -58,7 +58,7 @@ namespace Rhino.ServiceBus.Hosting
 
             InitializeContainer();
 
-            bootStrapper.BeforeStart();
+            bootStrapper.BeginStart();
 
             logger.Debug("Starting bus");
             startable = bootStrapper.GetInstance<IStartable>();
