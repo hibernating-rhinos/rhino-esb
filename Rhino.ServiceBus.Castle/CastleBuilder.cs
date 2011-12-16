@@ -59,7 +59,7 @@ namespace Rhino.ServiceBus.Castle
 
             container.Register(
                 AllTypes.FromAssembly(typeof(IServiceBus).Assembly)
-                    .BasedOn<IBusConfigurationAware>()
+                    .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
                 );
 
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
@@ -104,9 +104,7 @@ namespace Rhino.ServiceBus.Castle
                     {
                         messageOwners = busConfig.MessageOwners.ToArray(),
                     })
-                    .Parameters(
-                        Parameter.ForKey("modules").Eq(CreateModuleConfigurationNode(busConfig.MessageModules))
-                    )
+                    .DependsOn(Dependency.OnConfigValue("modules",CreateModuleConfigurationNode(busConfig.MessageModules)))
                 );
         }
 
@@ -236,7 +234,8 @@ namespace Rhino.ServiceBus.Castle
 
         public void RegisterQueueCreation()
         {
-            container.Kernel.Register(Component.For<QueueCreationModule>());
+            container.Kernel.Register(Component.For<IServiceBusAware>()
+                .ImplementedBy<QueueCreationModule>());
         }
 
         public void RegisterMsmqOneWay()
@@ -316,13 +315,13 @@ namespace Rhino.ServiceBus.Castle
             container.Register(
                 Component.For<IValueConvertor<WireEcryptedString>>()
                     .ImplementedBy<WireEcryptedStringConvertor>()
-					.ServiceOverrides(ServiceOverride.ForKey("encryptionService").Eq("esb.security"))
+                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security"))
                 );
 
         	container.Register(
 				Component.For<IElementSerializationBehavior>()
 					.ImplementedBy<WireEncryptedMessageConvertor>()
-					.ServiceOverrides(ServiceOverride.ForKey("encryptionService").Eq("esb.security"))
+                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security"))
         		);
         }
 

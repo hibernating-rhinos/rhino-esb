@@ -527,7 +527,7 @@ namespace Rhino.ServiceBus.Impl
                 {
                     try
                     {
-                        var sagaFinder = serviceLocator.Resolve(sagaFinderHandler.Service);
+                        var sagaFinder = sagaFinderHandler.Resolve();
                         var saga = reflection.InvokeSagaFinderFindBy(sagaFinder, message);
                         if (saga != null)
                             instances.Add(saga);
