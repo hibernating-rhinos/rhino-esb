@@ -483,8 +483,6 @@ namespace Rhino.ServiceBus.Serializers
 			var genericArguments = type.GetGenericArguments();
 			var keyType = genericArguments[0];
 			var valueType = genericArguments[1];
-			int index = 0;
-			var array = instance as Array;
 			foreach (var entry in element.Elements())
 			{
 				var elements = entry.Elements().ToArray();
@@ -495,8 +493,6 @@ namespace Rhino.ServiceBus.Serializers
 				object value = ReadObject(itemValueType ?? valueType, elements[1]);
 
 				reflection.InvokeAdd(instance, key, value);
-
-				index += 1;
 			}
 			return instance;
 		}
