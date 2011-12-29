@@ -51,6 +51,12 @@ namespace Rhino.ServiceBus.Tests.Bugs
 			public Dictionary<string, string> Arguments { get; set; }
 		}
 
+		public class ItemWithObjectDictionary
+		{
+			public string Name { get; set; }
+			public Dictionary<string, object> Arguments { get; set; }
+		}
+
 		[Fact]
 		public void Can_use_dictionaries_initialized()
 		{
@@ -90,6 +96,37 @@ namespace Rhino.ServiceBus.Tests.Bugs
 			var foo = (ItemWithoutInitDictionary)serializer.Deserialize(stream)[0];
 			Assert.Equal("abc", foo.Name);
 			Assert.Equal("cdef", foo.Arguments["abc"]);
+		}
+
+		public class Dog
+		{
+			public string Name { get; set; }
+		}
+
+		[Fact]
+		public void Can_handle_dictionaries_where_values_are_objects()
+		{
+			var serializer = new XmlMessageSerializer(new DefaultReflection(),
+													new CastleServiceLocator(new WindsorContainer()));
+
+			var stream = new MemoryStream();
+			serializer.Serialize(new object[] { new ItemWithObjectDictionary() { Name = "abc", Arguments = new Dictionary<string, object>
+			{
+				{"abc","cdef"},
+				{"def", 1},
+				{"123", new Dog{Name = "Oscar"}}
+			}} }, stream);
+
+			stream.Position = 0;
+
+			stream.Position = 0;
+
+
+			var foo = (ItemWithObjectDictionary)serializer.Deserialize(stream)[0];
+			Assert.Equal("abc", foo.Name);
+			Assert.Equal("cdef", foo.Arguments["abc"]);
+			Assert.Equal(1, (int)foo.Arguments["def"]);
+			Assert.Equal("Oscar", ((Dog)foo.Arguments["123"]).Name);
 		}
 
         [Fact]
