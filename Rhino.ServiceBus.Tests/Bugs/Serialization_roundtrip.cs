@@ -98,6 +98,28 @@ namespace Rhino.ServiceBus.Tests.Bugs
 			Assert.Equal("cdef", foo.Arguments["abc"]);
 		}
 
+		[Fact]
+		public void Can_use_dictionaries_with_a_null_value()
+		{
+			var serializer = new XmlMessageSerializer(new DefaultReflection(),
+													new CastleServiceLocator(new WindsorContainer()));
+
+			var stream = new MemoryStream();
+			serializer.Serialize(new object[] { new ItemWithoutInitDictionary { Name = "abc", Arguments = new Dictionary<string, string>
+			{
+				{"abc",null}
+			}} }, stream);
+
+			stream.Position = 0;
+
+			stream.Position = 0;
+
+
+			var foo = (ItemWithoutInitDictionary)serializer.Deserialize(stream)[0];
+			Assert.Equal("abc", foo.Name);
+			Assert.Equal(null, foo.Arguments["abc"]);
+		}
+
 		public class Dog
 		{
 			public string Name { get; set; }

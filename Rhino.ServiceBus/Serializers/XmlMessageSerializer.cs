@@ -489,8 +489,12 @@ namespace Rhino.ServiceBus.Serializers
 				var itemKeyType = reflection.GetTypeFromXmlNamespace(elements[0].Name.NamespaceName);
 				object key = ReadObject(itemKeyType ?? keyType, elements[0]);
 
-				var itemValueType = reflection.GetTypeFromXmlNamespace(elements[1].Name.NamespaceName);
-				object value = ReadObject(itemValueType ?? valueType, elements[1]);
+				object value = null;
+				if (elements.Length > 1)
+				{
+					var itemValueType = reflection.GetTypeFromXmlNamespace(elements[1].Name.NamespaceName);
+					value = ReadObject(itemValueType ?? valueType, elements[1]);
+				}
 
 				reflection.InvokeAdd(instance, key, value);
 			}
