@@ -42,9 +42,6 @@
     <LibDir>..\SharedLibs\4.0\</LibDir>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>$(LibDir)Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\Esent.Interop.dll</HintPath>
     </Reference>
@@ -246,7 +243,6 @@
     <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
     <Compile Include="Util\CurrentMessage.cs" />
-    <Compile Include="Util\ProxyUtil.cs" />
     <Compile Include="Util\SerializationExtensions.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />

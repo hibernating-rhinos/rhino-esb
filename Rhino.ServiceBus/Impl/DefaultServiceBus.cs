@@ -9,7 +9,6 @@ using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Sagas;
-using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -521,7 +520,7 @@ namespace Rhino.ServiceBus.Impl
                 Type sagaType = sagaHandler.Implementation;
 
                 //first try to execute any saga finders.
-                Type sagaFinderType = reflection.GetGenericTypeOf(typeof(ISagaFinder<,>), sagaType, ProxyUtil.GetUnproxiedType(message));
+                Type sagaFinderType = reflection.GetGenericTypeOf(typeof(ISagaFinder<,>), sagaType, reflection.GetUnproxiedType(message));
                 var sagaFinderHandlers = serviceLocator.GetAllHandlersFor(sagaFinderType);
                 foreach (var sagaFinderHandler in sagaFinderHandlers)
                 {
