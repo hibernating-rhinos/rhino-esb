@@ -51,6 +51,9 @@ namespace Rhino.ServiceBus.Internal
         object InvokeFromElement(object covertor, XElement value);
 
         XElement InvokeToElement(object covertor, object value, Func<Type, XNamespace> getNamespace);
+        
         string GetNameForXml(Type type);
+        
+        Type GetUnproxiedType(object instance);
     }
 }

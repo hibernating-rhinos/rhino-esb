@@ -6,7 +6,6 @@ using System.Text;
 using System.Xml.Linq;
 using log4net;
 using Rhino.ServiceBus.Internal;
-using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {
@@ -179,7 +178,7 @@ namespace Rhino.ServiceBus.Impl
 
         public Type GetGenericTypeOf(Type type, object msg)
         {
-            return GetGenericTypeOf(type, ProxyUtil.GetUnproxiedType(msg));
+            return GetGenericTypeOf(type, GetUnproxiedType(msg));
         }
 
         public Type GetGenericTypeOf(Type type, Type paramType)
@@ -194,7 +193,7 @@ namespace Rhino.ServiceBus.Impl
 
     	public ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, object msg)
     	{
-			return GetGenericTypesOfWithBaseTypes(type, ProxyUtil.GetUnproxiedType(msg));
+			return GetGenericTypesOfWithBaseTypes(type, GetUnproxiedType(msg));
     	}
 
 		public ICollection<Type> GetGenericTypesOfWithBaseTypes(Type type, Type paramType)
@@ -415,6 +414,12 @@ namespace Rhino.ServiceBus.Impl
             }
             list.ExceptWith(toRemove);
             return list.ToArray();
+        }
+
+        public virtual Type GetUnproxiedType(object instance)
+        {
+            // default to not understanding proxies
+            return instance.GetType();
         }
 
         #endregion

@@ -78,7 +78,7 @@ namespace Rhino.ServiceBus.Castle
             container.Register(
                 Component.For<IReflection>()
                     .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy<DefaultReflection>(),
+                    .ImplementedBy<CastleReflection>(),
 
                 Component.For<IMessageSerializer>()
                     .LifeStyle.Is(LifestyleType.Singleton)

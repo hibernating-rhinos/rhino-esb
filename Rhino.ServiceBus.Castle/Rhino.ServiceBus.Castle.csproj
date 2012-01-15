@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="CastleBootStrapper.cs" />
     <Compile Include="CastleBuilder.cs" />
+    <Compile Include="CastleReflection.cs" />
     <Compile Include="CastleServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CastleLoadBalancerBootStrapper.cs" />

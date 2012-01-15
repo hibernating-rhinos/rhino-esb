@@ -1,14 +1,15 @@
-using System;
+﻿using System;
 using System.Runtime.Remoting;
 using Castle.DynamicProxy;
+using Rhino.ServiceBus.Impl;
 
-namespace Rhino.ServiceBus.Util
+namespace Rhino.ServiceBus.Castle
 {
-    //Pulled from Castle.Windsor 
-    public static class ProxyUtil
+    public class CastleReflection : DefaultReflection
     {
-        public static Type GetUnproxiedType(object instance)
+        public override Type GetUnproxiedType(object instance)
         {
+            //Pulled from Castle.Windsor 
             if (!RemotingServices.IsTransparentProxy(instance))
             {
                 IProxyTargetAccessor accessor = instance as IProxyTargetAccessor;
@@ -27,8 +28,5 @@ namespace Rhino.ServiceBus.Util
             }
             return instance.GetType();
         }
-
- 
-
     }
 }
