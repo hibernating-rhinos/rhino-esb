@@ -11,20 +11,22 @@ namespace Rhino.ServiceBus.Transport
 		private readonly Action sendMessageBackToQueue;
 		private readonly Action<CurrentMessageInformation, Exception> messageCompleted;
 		private readonly Action<CurrentMessageInformation> beforeTransactionCommit;
-		private readonly ILog logger;
+	    private readonly Action<CurrentMessageInformation> beforeTransactionRollback;
+	    private readonly ILog logger;
 		private readonly Action<CurrentMessageInformation, Exception> messageProcessingFailure;
 		private readonly CurrentMessageInformation currentMessageInformation;
 
 		private Exception exception;
 
-		public MessageHandlingCompletion(TransactionScope tx, Action sendMessageBackToQueue, Exception exception, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit, ILog logger, Action<CurrentMessageInformation, Exception> messageProcessingFailure, CurrentMessageInformation currentMessageInformation)
+        public MessageHandlingCompletion(TransactionScope tx, Action sendMessageBackToQueue, Exception exception, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit, Action<CurrentMessageInformation> beforeTransactionRollback, ILog logger, Action<CurrentMessageInformation, Exception> messageProcessingFailure, CurrentMessageInformation currentMessageInformation)
 		{
 			this.tx = tx;
 			this.sendMessageBackToQueue = sendMessageBackToQueue;
 			this.exception = exception;
 			this.messageCompleted = messageCompleted;
 			this.beforeTransactionCommit = beforeTransactionCommit;
-			this.logger = logger;
+            this.beforeTransactionRollback = beforeTransactionRollback;
+            this.logger = logger;
 			this.messageProcessingFailure = messageProcessingFailure;
 			this.currentMessageInformation = currentMessageInformation;
 		}
@@ -92,6 +94,8 @@ namespace Rhino.ServiceBus.Transport
 			{
 				if (txDisposed == false && tx != null)
 				{
+                    if (beforeTransactionRollback != null)
+                        beforeTransactionRollback(currentMessageInformation);
 					logger.Warn("Disposing transaction in error mode");
 					tx.Dispose();
 				}

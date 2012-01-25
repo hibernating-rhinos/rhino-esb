@@ -15,32 +15,60 @@ using Xunit;
 namespace Rhino.ServiceBus.Tests.Bugs
 {
     // ReSharper disable InconsistentNaming
-    public class When_transaction_disposed_nested_transactions_fail
+    public class When_transaction_rolled_back_nested_transactions_fail
     {
         private MemoryAppender memoryAppender;
 
-        public When_transaction_disposed_nested_transactions_fail()
+        public When_transaction_rolled_back_nested_transactions_fail()
         {
             log4net.Config.BasicConfigurator.Configure();
             memoryAppender = new MemoryAppender();
             var hierarchy = (Hierarchy)LogManager.GetRepository();
+            hierarchy.Root.RemoveAllAppenders();
             hierarchy.Root.AddAppender(memoryAppender);
         }
 
-        private static IWindsorContainer CreateContainer()
+        private static IWindsorContainer SetupBusForMsmq()
         {
             var container = new WindsorContainer(new XmlInterpreter());
             new RhinoServiceBusConfiguration()
                 .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("BusOnTransactionalQueue.config")
+                .AddMessageModule<TestMessageModule>()
+                .Configure();
+            return container;
+        }
+
+        private static IWindsorContainer SetupBusForRhinoQueues()
+        {
+            var container = new WindsorContainer(new XmlInterpreter());
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("RhinoQueues/RhinoQueues.config")
                 .AddMessageModule<TestMessageModule>()
                 .Configure();
             return container;
         }
 
         [Fact]
-        public void Should_allow_nested_transaction_to_be_disposed()
+        public void Should_allow_nested_transaction_to_be_rolled_back_using_msmq()
         {
-            var container = CreateContainer();
+            var container = SetupBusForMsmq();
+            container.Register(Component.For<TestConsumer>());
+
+            using (var bus = container.Resolve<IStartableServiceBus>())
+            {
+                bus.Start();
+                bus.SendToSelf(new TestMessage());
+            }
+
+            AssertThatNestedTransactionExceptionHasNotBeenThrown();
+        }
+
+        [Fact]
+        public void Should_allow_nested_transaction_to_be_rolled_back_using_rhino_queues()
+        {
+            var container = SetupBusForRhinoQueues();
             container.Register(Component.For<TestConsumer>());
 
             using (var bus = container.Resolve<IStartableServiceBus>())
@@ -81,17 +109,13 @@ namespace Rhino.ServiceBus.Tests.Bugs
             public void Init(ITransport transport, IServiceBus bus)
             {
                 transport.MessageArrived += MessageArrived;
-                transport.MessageProcessingCompleted += MessageProcessingCompleted;
-                transport.MessageProcessingFailure += MessageProcessingFailed;
-                transport.BeforeMessageTransactionCommit += BeforeCommit;
+                transport.BeforeMessageTransactionRollback += BeforeMessageTransactionRollback;
             }
-            
+
             public void Stop(ITransport transport, IServiceBus bus)
             {
                 transport.MessageArrived -= MessageArrived;
-                transport.MessageProcessingCompleted -= MessageProcessingCompleted;
-                transport.MessageProcessingFailure -= MessageProcessingFailed;
-                transport.BeforeMessageTransactionCommit -= BeforeCommit;
+                transport.BeforeMessageTransactionRollback -= BeforeMessageTransactionRollback;
             }
 
             private bool MessageArrived(CurrentMessageInformation arg)
@@ -104,17 +128,7 @@ namespace Rhino.ServiceBus.Tests.Bugs
                 return false;
             }
 
-            private void MessageProcessingCompleted(CurrentMessageInformation arg1, Exception arg2)
-            {
-                DisposeNestedTransaction();
-            }
-
-            private void MessageProcessingFailed(CurrentMessageInformation arg1, Exception arg2)
-            {
-               DisposeNestedTransaction();
-            }
-
-            private void BeforeCommit(CurrentMessageInformation obj)
+            private void BeforeMessageTransactionRollback(CurrentMessageInformation obj)
             {
                 DisposeNestedTransaction();
             }
