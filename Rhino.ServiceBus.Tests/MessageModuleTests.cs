@@ -147,18 +147,36 @@ namespace Rhino.ServiceBus.Tests
             Assert.True(Module1.TransactionCommit);
         }
 
+        [Fact]
+        public void Can_register_to_get_transaction_rollback_notification()
+        {
+            using (var serviceBus = (DefaultServiceBus)container.Resolve<IServiceBus>())
+            {
+                serviceBus.Start();
+                Module1.TransactionRollbackResetEvent = new ManualResetEvent(false);
+                Module1.TransactionRollback = false;
+
+                serviceBus.Send(serviceBus.Endpoint, 42);
+                Module1.TransactionRollbackResetEvent.WaitOne(TimeSpan.FromSeconds(30), false);
+            }
+            Assert.True(Module1.TransactionRollback);
+        }
+
     	public class Module1 : IMessageModule
         {
             public static Exception Exception;
             public static ManualResetEvent ErrorResetEvent;
             public static ManualResetEvent CompletionResetEvent;
             public static ManualResetEvent TransactionCommitResetEvent;
+            public static ManualResetEvent TransactionRollbackResetEvent;
             public static bool Completion = true;
             public static bool TransactionCommit;
+            public static bool TransactionRollback;
 
     	    public void Init(ITransport transport, IServiceBus bus)
             {
                 transport.BeforeMessageTransactionCommit += Transport_BeforeMessageTransactionCommit;
+                transport.BeforeMessageTransactionRollback += TransportBeforeMessageTransactionRollback;
                 transport.MessageProcessingFailure+=Transport_OnMessageProcessingFailure;
                 transport.MessageProcessingCompleted+=Transport_OnMessageProcessingCompleted;
             }
@@ -169,7 +187,13 @@ namespace Rhino.ServiceBus.Tests
                 TransactionCommitResetEvent.Set();
     	    }
 
-    	    private static void Transport_OnMessageProcessingCompleted(CurrentMessageInformation t, Exception e)
+            private void TransportBeforeMessageTransactionRollback(CurrentMessageInformation obj)
+            {
+                TransactionRollback = true;
+                TransactionRollbackResetEvent.Set();
+            }
+            
+            private static void Transport_OnMessageProcessingCompleted(CurrentMessageInformation t, Exception e)
             {
             	Completion = true;
             	CompletionResetEvent.Set();

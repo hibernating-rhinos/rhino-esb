@@ -15,7 +15,8 @@ namespace Rhino.ServiceBus.Internal
             string messageId, 
             Func<CurrentMessageInformation, bool> messageArrived,
             Action<CurrentMessageInformation, Exception> messageProcessingCompleted, 
-			Action<CurrentMessageInformation> beforeMessageTransactionCommit);
+			Action<CurrentMessageInformation> beforeMessageTransactionCommit,
+            Action<CurrentMessageInformation> beforeMessageTransactionRollback);
 
         void RaiseMessageSerializationException(OpenedQueue queue, Message msg, string errorMessage);
         OpenedQueue CreateQueue();
