@@ -316,6 +316,7 @@ namespace Rhino.ServiceBus.RhinoQueues
                                 ProcessMessage(message, tx,
                                        AdministrativeMessageArrived,
                                        AdministrativeMessageProcessingCompleted,
+                                       null, 
                                        null);
                                 break;
                             case MessageType.ShutDownMessageMarker:
@@ -335,14 +336,16 @@ namespace Rhino.ServiceBus.RhinoQueues
                                     ProcessMessage(message, tx,
                                                    MessageArrived,
                                                    MessageProcessingCompleted,
-                                                   BeforeMessageTransactionCommit);
+                                                   BeforeMessageTransactionCommit,
+                                                   BeforeMessageTransactionRollback);
                                 }
                                 break;
                             default:
                                 ProcessMessage(message, tx,
                                        MessageArrived,
                                        MessageProcessingCompleted,
-                                       BeforeMessageTransactionCommit);
+                                       BeforeMessageTransactionCommit,
+                                       BeforeMessageTransactionRollback);
                                 break;
                         }
                     }
@@ -355,12 +358,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             }
         }
 
-        private void ProcessMessage(
-            Message message,
-            TransactionScope tx,
-            Func<CurrentMessageInformation, bool> messageRecieved,
-            Action<CurrentMessageInformation, Exception> messageCompleted,
-            Action<CurrentMessageInformation> beforeTransactionCommit)
+        private void ProcessMessage(Message message, TransactionScope tx, Func<CurrentMessageInformation, bool> messageRecieved, Action<CurrentMessageInformation, Exception> messageCompleted, Action<CurrentMessageInformation> beforeTransactionCommit, Action<CurrentMessageInformation> beforeTransactionRollback)
         {
             Exception ex = null;
             try
@@ -402,7 +400,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             }
             finally
             {
-                var messageHandlingCompletion = new MessageHandlingCompletion(tx, null, ex, messageCompleted, beforeTransactionCommit, logger,
+                var messageHandlingCompletion = new MessageHandlingCompletion(tx, null, ex, messageCompleted, beforeTransactionCommit, beforeTransactionRollback, logger,
                                                                               MessageProcessingFailure, currentMessageInformation);
                 messageHandlingCompletion.HandleMessageCompletion();
                 currentMessageInformation = null;
@@ -526,6 +524,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         public event Action<CurrentMessageInformation, Exception> MessageSerializationException;
         public event Action<CurrentMessageInformation, Exception> MessageProcessingFailure;
         public event Action<CurrentMessageInformation, Exception> MessageProcessingCompleted;
+        public event Action<CurrentMessageInformation> BeforeMessageTransactionRollback;
         public event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
         public event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
         public event Action Started;
