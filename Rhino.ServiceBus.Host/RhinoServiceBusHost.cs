@@ -1,55 +1,99 @@
 ﻿
 using System;
+using System.IO;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Host
 {
-	using System.ServiceProcess;
-	using Hosting;
+    using System.ServiceProcess;
+    using Hosting;
 
-	internal partial class RhinoServiceBusHost : ServiceBase
-	{
-		private RemoteAppDomainHost host;
-		private string asm;
-	    private string cfg;
-	    private string hostType;
+    internal partial class RhinoServiceBusHost : ServiceBase
+    {
+        private RemoteAppDomainHost host;
+        private string asm;
+        private string cfg;
+        private string bootStrapper;
+        private string hostType;
 
-	    public RhinoServiceBusHost()
-		{
-			InitializeComponent();
-		}
+        public RhinoServiceBusHost()
+        {
+            InitializeComponent();
+        }
 
-		public void SetArguments(ExecutingOptions options)
-		{
-		    asm = options.Assembly;
-		    cfg = options.ConfigFile;
-		    hostType = options.Host;
-		}
+        public void SetArguments(ExecutingOptions options)
+        {
+            asm = options.Assembly;
+            cfg = options.ConfigFile;
+            bootStrapper = options.BootStrapper;
+            hostType = options.Host;
+        }
 
-		protected override void OnStart(string[] ignored)
-		{
-            host = new RemoteAppDomainHost(asm, cfg);
+        protected override void OnStart(string[] ignored)
+        {
+            RemoteAppDomainHost remoteAppDomainHost;
+
+            if (string.IsNullOrEmpty(bootStrapper) == false)
+            {
+                var assembly = LoadAssembly();
+                var bootStrapperType = LoadBootStrapperType(assembly);
+                remoteAppDomainHost = new RemoteAppDomainHost(bootStrapperType);
+                remoteAppDomainHost.Configuration(cfg);
+            }
+            else
+            {
+                remoteAppDomainHost = new RemoteAppDomainHost(asm, cfg);
+            }
+
             if (string.IsNullOrEmpty(hostType) == false)
-                host.SetHostType(hostType);
-			host.Start();
-		}
+            {
+                remoteAppDomainHost.SetHostType(hostType);
+            }
 
-		protected override void OnStop()
-		{
-			if (host != null)
-				host.Close();
-		}
+            remoteAppDomainHost.Start();
+        }
 
-		public void DebugStart(string[] arguments)
-		{
-			OnStart(arguments);
-		}
+        private Assembly LoadAssembly()
+        {
+            try
+            {
+                return Assembly.LoadFrom(asm);
+            }
+            catch (FileNotFoundException)
+            {
+                throw new InvalidOperationException("The specified assembly file was not found: " + asm);
+            }
+        }
 
-	    public void InitialDeployment(string user)
-	    {
-	        var tmpHost = new RemoteAppDomainHost(asm, cfg);
-	        tmpHost.InitialDeployment(user);
+        private Type LoadBootStrapperType(Assembly assembly)
+        {
+            var type = assembly.GetType(bootStrapper);
+
+            if (type == null)
+            {
+                throw new InvalidOperationException("Unable to load the specified bootstrapper type: " + bootStrapper);
+            }
+
+            return type;
+        }
+
+        protected override void OnStop()
+        {
+            if (host != null)
+                host.Close();
+        }
+
+        public void DebugStart(string[] arguments)
+        {
+            OnStart(arguments);
+        }
+
+        public void InitialDeployment(string user)
+        {
+            var tmpHost = new RemoteAppDomainHost(asm, cfg);
+            tmpHost.InitialDeployment(user);
             tmpHost.Close();
-	        
-	    }
-	}
+
+        }
+    }
 }
