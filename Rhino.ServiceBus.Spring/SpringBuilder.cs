@@ -56,7 +56,7 @@ namespace Rhino.ServiceBus.Spring
             }
 
 
-            applicationContext.RegisterSingleton<IReflection>(() => new DefaultReflection());
+            applicationContext.RegisterSingleton<IReflection>(() => new SpringReflection());
             applicationContext.RegisterSingleton(config.SerializerType);
             applicationContext.RegisterSingleton<IEndpointRouter>(() => new EndpointRouter());
         }
