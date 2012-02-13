@@ -4,6 +4,7 @@ using System.Transactions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
+using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.MessageModules
 {
@@ -23,6 +24,9 @@ namespace Rhino.ServiceBus.MessageModules
         public MessageLoggingModule(IEndpointRouter endpointRouter, Uri logQueue)
         {
             logEndpoint = endpointRouter.GetRoutedEndpoint(logQueue);
+            var queueInfo = MsmqUtil.GetQueuePath(logEndpoint);
+            queueInfo.Create();
+
         }
 
         public void Init(ITransport transport, IServiceBus bus)
