@@ -32,7 +32,9 @@ namespace Rhino.ServiceBus.Internal
 
         event Action<CurrentMessageInformation, Exception> MessageProcessingCompleted;
 
-		event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
+        event Action<CurrentMessageInformation> BeforeMessageTransactionRollback;
+
+        event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
 
         event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
 

@@ -120,6 +120,7 @@
     <Compile Include="Bugs\Private_queue_formatting.cs" />
     <Compile Include="Bugs\Serialization_roundtrip.cs" />
     <Compile Include="Bugs\WhenTransactionCommitErrors_ShouldNotCrash.cs" />
+    <Compile Include="Bugs\When_transaction_rolled_back_nested_transactions_fail.cs" />
     <Compile Include="Bugs\When_using_ip_of_machine.cs" />
     <Compile Include="Bugs\Resolving_consumer_from_container.cs" />
     <Compile Include="Bugs\Restarting_server_when_using_flat_queue_strategy.cs" />

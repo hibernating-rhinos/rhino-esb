@@ -79,7 +79,9 @@ namespace Rhino.ServiceBus.Msmq
         
         public event Action<CurrentMessageInformation, Exception> MessageProcessingCompleted;
 
-    	public event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
+        public event Action<CurrentMessageInformation> BeforeMessageTransactionRollback;
+
+        public event Action<CurrentMessageInformation> BeforeMessageTransactionCommit;
 
     	public event Action<CurrentMessageInformation, Exception> AdministrativeMessageProcessingCompleted;
 
@@ -155,7 +157,7 @@ namespace Rhino.ServiceBus.Msmq
 
 		#endregion
 
-        public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted, Action<CurrentMessageInformation> beforeMessageTransactionCommit)
+        public void ReceiveMessageInTransaction(OpenedQueue queue, string messageId, Func<CurrentMessageInformation, bool> messageArrived, Action<CurrentMessageInformation, Exception> messageProcessingCompleted, Action<CurrentMessageInformation> beforeMessageTransactionCommit, Action<CurrentMessageInformation> beforeMessageTransactionRollback)
 		{
         	var transactionOptions = new TransactionOptions
         	{
@@ -169,7 +171,7 @@ namespace Rhino.ServiceBus.Msmq
                 if (message == null)
                     return;// someone else got our message, better luck next time
 
-                ProcessMessage(message, queue, tx, messageArrived, beforeMessageTransactionCommit, messageProcessingCompleted);
+                ProcessMessage(message, queue, tx, messageArrived, beforeMessageTransactionCommit, beforeMessageTransactionRollback, messageProcessingCompleted);
 			}
 		}
 
@@ -180,7 +182,7 @@ namespace Rhino.ServiceBus.Msmq
             if (message == null)
                 return;
 
-            ProcessMessage(message, queue, null, messageArrived, null, messageProcessingCompleted);
+            ProcessMessage(message, queue, null, messageArrived, null, null, messageProcessingCompleted);
         }
 
         public void RaiseMessageSerializationException(OpenedQueue queue, Message msg, string errorMessage)
@@ -210,6 +212,7 @@ namespace Rhino.ServiceBus.Msmq
             TransactionScope tx,
             Func<CurrentMessageInformation, bool> messageRecieved,
 			Action<CurrentMessageInformation> beforeMessageTransactionCommit,
+			Action<CurrentMessageInformation> beforeMessageTransactionRollback,
             Action<CurrentMessageInformation, Exception> messageCompleted)
 		{
         	Exception ex = null;
@@ -244,7 +247,7 @@ namespace Rhino.ServiceBus.Msmq
 				Action sendMessageBackToQueue = null;
 				if (message != null && (messageQueue.IsTransactional == false|| consumeInTransaction==false))
 					sendMessageBackToQueue = () => messageQueue.Send(message);
-				var messageHandlingCompletion = new MessageHandlingCompletion(tx, sendMessageBackToQueue, ex, messageCompleted, beforeMessageTransactionCommit, logger, MessageProcessingFailure, currentMessageInformation);
+				var messageHandlingCompletion = new MessageHandlingCompletion(tx, sendMessageBackToQueue, ex, messageCompleted, beforeMessageTransactionCommit, beforeMessageTransactionRollback, logger, MessageProcessingFailure, currentMessageInformation);
 				messageHandlingCompletion.HandleMessageCompletion();
 				currentMessageInformation = null;
 			}
@@ -307,7 +310,7 @@ namespace Rhino.ServiceBus.Msmq
             }
 
             if (consumeInTransaction)
-	            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted, BeforeMessageTransactionCommit);
+	            ReceiveMessageInTransaction(queue, message.Id, MessageArrived, MessageProcessingCompleted, BeforeMessageTransactionCommit, BeforeMessageTransactionRollback);
             else
 	            ReceiveMessage(queue, message.Id, MessageArrived, MessageProcessingCompleted);
         }
