@@ -239,13 +239,13 @@ namespace Rhino.ServiceBus.Spring
         public void RegisterSecurity(byte[] key)
         {
             applicationContext.RegisterSingleton<IEncryptionService>(() => new RijndaelEncryptionService(key));
-            applicationContext.RegisterSingleton<IValueConvertor<WireEcryptedString>>(() => new WireEcryptedStringConvertor(applicationContext.Get<IEncryptionService>()));
+            applicationContext.RegisterSingleton<IValueConvertor<WireEncryptedString>>(() => new WireEncryptedStringConvertor(applicationContext.Get<IEncryptionService>()));
             applicationContext.RegisterSingleton<IElementSerializationBehavior>(() => new WireEncryptedMessageConvertor(applicationContext.Get<IEncryptionService>()));
         }
 
         public void RegisterNoSecurity()
         {
-            applicationContext.RegisterSingleton<IValueConvertor<WireEcryptedString>>(() => new ThrowingWireEcryptedStringConvertor());
+            applicationContext.RegisterSingleton<IValueConvertor<WireEncryptedString>>(() => new ThrowingWireEncryptedStringConvertor());
             applicationContext.RegisterSingleton<IElementSerializationBehavior>(() => new ThrowingWireEncryptedMessageConvertor());
         }
     }

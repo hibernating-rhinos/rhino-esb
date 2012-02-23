@@ -265,8 +265,8 @@ namespace Rhino.ServiceBus.Autofac
             builder.RegisterType<RijndaelEncryptionService>()
                 .WithParameter(new NamedParameter("key", key))
                 .As<IEncryptionService>().SingleInstance();
-            builder.RegisterType<WireEcryptedStringConvertor>()
-                .As<IValueConvertor<WireEcryptedString>>()
+            builder.RegisterType<WireEncryptedStringConvertor>()
+                .As<IValueConvertor<WireEncryptedString>>()
                 .SingleInstance();
             builder.RegisterType<WireEncryptedMessageConvertor>()
                 .As<IElementSerializationBehavior>().SingleInstance();
@@ -276,8 +276,8 @@ namespace Rhino.ServiceBus.Autofac
         public void RegisterNoSecurity()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<ThrowingWireEcryptedStringConvertor>()
-                .As<IValueConvertor<WireEcryptedString>>().SingleInstance();
+            builder.RegisterType<ThrowingWireEncryptedStringConvertor>()
+                .As<IValueConvertor<WireEncryptedString>>().SingleInstance();
             builder.RegisterType<ThrowingWireEncryptedMessageConvertor>()
                 .As<IElementSerializationBehavior>().SingleInstance();
             builder.Update(container);

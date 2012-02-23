@@ -35,7 +35,7 @@ namespace Rhino.ServiceBus.Tests
             }
             catch (SerializationException e)
             {
-                Assert.Equal("Cannot send message containing WireEcryptedString when <security> was not properly set up",
+                Assert.Equal("Cannot send message containing WireEncryptedString when <security> was not properly set up",
                     e.InnerException.Message);
             }
         }
