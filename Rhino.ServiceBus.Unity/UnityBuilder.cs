@@ -279,7 +279,7 @@ namespace Rhino.ServiceBus.Unity
                 new InjectionConstructor(
                     new InjectionParameter<byte[]>(key)));
 
-            container.RegisterType<IValueConvertor<WireEcryptedString>, WireEcryptedStringConvertor>(
+            container.RegisterType<IValueConvertor<WireEncryptedString>, WireEncryptedStringConvertor>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEncryptionService>("esb.security")));
@@ -291,7 +291,7 @@ namespace Rhino.ServiceBus.Unity
 
         public void RegisterNoSecurity()
         {
-            container.RegisterType<IValueConvertor<WireEcryptedString>, ThrowingWireEcryptedStringConvertor>(
+            container.RegisterType<IValueConvertor<WireEncryptedString>, ThrowingWireEncryptedStringConvertor>(
                 new ContainerControlledLifetimeManager());
             container.RegisterType<IElementSerializationBehavior, ThrowingWireEncryptedMessageConvertor>(
                 new ContainerControlledLifetimeManager());

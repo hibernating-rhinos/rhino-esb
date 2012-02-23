@@ -5,16 +5,16 @@ using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Convertors
 {
-    public class WireEcryptedStringConvertor : IValueConvertor<WireEcryptedString>
+    public class WireEncryptedStringConvertor : IValueConvertor<WireEncryptedString>
     {
     	public IEncryptionService EncryptionService { get; set;}
 
-        public WireEcryptedStringConvertor(IEncryptionService encryptionService)
+        public WireEncryptedStringConvertor(IEncryptionService encryptionService)
         {
         	EncryptionService = encryptionService;
         }
 
-        public XElement ToElement(WireEcryptedString val, Func<Type, XNamespace> getNamespace)
+        public XElement ToElement(WireEncryptedString val, Func<Type, XNamespace> getNamespace)
         {
         	var encryptedValue = EncryptionService.Encrypt(val);
 			return new XElement(getNamespace(typeof(string)) + "Value",
@@ -22,7 +22,7 @@ namespace Rhino.ServiceBus.Convertors
 				encryptedValue.EncryptedBase64Value);
         }
 
-        public WireEcryptedString FromElement(XElement element)
+        public WireEncryptedString FromElement(XElement element)
         {
             var value = element.Element(XName.Get("Value","System.String"));
             if(value==null)

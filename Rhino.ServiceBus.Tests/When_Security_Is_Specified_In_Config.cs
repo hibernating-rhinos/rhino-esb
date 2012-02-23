@@ -27,8 +27,8 @@ namespace Rhino.ServiceBus.Tests
         public void Will_register_wire_encrypted_string_convertor_on_container()
         {
             var container = CreateContainer();
-            var convertor = container.Resolve<IValueConvertor<WireEcryptedString>>();
-            Assert.IsType<WireEcryptedStringConvertor>(convertor);
+            var convertor = container.Resolve<IValueConvertor<WireEncryptedString>>();
+            Assert.IsType<WireEncryptedStringConvertor>(convertor);
         }
 
 		[Fact]
@@ -42,7 +42,7 @@ namespace Rhino.ServiceBus.Tests
 
         public class ClassWithSecretField
         {
-            public WireEcryptedString ShouldBeEncrypted
+            public WireEncryptedString ShouldBeEncrypted
             {
                 get; set;
             }
@@ -56,11 +56,11 @@ namespace Rhino.ServiceBus.Tests
 
         public const string encryptedMessage =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
-<esb:messages xmlns:esb=""http://servicebus.hibernatingrhinos.com/2008/12/20/esb"" xmlns:tests.classwithsecretfield=""Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"" xmlns:datastructures.wireecryptedstring=""Rhino.ServiceBus.DataStructures.WireEcryptedString, Rhino.ServiceBus"" xmlns:string=""System.String"">
+<esb:messages xmlns:esb=""http://servicebus.hibernatingrhinos.com/2008/12/20/esb"" xmlns:tests.classwithsecretfield=""Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"" xmlns:datastructures.wireencryptedstring=""Rhino.ServiceBus.DataStructures.WireEncryptedString, Rhino.ServiceBus"" xmlns:string=""System.String"">
   <tests.classwithsecretfield:ClassWithSecretField>
-    <datastructures.wireecryptedstring:ShouldBeEncrypted>
+    <datastructures.wireencryptedstring:ShouldBeEncrypted>
       <string:Value iv=""0yL9+t0uyDy9NeP7CU1Wow=="">q9a10IFuRxrzFoZewfdOyg==</string:Value>
-    </datastructures.wireecryptedstring:ShouldBeEncrypted>
+    </datastructures.wireencryptedstring:ShouldBeEncrypted>
   </tests.classwithsecretfield:ClassWithSecretField>
 </esb:messages>";
 
@@ -74,7 +74,7 @@ namespace Rhino.ServiceBus.Tests
             {
                 new ClassWithSecretField
                 {
-                    ShouldBeEncrypted = new WireEcryptedString{Value = "abc"}
+                    ShouldBeEncrypted = new WireEncryptedString{Value = "abc"}
                 }
             },memoryStream);
 
@@ -85,7 +85,7 @@ namespace Rhino.ServiceBus.Tests
             var actual = document
                 .Element(XName.Get("messages", "http://servicebus.hibernatingrhinos.com/2008/12/20/esb"))
                 .Element(XName.Get("ClassWithSecretField","Rhino.ServiceBus.Tests.When_Security_Is_Specified_In_Config+ClassWithSecretField, Rhino.ServiceBus.Tests"))
-                .Element(XName.Get("ShouldBeEncrypted","Rhino.ServiceBus.DataStructures.WireEcryptedString, Rhino.ServiceBus"))
+                .Element(XName.Get("ShouldBeEncrypted","Rhino.ServiceBus.DataStructures.WireEncryptedString, Rhino.ServiceBus"))
                 .Element(XName.Get("Value","System.String"))
                 .Value;
 
@@ -102,7 +102,7 @@ namespace Rhino.ServiceBus.Tests
             {
                 new ClassWithSecretField
                 {
-                    ShouldBeEncrypted = new WireEcryptedString{Value = "abc"}
+                    ShouldBeEncrypted = new WireEncryptedString{Value = "abc"}
                 }
             }, memoryStream);
 
@@ -171,7 +171,7 @@ namespace Rhino.ServiceBus.Tests
         {
             var container = CreateContainer();
             var serializer = container.Resolve<IMessageSerializer>();
-            var convertor = (WireEcryptedStringConvertor)container.Resolve<IValueConvertor<WireEcryptedString>>();
+            var convertor = (WireEncryptedStringConvertor)container.Resolve<IValueConvertor<WireEncryptedString>>();
 
             var managed = new RijndaelManaged();
             managed.GenerateKey();

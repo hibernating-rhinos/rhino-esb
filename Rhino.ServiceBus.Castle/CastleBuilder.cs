@@ -313,8 +313,8 @@ namespace Rhino.ServiceBus.Castle
 				);
 
             container.Register(
-                Component.For<IValueConvertor<WireEcryptedString>>()
-                    .ImplementedBy<WireEcryptedStringConvertor>()
+                Component.For<IValueConvertor<WireEncryptedString>>()
+                    .ImplementedBy<WireEncryptedStringConvertor>()
                     .DependsOn(Dependency.OnComponent("encryptionService", "esb.security"))
                 );
 
@@ -328,8 +328,8 @@ namespace Rhino.ServiceBus.Castle
         public void RegisterNoSecurity()
         {
             container.Register(
-                   Component.For<IValueConvertor<WireEcryptedString>>()
-                       .ImplementedBy<ThrowingWireEcryptedStringConvertor>()
+                   Component.For<IValueConvertor<WireEncryptedString>>()
+                       .ImplementedBy<ThrowingWireEncryptedStringConvertor>()
                    );
             container.Register(
                 Component.For<IElementSerializationBehavior>()
