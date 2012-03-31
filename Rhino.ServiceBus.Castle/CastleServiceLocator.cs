@@ -40,7 +40,7 @@ namespace Rhino.ServiceBus.Castle
         public IEnumerable<IHandler> GetAllHandlersFor(Type type)
         {
             return (from h in container.Kernel.GetAssignableHandlers(type)
-                   select (IHandler)new DefaultHandler(null, h.ComponentModel.Implementation, () => h.Resolve(CreationContext.CreateEmpty())));
+                   select (IHandler)new DefaultHandler(null, h.ComponentModel.Implementation, () => h.Resolve(new CreationContext(h, container.Kernel.ReleasePolicy, type, null, null, null))));
         }
 
         public void Release(object item)
