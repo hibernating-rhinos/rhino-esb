@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(LibDir)' == '' ">
-    <LibDir>..\SharedLibs\4.0\</LibDir>
+    <LibDir>..\..\SharedLibs\4.0\</LibDir>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
@@ -43,8 +43,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+    <Reference Include="log4net">
       <HintPath>..\..\SharedLibs\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Queues">
+      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
