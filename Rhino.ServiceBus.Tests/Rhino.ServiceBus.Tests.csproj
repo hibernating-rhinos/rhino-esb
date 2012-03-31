@@ -138,6 +138,7 @@
     <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Autofac\ContainerTests.cs" />
     <Compile Include="Containers\Autofac\QueueCreationTests.cs" />
+    <Compile Include="Containers\Castle\ContainerTests.cs" />
     <Compile Include="Containers\Spring\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Spring\ContainerTests.cs" />
     <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
