@@ -175,6 +175,7 @@ namespace Rhino.ServiceBus.Hosting
         public void InitialDeployment(string user)
         {
             HostedService service = CreateNewAppDomain();
+            current = service;
             service.InitialDeployment(user);
         }
 
