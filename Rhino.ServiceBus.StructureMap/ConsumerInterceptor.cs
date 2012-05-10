@@ -22,7 +22,7 @@ namespace Rhino.ServiceBus.StructureMap
         {
             var type = target.GetType();
             var lifecycle = container.Model.For(type).Lifecycle;
-            interceptor.ItemCreated(type, lifecycle == "Transient"); //got to be a better way for this
+            interceptor.ItemCreated(type, string.IsNullOrEmpty(lifecycle) || lifecycle == "Transient"); //got to be a better way for this
             return target;
         }
 
