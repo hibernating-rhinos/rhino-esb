@@ -1,5 +1,5 @@
 properties { 
-  $base_dir  = resolve-path .
+  $base_dir = resolve-path .
   $build_dir = "$base_dir\build"
   $packageinfo_dir = "$base_dir\packaging"
   $40_build_dir = "$build_dir\4.0\"
@@ -53,7 +53,17 @@ task Init -depends Clean {
 
 task Compile -depends Init {
   msbuild $sln_file /p:"OutDir=$35_build_dir;Configuration=$config;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$35_build_dir\UAC\;Configuration=$config;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$35_build_dir\x86\;Configuration=$config;Platform=x86;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$35_build_dir\x86\UAC\;Configuration=$config;Platform=x86;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$35_build_dir\x64\;Configuration=$config;Platform=x64;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$35_build_dir\x64\UAC\;Configuration=$config;Platform=x64;TargetFrameworkVersion=V3.5;LibDir=$35_lib_dir;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
   msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir;Configuration=$config;TargetFrameworkVersion=4.0"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir\UAC\;Configuration=$config;TargetFrameworkVersion=4.0;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir\x86\;Configuration=$config;Platform=x86;TargetFrameworkVersion=4.0"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir\x86\UAC\;Configuration=$config;Platform=x86;TargetFrameworkVersion=4.0;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir\x64\;Configuration=$config;Platform=x64;TargetFrameworkVersion=4.0"
+  msbuild $sln_file /target:Rebuild /p:"OutDir=$40_build_dir\x64\UAC\;Configuration=$config;Platform=x64;TargetFrameworkVersion=4.0;ApplicationManifest=$base_dir\Rhino.ServiceBus.manifest"
 }
 
 task Test -depends Compile -precondition { return $run_tests }{
@@ -63,7 +73,8 @@ task Test -depends Compile -precondition { return $run_tests }{
   cd $old		
 }
 
-task Release  -depends Compile, Test {
+#task Release -depends Compile, Test {
+task Release {
 
   cd $build_dir
 	& $tools_dir\7za.exe a $release_dir\Rhino.ServiceBus.zip `
@@ -110,6 +121,20 @@ task Release  -depends Compile, Test {
     	*\Rhino.ServiceBus.Host.pdb `
     	*\Wintellect.Threading.dll `
     	*\Wintellect.Threading.xml `
+    	*\UAC\Rhino.ServiceBus.Host.exe `
+    	*\UAC\Rhino.ServiceBus.Host.pdb `
+		*\x86\Rhino.ServiceBus.dll `
+    	*\x86\Rhino.ServiceBus.pdb `
+    	*\x86\Rhino.ServiceBus.Host.exe `
+    	*\x86\Rhino.ServiceBus.Host.pdb `
+		*\x86\UAC\Rhino.ServiceBus.Host.exe `
+    	*\x86\UAC\Rhino.ServiceBus.Host.pdb `
+		*\x64\Rhino.ServiceBus.dll `
+    	*\x64\Rhino.ServiceBus.pdb `
+		*\x64\Rhino.ServiceBus.Host.exe `
+    	*\x64\Rhino.ServiceBus.Host.pdb `
+		*\x64\UAC\Rhino.ServiceBus.Host.exe `
+    	*\x64\UAC\Rhino.ServiceBus.Host.pdb `
     	..\license.txt `
 		..\acknowledgements.txt
 	if ($lastExitCode -ne 0) {
