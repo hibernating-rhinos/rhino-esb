@@ -73,8 +73,7 @@ task Test -depends Compile -precondition { return $run_tests }{
   cd $old		
 }
 
-#task Release -depends Compile, Test {
-task Release {
+task Release -depends Compile, Test {
 
   cd $build_dir
 	& $tools_dir\7za.exe a $release_dir\Rhino.ServiceBus.zip `
