@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using CommandLine;
 
@@ -18,6 +19,8 @@ namespace Rhino.ServiceBus.Host
 
         [Argument(ArgumentType.AtMostOnce, LongName = "Host")] public string Host;
         [Argument(ArgumentType.AtMostOnce, LongName = "BootStrapper")] public string BootStrapper;
+
+        [Argument(ArgumentType.AtMostOnce, LongName = "DependsOn")] public string DependsOn;
 
         public override string ToString()
         {
@@ -55,5 +58,7 @@ namespace Rhino.ServiceBus.Host
             }
             return sb.ToString();
         }
+
+        public string[] DependOnService { get { return (string.IsNullOrEmpty(DependsOn) ? null : DependsOn.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries)); } }
     }
 }
