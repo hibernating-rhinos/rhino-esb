@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Messaging;
 using System.Runtime.Serialization;
-using log4net;
+using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Util;

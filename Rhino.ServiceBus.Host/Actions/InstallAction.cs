@@ -40,11 +40,6 @@ namespace Rhino.ServiceBus.Host.Actions
 				options.Action = Action.Server;
 
                 service.SetValue("ImagePath", path + options);
-
-                if (options.DependOnService != null && options.DependOnService.Length > 0)
-                    service.SetValue("DependOnService", options.DependOnService, RegistryValueKind.MultiString);
-                else
-                    service.DeleteValue("DependOnService", false);
             }
         }
     }

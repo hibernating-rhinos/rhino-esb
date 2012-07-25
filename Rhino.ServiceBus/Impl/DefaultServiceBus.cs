@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using log4net;
+
 using Rhino.Queues.Utils;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
@@ -389,14 +389,7 @@ namespace Rhino.ServiceBus.Impl
                     }
                     catch (Exception e)
                     {
-                        if(logger.IsDebugEnabled)
-                        {
-                            var message = string.Format("Consumer {0} failed to process message {1}",
-                                                       consumer,
-                                                       msg.Message
-                                );
-                            logger.Debug(message,e);
-                        }
+                        logger.DebugFormat("Consumer {0} failed to process message {1}", e, consumer, msg.Message);
                         throw;
                     }
                     finally

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
 using System.Xml;
-using log4net;
+
 using Rhino.Queues;
 using Rhino.Queues.Model;
 using Rhino.ServiceBus.DataStructures;
+using Rhino.ServiceBus.Impl;
+using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Transport;
 using Message=Rhino.Queues.Model.Message;
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Messaging;
-using log4net;
+
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;

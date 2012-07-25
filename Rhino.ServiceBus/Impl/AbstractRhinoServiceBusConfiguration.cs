@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using Rhino.ServiceBus.Config;
+using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Serializers;
@@ -10,6 +11,107 @@ using System.Transactions;
 
 namespace Rhino.ServiceBus.Impl
 {
+    /// <summary>
+    /// Used to manage logging.
+    /// </summary>
+    public static class LogManager
+    {
+        static readonly ILog NullLogSingleton = new NullLog();
+        static Func<Type, ILog> _logLocator = type => NullLogSingleton;
+
+        /// <summary>
+        /// Initializes the system with the specified log creator.
+        /// </summary>
+        /// <param name="logLocator">The log locator.</param>
+        public static void Initialize(Func<Type, ILog> logLocator)
+        {
+            _logLocator = logLocator;
+        }
+
+        /// <summary>
+        /// Creates a log.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static ILog GetLogger(Type type)
+        {
+            return _logLocator(type);
+        }
+
+        private class NullLog : ILog
+        {
+            public void Info(string message) { }
+            public void Warn(string message) { }
+            public void Warn(string message, Exception exception) { }
+            public void Debug(string message) { }
+            public void Debug(string message, Exception exception) { }
+            public void Error(string message) { }
+            public void Error(Exception exception) { }
+            public void Error(string message, Exception exception) { }
+            public void Fatal(string message) { }
+            public void Fatal(string message, Exception exception) { }
+        }
+    }
+
+    public static class LogExtensions
+    {
+        /// <summary>
+        /// Logs the message as info.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        /// <param name="format">The message.</param>
+        /// <param name="args">The args.</param>
+        public static void InfoFormat(this ILog log, string format, params object[] args)
+        {
+            log.Info(string.Format(format, args));
+        }
+
+        /// <summary>
+        /// Logs the message as info.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        /// <param name="format">The message.</param>
+        /// <param name="args">The args.</param>
+        /// <param name="e">The exception</param>
+        public static void DebugFormat(this ILog log, Exception e, string format, params object[] args)
+        {
+            log.Debug(string.Format(format, args), e);
+        }
+
+        /// <summary>
+        /// Logs the message as info.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        /// <param name="format">The message.</param>
+        /// <param name="args">The args.</param>
+        public static void DebugFormat(this ILog log, string format, params object[] args)
+        {
+            log.Debug(string.Format(format, args));
+        }
+
+        /// <summary>
+        /// Logs the message as a warning.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        /// <param name="format">The message.</param>
+        /// <param name="args">The args.</param>
+        public static void WarnFormat(this ILog log, string format, params object[] args)
+        {
+            log.Info(string.Format(format, args));
+        }
+
+        /// <summary>
+        /// Logs the message as an error.
+        /// </summary>
+        /// <param name="log">The log.</param>
+        /// <param name="format">The message.</param>
+        /// <param name="args">The args.</param>
+        public static void ErrorFormat(this ILog log, string format, params object[] args)
+        {
+            log.Error(string.Format(format, args));
+        }
+    }
+
     public abstract class AbstractRhinoServiceBusConfiguration 
     {
         private readonly List<Type> messageModules = new List<Type>();

@@ -31,24 +31,26 @@ namespace Rhino.ServiceBus.Host
 
         protected override void OnStart(string[] ignored)
         {
+            RemoteAppDomainHost remoteAppDomainHost;
+
             if (string.IsNullOrEmpty(bootStrapper) == false)
             {
                 var assembly = LoadAssembly();
                 var bootStrapperType = LoadBootStrapperType(assembly);
-                host = new RemoteAppDomainHost(bootStrapperType);
-                host.Configuration(cfg);
+                remoteAppDomainHost = new RemoteAppDomainHost(bootStrapperType);
+                remoteAppDomainHost.Configuration(cfg);
             }
             else
             {
-                host = new RemoteAppDomainHost(asm, cfg);
+                remoteAppDomainHost = new RemoteAppDomainHost(asm, cfg);
             }
 
             if (string.IsNullOrEmpty(hostType) == false)
             {
-                host.SetHostType(hostType);
+                remoteAppDomainHost.SetHostType(hostType);
             }
 
-            host.Start();
+            remoteAppDomainHost.Start();
         }
 
         private Assembly LoadAssembly()
