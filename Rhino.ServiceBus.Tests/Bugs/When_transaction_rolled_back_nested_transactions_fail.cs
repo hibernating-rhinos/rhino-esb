@@ -5,7 +5,7 @@ using System.Transactions;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
-using log4net;
+
 using log4net.Appender;
 using log4net.Repository.Hierarchy;
 using Rhino.ServiceBus.Impl;

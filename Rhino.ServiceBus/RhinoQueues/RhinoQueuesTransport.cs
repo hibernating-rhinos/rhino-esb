@@ -9,7 +9,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Transactions;
 using System.Xml;
-using log4net;
+
 using Microsoft.Isam.Esent.Interop;
 using Rhino.Queues;
 using Rhino.Queues.Model;

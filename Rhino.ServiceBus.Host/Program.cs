@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CommandLine;
-using log4net;
 using Rhino.ServiceBus.Host.Actions;
+using Rhino.ServiceBus.Impl;
+using ILog = Rhino.ServiceBus.Internal.ILog;
 
 namespace Rhino.ServiceBus.Host
 {
@@ -19,19 +20,25 @@ namespace Rhino.ServiceBus.Host
             {Action.Deploy, new DeployAction()}
         };
 
-    	private static ILog log = LogManager.GetLogger(typeof (Program));
+        private static ILog log;
+
+        private static ILog GetLogger(Type typ)
+        {
+            return new Log4NetWrapper(typ);
+        }
 
         public static int Main(string[] args)
         {
+            LogManager.Initialize(GetLogger);
+            log = LogManager.GetLogger(typeof (Program));
+
             var executingOptions = new ExecutingOptions();
             if (Parser.ParseArguments(args, executingOptions) == false)
             {
                 Console.WriteLine("Invalid arguments:");
-                Console.WriteLine("\t{0}",
-                    string.Join(" ",args));
+                Console.WriteLine("\t{0}", string.Join(" ",args));
                 Console.WriteLine();
                 Console.WriteLine(Parser.ArgumentsUsage(typeof(ExecutingOptions)));
-
                 return 1;
             }
 

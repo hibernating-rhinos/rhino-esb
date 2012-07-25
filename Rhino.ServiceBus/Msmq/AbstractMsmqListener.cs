@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Messaging;
 using System.Threading;
 using System.Transactions;
-using log4net;
+
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Transport;
