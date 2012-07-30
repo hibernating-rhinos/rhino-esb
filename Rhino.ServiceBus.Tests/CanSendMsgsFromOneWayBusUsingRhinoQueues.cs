@@ -51,17 +51,18 @@ namespace Rhino.ServiceBus.Tests
                 bus.Start();
 
                 using (var oneWay = new RhinoQueuesOneWayBus(
-                                                new[]{
-                                                     new MessageOwner
-                                                         {
-                                                             Endpoint = bus.Endpoint.Uri,
-                                                             Name = "System",
-                                                         },
-                                                    }, 
-                                                 container.Resolve<IMessageSerializer>(),
-                                                 Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"),
-                                                 false,
-                                                 new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>())))
+                    new[]{
+                            new MessageOwner
+                                {
+                                    Endpoint = bus.Endpoint.Uri,
+                                    Name = "System",
+                                },
+                        }, 
+                        container.Resolve<IMessageSerializer>(),
+                        Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"),
+                        false,
+                        new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>(),
+                            container.Resolve<IServiceLocator>())))
                 {
                     oneWay.Send("hello there, one way");
 

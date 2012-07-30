@@ -18,9 +18,14 @@ namespace Rhino.ServiceBus.Msmq
         public void Send(params object[] msgs)
         {
             var endpoint = messageOwners.GetEndpointForMessageBatch(msgs);
+            var messageInformation = new OutgoingMessageInformation
+            {
+                Destination = endpoint,
+                Messages = msgs,
+            };
             using(var queue = endpoint.InitalizeQueue())
             {
-                var message = messageBuilder.BuildFromMessageBatch(msgs);
+                var message = messageBuilder.BuildFromMessageBatch(messageInformation);
                 queue.SendInSingleTransaction(message);
             }
         }

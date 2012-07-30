@@ -33,7 +33,7 @@ namespace Rhino.ServiceBus.Impl
                 .FirstOrDefault();
 
             if (messageOwner == null)
-                throw new MessagePublicationException("Could not find no message owner for " + messages[0]);
+                throw new MessagePublicationException("Could not find a message owner for " + messages[0]);
 
             var endpoint = endpointRouter.GetRoutedEndpoint(messageOwner.Endpoint);
             endpoint.Transactional = messageOwner.Transactional;

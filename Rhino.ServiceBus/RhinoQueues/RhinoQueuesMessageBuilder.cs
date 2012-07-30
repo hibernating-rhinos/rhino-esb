@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using Rhino.Queues;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
@@ -8,20 +8,21 @@ using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.RhinoQueues
 {
-    
     public class RhinoQueuesMessageBuilder : IMessageBuilder<MessagePayload>
     {
         private readonly IMessageSerializer messageSerializer;
+        private readonly ICustomizeOutgoingMessages[] customizeHeaders;
         private Endpoint endpoint;
-        public RhinoQueuesMessageBuilder(IMessageSerializer messageSerializer)
+        public RhinoQueuesMessageBuilder(IMessageSerializer messageSerializer, IServiceLocator serviceLocator)
         {
             this.messageSerializer = messageSerializer;
+            customizeHeaders = serviceLocator.ResolveAll<ICustomizeOutgoingMessages>().ToArray();
         }
 
         public event Action<MessagePayload> MessageBuilt;
 
         [CLSCompliant(false)]
-        public MessagePayload BuildFromMessageBatch(params object[] msgs)
+        public MessagePayload BuildFromMessageBatch(OutgoingMessageInformation messageInformation)
         {
             if (endpoint == null)
                 throw new InvalidOperationException("A source endpoint is required for Rhino Queues transport, did you Initialize me? try providing a null Uri.");
@@ -30,7 +31,7 @@ namespace Rhino.ServiceBus.RhinoQueues
             byte[] data = new byte[0];
             using (var memoryStream = new MemoryStream())
             {
-                messageSerializer.Serialize(msgs, memoryStream);
+                messageSerializer.Serialize(messageInformation.Messages, memoryStream);
                 data = memoryStream.ToArray();
                 
             }
@@ -40,12 +41,19 @@ namespace Rhino.ServiceBus.RhinoQueues
                 Headers =
                         {
                             {"id", messageId.ToString()},
-                            {"type", GetAppSpecificMarker(msgs).ToString()},
+                            {"type", GetAppSpecificMarker(messageInformation.Messages).ToString()},
                             {"source", endpoint.Uri.ToString()},
                         }
             };
 
-            TryCustomizeHeaders(payload.Headers);
+            messageInformation.Headers = payload.Headers;
+            foreach (var customizeHeader in customizeHeaders)
+            {
+                customizeHeader.Customize(messageInformation);
+            }
+
+            payload.DeliverBy = messageInformation.DeliverBy;
+            payload.MaxAttempts = messageInformation.MaxAttempts;
 
             var copy = MessageBuilt;
             if (copy != null)
@@ -53,21 +61,11 @@ namespace Rhino.ServiceBus.RhinoQueues
 
             return payload;
         }
-
-        private void TryCustomizeHeaders(NameValueCollection headers)
-        {
-            if (MessageHeaders == null)
-                return;
-            MessageHeaders.Customize(headers);
-        }
-
-        public ICustomizeMessageHeaders MessageHeaders { get; set; }
+        
         public void Initialize(Endpoint source)
         {
             endpoint = source;
         }
-
-        
 
         private static MessageType GetAppSpecificMarker(object[] msgs)
         {

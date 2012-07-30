@@ -89,9 +89,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             {
                 logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work on awating listenerQueue",
                    queueUri,
-                   newEndpoint,
-                   originalEndPoint
-                   );
+                   newEndpoint);
 
                 SendToQueue(queueUri,
                     new Reroute
@@ -105,9 +103,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             {
                 logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work",
                    queueUri,
-                   Endpoint.Uri,
-                   PrimaryLoadBalancer
-                   );
+                   Endpoint.Uri);
 
                 SendToQueue(queueUri,
                     new AcceptingWork

@@ -21,7 +21,7 @@ namespace Rhino.ServiceBus.Tests
         {
             using (var container = new WindsorContainer())
             {
-                container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
+                container.Register(Component.For<ICustomizeOutgoingMessages>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
                 new RhinoServiceBusConfiguration()
                     .UseCastleWindsor(container)
                     .Configure();
@@ -45,7 +45,7 @@ namespace Rhino.ServiceBus.Tests
         {
             using (var container = new WindsorContainer(new XmlInterpreter()))
             {
-                container.Register(Component.For<ICustomizeMessageHeaders>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
+                container.Register(Component.For<ICustomizeOutgoingMessages>().ImplementedBy<AppIdentityCustomizer>().LifeStyle.Is(LifestyleType.Transient));
                 new RhinoServiceBusConfiguration()
                     .UseCastleWindsor(container)
                     .Configure();
@@ -77,11 +77,11 @@ namespace Rhino.ServiceBus.Tests
             }
         }
 
-        public class AppIdentityCustomizer : ICustomizeMessageHeaders
+        public class AppIdentityCustomizer : ICustomizeOutgoingMessages
         {
-            public void Customize(NameValueCollection headers)
+            public void Customize(OutgoingMessageInformation messageInformation)
             {
-                headers.Add("user-id", "corey");
+                messageInformation.Headers.Add("user-id", "corey");
             }
         }
     }

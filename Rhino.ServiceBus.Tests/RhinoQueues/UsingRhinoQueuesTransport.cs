@@ -25,8 +25,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             if (Directory.Exists("test.esent"))
                 Directory.Delete("test.esent", true);
 
-            messageSerializer = new XmlMessageSerializer(new DefaultReflection(),
-                                                      new CastleServiceLocator(new WindsorContainer()));
+            var serviceLocator = new CastleServiceLocator(new WindsorContainer());
+            messageSerializer = new XmlMessageSerializer(new DefaultReflection(), serviceLocator);
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),
@@ -36,7 +36,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 IsolationLevel.Serializable, 
                 5,
                 false,
-                new RhinoQueuesMessageBuilder(messageSerializer)
+                new RhinoQueuesMessageBuilder(messageSerializer, serviceLocator)
                 );
             transport.Start();
         }

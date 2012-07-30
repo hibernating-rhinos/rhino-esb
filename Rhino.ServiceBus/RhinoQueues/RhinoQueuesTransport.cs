@@ -471,7 +471,13 @@ namespace Rhino.ServiceBus.RhinoQueues
         private void SendInternal(object[] msgs, Endpoint destination, Action<NameValueCollection> customizeHeaders)
         {
             var messageId = Guid.NewGuid();
-            var payload = messageBuilder.BuildFromMessageBatch(msgs);
+            var messageInformation = new OutgoingMessageInformation
+            {
+                Destination = destination,
+                Messages = msgs,
+                Source = Endpoint
+            };
+            var payload = messageBuilder.BuildFromMessageBatch(messageInformation);
             logger.DebugFormat("Sending a message with id '{0}' to '{1}'", messageId, destination.Uri);
             customizeHeaders(payload.Headers);
             var transactionOptions = GetTransactionOptions();
