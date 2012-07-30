@@ -220,7 +220,9 @@ namespace Rhino.ServiceBus.Spring
                                                                                                                                     busConfig.EnablePerformanceCounters,
                                                                                                                                     applicationContext.Get<IMessageBuilder<MessagePayload>>()));
 
-            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(applicationContext.Get<IMessageSerializer>()));
+            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
+                applicationContext.Get<IMessageSerializer>(),
+                applicationContext.Get<IServiceLocator>()));
         }
 
         public void RegisterRhinoQueuesOneWay()
@@ -228,7 +230,9 @@ namespace Rhino.ServiceBus.Spring
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
             var busConfig = config.ConfigurationSection.Bus;
 
-            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(applicationContext.Get<IMessageSerializer>()));
+            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
+                applicationContext.Get<IMessageSerializer>(),
+                applicationContext.Get<IServiceLocator>()));
             applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.QueuePath, busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
         }
 

@@ -42,24 +42,29 @@ namespace Rhino.ServiceBus.Tests.Bugs
                 subscriptionStorage.HandleAdministrativeMessage;
 
             Message msg = new MsmqMessageBuilder
-                (serializer, new CastleServiceLocator(new WindsorContainer())).BuildFromMessageBatch(new
-                                                                     AddInstanceSubscription
+                (serializer, new CastleServiceLocator(new WindsorContainer())).BuildFromMessageBatch(
+                new OutgoingMessageInformation
                 {
-                    Endpoint = queueEndpoint.Uri.ToString(),
-                    InstanceSubscriptionKey = id,
-                    Type = typeof (TestMessage2).FullName,
+                    Messages = new[] { new AddInstanceSubscription
+                    {
+                        Endpoint = queueEndpoint.Uri.ToString(),
+                        InstanceSubscriptionKey = id,
+                        Type = typeof (TestMessage2).FullName,
+                    }}
                 });
             send(msg);
 
             wait.WaitOne();
 
             msg = new MsmqMessageBuilder
-                (serializer, new CastleServiceLocator(new WindsorContainer())).BuildFromMessageBatch(new
-                                                                     RemoveInstanceSubscription
+                (serializer, new CastleServiceLocator(new WindsorContainer())).BuildFromMessageBatch(new OutgoingMessageInformation
                 {
-                    Endpoint = queueEndpoint.Uri.ToString(),
-                    InstanceSubscriptionKey = id,
-                    Type = typeof (TestMessage2).FullName,
+                    Messages = new[] { new RemoveInstanceSubscription
+                    {
+                        Endpoint = queueEndpoint.Uri.ToString(),
+                        InstanceSubscriptionKey = id,
+                        Type = typeof (TestMessage2).FullName,
+                    }}
                 });
            
             wait.Reset();

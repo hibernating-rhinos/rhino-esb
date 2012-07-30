@@ -273,7 +273,17 @@ namespace Rhino.ServiceBus.Msmq
 
         protected Message GenerateMsmqMessageFromMessageBatch(params object[] msgs)
         {
-            return messageBuilder.BuildFromMessageBatch(msgs);
+            var messageInformation = new OutgoingMessageInformation
+            {
+                Messages = msgs,
+                Source = Endpoint
+            };
+            return GenerateMsmqMessageFromMessageBatch(messageInformation);
+        }
+
+        protected Message GenerateMsmqMessageFromMessageBatch(OutgoingMessageInformation messageInformation)
+        {
+            return messageBuilder.BuildFromMessageBatch(messageInformation);
         }
 
         protected object[] DeserializeMessages(OpenedQueue messageQueue, Message transportMessage, Action<CurrentMessageInformation, Exception> messageSerializationException)
