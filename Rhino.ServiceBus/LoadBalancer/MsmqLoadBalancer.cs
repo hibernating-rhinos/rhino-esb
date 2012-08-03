@@ -2,7 +2,7 @@ using System;
 using System.Messaging;
 using System.Threading;
 using System.Transactions;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;

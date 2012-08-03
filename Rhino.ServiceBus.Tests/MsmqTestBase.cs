@@ -1,10 +1,8 @@
 using System;
 using System.Messaging;
-using Castle.MicroKernel;
 using Castle.Windsor;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Layout;
+using Common.Logging;
+using Common.Logging.Simple;
 using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -19,10 +17,7 @@ namespace Rhino.ServiceBus.Tests
     {
         static MsmqTestBase()
         {
-            BasicConfigurator.Configure(new DebugAppender
-            {
-                Layout = new SimpleLayout()
-            });    
+            LogManager.Adapter = new ConsoleOutLoggerFactoryAdapter();
         }
 
         private readonly string subscriptionQueuePath;

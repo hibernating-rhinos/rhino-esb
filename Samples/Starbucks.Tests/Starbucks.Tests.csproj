@@ -102,8 +102,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\..\SharedLibs\log4net.dll</HintPath>
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\SharedLibs\3.5\Common.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Queues">
       <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>

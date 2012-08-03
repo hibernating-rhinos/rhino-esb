@@ -107,10 +107,7 @@
       <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="Common.Logging">
-      <HintPath>..\SharedLibs\Common.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\SharedLibs\log4net.dll</HintPath>
+      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>

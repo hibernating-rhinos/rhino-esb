@@ -114,11 +114,11 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\Esent.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\SharedLibs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.PersistentHashTable">
       <HintPath>$(LibDir)Rhino.PersistentHashTable.dll</HintPath>

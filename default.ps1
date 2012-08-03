@@ -86,8 +86,6 @@ task Release -depends Compile, Test {
     	*\Esent.Interop.dll `
     	*\Esent.Interop.pdb `
     	*\Esent.Interop.xml `
-    	*\log4net.dll `
-    	*\log4net.xml `
     	*\Rhino.PersistentHashTable.dll `
     	*\Rhino.PersistentHashTable.pdb `
     	*\Rhino.Queues.dll `

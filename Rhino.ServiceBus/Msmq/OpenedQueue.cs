@@ -1,4 +1,4 @@
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Transport;
 
 namespace Rhino.ServiceBus.Msmq

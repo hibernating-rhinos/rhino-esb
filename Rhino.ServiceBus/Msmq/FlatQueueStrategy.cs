@@ -1,6 +1,6 @@
 using System;
 using System.Messaging;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Transport;
 

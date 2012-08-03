@@ -2,8 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using log4net;
-using log4net.Config;
+using Common.Logging;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Internal;
 
@@ -46,15 +45,9 @@ namespace Rhino.ServiceBus.Hosting
 
         private void InitailizeBus(string asmName)
         {
-            string logfile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-
-            XmlConfigurator.ConfigureAndWatch(new FileInfo(logfile));
-
             assemblyName = asmName;
 
             CreateBootStrapper();
-
-            log4net.GlobalContext.Properties["BusName"] = bootStrapper.GetType().Namespace;
 
             InitializeContainer();
 
