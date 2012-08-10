@@ -4,6 +4,7 @@ using System.Linq;
 using System.Messaging;
 using System.Runtime.Serialization;
 using Common.Logging;
+using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Util;
@@ -66,6 +67,20 @@ namespace Rhino.ServiceBus.Msmq
             else
             {
                 extension = messageId;
+            }
+
+            if (messageInformation.DeliverBy != null)
+            {
+                var timeFromNow = messageInformation.DeliverBy.Value - DateTime.Now;
+                message.TimeToReachQueue = timeFromNow > TimeSpan.Zero ? timeFromNow : TimeSpan.Zero;
+            }
+
+            if (messageInformation.MaxAttempts != null)
+            {
+                if (messageInformation.MaxAttempts != 1)
+                    throw new InvalidUsageException("MSMQ does not support a maximum number of attempts other than 1");
+
+                message.TimeToReachQueue = TimeSpan.Zero;
             }
 
             message.Extension = extension;
