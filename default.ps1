@@ -30,6 +30,7 @@ task Init -depends Clean {
 		"$base_dir\Rhino.ServiceBus\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Tests\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Host\Properties\AssemblyInfo.cs",
+		"$base_dir\Rhino.ServiceBus.RhinoQueues\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Castle\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.StructureMap\Properties\AssemblyInfo.cs",
 		"$base_dir\Rhino.ServiceBus.Autofac\Properties\AssemblyInfo.cs",
@@ -94,6 +95,8 @@ task Release -depends Compile, Test {
     	*\Rhino.Queues.pdb `
     	*\Rhino.ServiceBus.dll `
     	*\Rhino.ServiceBus.pdb `
+    	*\Rhino.ServiceBus.RhinoQueues.dll `
+    	*\Rhino.ServiceBus.RhinoQueues.pdb `
     	*\Rhino.ServiceBus.Castle.dll `
     	*\Rhino.ServiceBus.Castle.pdb `
     	*\StructureMap.dll `

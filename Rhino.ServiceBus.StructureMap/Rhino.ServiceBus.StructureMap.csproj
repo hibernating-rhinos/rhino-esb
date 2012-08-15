@@ -137,6 +137,10 @@
     <Compile Include="StructureMapServiceLocator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.ServiceBus.RhinoQueues\Rhino.ServiceBus.RhinoQueues.csproj">
+      <Project>{9748B2BF-41EA-487A-944C-A4ABEFFA2087}</Project>
+      <Name>Rhino.ServiceBus.RhinoQueues</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>
