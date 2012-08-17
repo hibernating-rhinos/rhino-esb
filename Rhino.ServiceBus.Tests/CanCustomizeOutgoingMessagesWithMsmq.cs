@@ -108,6 +108,7 @@ namespace Rhino.ServiceBus.Tests
         {
             using (var container = new WindsorContainer())
             {
+                MaxAttemptCustomizer.MaxAttempts = 1;
                 container.Register(Component.For<ICustomizeOutgoingMessages>()
                     .ImplementedBy<MaxAttemptCustomizer>()
                     .LifeStyle.Is(LifestyleType.Transient));

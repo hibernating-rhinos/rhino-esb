@@ -34,6 +34,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         private QueueManager queueManager;
         private readonly Thread[] threads;
         private readonly string queueName;
+        private volatile int currentlyProccessingCount;
         private volatile bool shouldContinue;
         private bool haveStarted;
         private readonly IsolationLevel queueIsolationLevel;
@@ -84,17 +85,19 @@ namespace Rhino.ServiceBus.RhinoQueues
             shouldContinue = false;
             logger.DebugFormat("Stopping transport for {0}", endpoint);
 
+            while (currentlyProccessingCount > 0)
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+
             if (timeout != null)
                 timeout.Dispose();
             DisposeQueueManager();
 
             if (!haveStarted)
                 return;
-
             foreach (var thread in threads)
             {
                 thread.Join();
-            }
+            } 
         }
 
         private void DisposeQueueManager()
@@ -364,6 +367,8 @@ namespace Rhino.ServiceBus.RhinoQueues
             try
             {
                 //deserialization errors do not count for module events
+#pragma warning disable 420
+                Interlocked.Increment(ref currentlyProccessingCount);
                 object[] messages = DeserializeMessages(message);
                 try
                 {
@@ -404,6 +409,8 @@ namespace Rhino.ServiceBus.RhinoQueues
                                                                               MessageProcessingFailure, currentMessageInformation);
                 messageHandlingCompletion.HandleMessageCompletion();
                 currentMessageInformation = null;
+                Interlocked.Decrement(ref currentlyProccessingCount);
+#pragma warning restore 420
             }
         }
 
