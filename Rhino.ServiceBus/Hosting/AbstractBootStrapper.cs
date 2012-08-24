@@ -48,17 +48,6 @@ namespace Rhino.ServiceBus.Hosting
         {
         }
 
-        [Obsolete("BeforeStart is now obsolete, please use BeginStart, or if overriding use OnBeginStart")]
-        public virtual void BeforeStart()
-        {
-            config.Configure();
-        }
-
-        [Obsolete("AfterStart is now obsolete, please use EndStart, or if overriding use OnEndStart")]
-        public virtual void AfterStart()
-        {
-        }
-
         protected virtual void OnBeginStart()
         {
             

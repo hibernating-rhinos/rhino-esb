@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Transactions;
 using System.Xml;
-using log4net;
+using Common.Logging;
 using Rhino.Queues;
 using Rhino.Queues.Model;
 using Rhino.ServiceBus.DataStructures;

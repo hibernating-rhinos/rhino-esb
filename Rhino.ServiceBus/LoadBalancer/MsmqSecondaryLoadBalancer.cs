@@ -3,7 +3,7 @@ using System.Linq;
 using System.Messaging;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Msmq;
@@ -89,9 +89,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             {
                 logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work on awating listenerQueue",
                    queueUri,
-                   newEndpoint,
-                   originalEndPoint
-                   );
+                   newEndpoint);
 
                 SendToQueue(queueUri,
                     new Reroute
@@ -105,9 +103,7 @@ namespace Rhino.ServiceBus.LoadBalancer
             {
                 logger.InfoFormat("Notifying worker {0} that secondary load balancer {1} is accepting work",
                    queueUri,
-                   Endpoint.Uri,
-                   PrimaryLoadBalancer
-                   );
+                   Endpoint.Uri);
 
                 SendToQueue(queueUri,
                     new AcceptingWork

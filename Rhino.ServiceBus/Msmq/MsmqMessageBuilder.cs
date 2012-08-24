@@ -3,7 +3,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Messaging;
 using System.Runtime.Serialization;
-using log4net;
+using Common.Logging;
+using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;
 using Rhino.ServiceBus.Util;
@@ -14,20 +15,21 @@ namespace Rhino.ServiceBus.Msmq
     {
         private readonly ILog logger = LogManager.GetLogger(typeof (MsmqMessageBuilder));
         private readonly IMessageSerializer messageSerializer;
-        private readonly ICustomizeMessageHeaders[] customizeHeaders;
+        private readonly ICustomizeOutgoingMessages[] customizeHeaders;
         private Endpoint endpoint;
 
         
         public MsmqMessageBuilder(IMessageSerializer messageSerializer, IServiceLocator serviceLocator)
         {
             this.messageSerializer = messageSerializer;
-            customizeHeaders = serviceLocator.ResolveAll<ICustomizeMessageHeaders>().ToArray();
+            customizeHeaders = serviceLocator.ResolveAll<ICustomizeOutgoingMessages>().ToArray();
         }
 
         public event Action<Message> MessageBuilt;
 
-        public Message BuildFromMessageBatch(params object[] msgs)
+        public Message BuildFromMessageBatch(OutgoingMessageInformation messageInformation)
         {
+            var msgs = messageInformation.Messages;
             var message = new Message();
 
             var isAdmin = msgs.Any(x => x is AdministrativeMessage);
@@ -51,12 +53,12 @@ namespace Rhino.ServiceBus.Msmq
 
             if (customizeHeaders.Length > 0)
             {
-                var headers = new NameValueCollection();
+                messageInformation.Headers = new NameValueCollection();
                 foreach (var customizeHeader in customizeHeaders)
                 {
-                    customizeHeader.Customize(headers);
+                    customizeHeader.Customize(messageInformation);
                 }
-                var headerBytes = headers.SerializeHeaders();
+                var headerBytes = messageInformation.Headers.SerializeHeaders();
                 //accounts for existing use of Extension for messageId and deferred messages
                 extension = new byte[24 + headerBytes.Length];
                 Buffer.BlockCopy(messageId, 0, extension, 0, messageId.Length);
@@ -65,6 +67,20 @@ namespace Rhino.ServiceBus.Msmq
             else
             {
                 extension = messageId;
+            }
+
+            if (messageInformation.DeliverBy != null)
+            {
+                var timeFromNow = messageInformation.DeliverBy.Value - DateTime.Now;
+                message.TimeToReachQueue = timeFromNow > TimeSpan.Zero ? timeFromNow : TimeSpan.Zero;
+            }
+
+            if (messageInformation.MaxAttempts != null)
+            {
+                if (messageInformation.MaxAttempts != 1)
+                    throw new InvalidUsageException("MSMQ does not support a maximum number of attempts other than 1");
+
+                message.TimeToReachQueue = TimeSpan.Zero;
             }
 
             message.Extension = extension;

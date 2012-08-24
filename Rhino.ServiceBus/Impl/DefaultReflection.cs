@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Impl

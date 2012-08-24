@@ -1,5 +1,5 @@
 using System;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
 using Rhino.ServiceBus.Messages;

@@ -1,6 +1,6 @@
 using System;
 using System.Configuration;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Impl;
 
 namespace Rhino.ServiceBus.LoadBalancer

@@ -12,8 +12,8 @@
     <description>Castle Windsor integration with Rhino.ServiceBus</description>
     <tags>rhino castle windsor servicebus bus msmq messaging cqrs</tags>
     <dependencies>
-      <dependency id="Castle.Core" version="2.5.2" />
-      <dependency id="Castle.Windsor" version="3.0.0" />
+      <dependency id="Castle.Core" version="3.1.0" />
+      <dependency id="Castle.Windsor" version="3.1.0" />
       <dependency id="Rhino.ServiceBus"/>
       <dependency id="Rhino.Queues"/>
     </dependencies>

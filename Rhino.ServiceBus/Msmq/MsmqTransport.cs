@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Messaging;
 using System.Runtime.Serialization;
 using System.Transactions;
-using log4net;
+using Common.Logging;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -111,8 +111,14 @@ namespace Rhino.ServiceBus.Msmq
 		{
 			if (HaveStarted == false)
 				throw new InvalidOperationException("Cannot send a message before transport is started");
-			
-			var message = GenerateMsmqMessageFromMessageBatch(msgs);
+
+            var messageInformation = new OutgoingMessageInformation
+            {
+                Destination = endpoint,
+                Messages = msgs,
+                Source = Endpoint
+            };
+			var message = GenerateMsmqMessageFromMessageBatch(messageInformation);
 	        var processAgainBytes = BitConverter.GetBytes(processAgainAt.ToBinary());
             if (message.Extension.Length == 16)
             {
@@ -136,7 +142,13 @@ namespace Rhino.ServiceBus.Msmq
 			if(HaveStarted==false)
 				throw new InvalidOperationException("Cannot send a message before transport is started");
 
-			var message = GenerateMsmqMessageFromMessageBatch(msgs);
+            var messageInformation = new OutgoingMessageInformation
+            {
+                Destination = destination,
+                Messages = msgs,
+                Source = Endpoint
+            };
+            var message = GenerateMsmqMessageFromMessageBatch(messageInformation);
 
             SendMessageToQueue(message, destination);
 

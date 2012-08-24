@@ -115,8 +115,8 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\SharedLibs\log4net.dll</HintPath>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -152,12 +152,12 @@
     <Compile Include="Config\SecurityConfiguration.cs" />
     <Compile Include="Config\SecurityElement.cs" />
     <Compile Include="ConsumerOf.cs" />
-    <Compile Include="Convertors\ThrowingWireEcryptedStringConvertor.cs" />
-    <Compile Include="Convertors\WireEcryptedStringConvertor.cs" />
+    <Compile Include="Convertors\ThrowingWireEncryptedStringConvertor.cs" />
+    <Compile Include="Convertors\WireEncryptedStringConvertor.cs" />
     <Compile Include="DataStructures\OrderedList.cs" />
     <Compile Include="DataStructures\Queue.cs" />
     <Compile Include="DataStructures\Set.cs" />
-    <Compile Include="DataStructures\WireEcryptedString.cs" />
+    <Compile Include="DataStructures\WireEncryptedString.cs" />
     <Compile Include="DataStructures\MultiValueIndexHashtable.cs" />
     <Compile Include="DataStructures\LeastRecentlyUsedSet.cs" />
     <Compile Include="DataStructures\Hashtable.cs" />
@@ -167,7 +167,7 @@
     <Compile Include="Hosting\AbstractBootStrapper.cs" />
     <Compile Include="Hosting\DefaultHost.cs" />
     <Compile Include="Hosting\RemoteAppDomainHost.cs" />
-    <Compile Include="ICustomizeMessageHeaders.cs" />
+    <Compile Include="ICustomizeOutgoingMessages.cs" />
     <Compile Include="Impl\DefaultHandler.cs" />
     <Compile Include="Impl\EndpointRouter.cs" />
     <Compile Include="Endpoint.cs" />
@@ -194,6 +194,7 @@
     <Compile Include="Messages\ReadyToWork.cs" />
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
+    <Compile Include="OutgoingMessageInformation.cs" />
     <Compile Include="ServiceBusExtensions.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />

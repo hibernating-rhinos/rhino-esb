@@ -226,7 +226,7 @@ namespace Rhino.ServiceBus.StructureMap
             {
                 c.For<IEncryptionService>().Singleton().Use<RijndaelEncryptionService>()
                     .Ctor<byte[]>().Is(key);
-                c.For<IValueConvertor<WireEcryptedString>>().Singleton().Use<WireEcryptedStringConvertor>();
+                c.For<IValueConvertor<WireEncryptedString>>().Singleton().Use<WireEncryptedStringConvertor>();
                 c.For<IElementSerializationBehavior>().Singleton().Use<WireEncryptedMessageConvertor>();
             });
         }
@@ -235,7 +235,7 @@ namespace Rhino.ServiceBus.StructureMap
         {
             container.Configure(c =>
             {
-                c.For<IValueConvertor<WireEcryptedString>>().Singleton().Use<ThrowingWireEcryptedStringConvertor>();
+                c.For<IValueConvertor<WireEncryptedString>>().Singleton().Use<ThrowingWireEncryptedStringConvertor>();
                 c.For<IElementSerializationBehavior>().Singleton().Use<ThrowingWireEncryptedMessageConvertor>();
             });
         }

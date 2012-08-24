@@ -30,8 +30,9 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void Deserialization_Error_Will_Not_Retry()
         {
+            var serviceLocator = new CastleServiceLocator(new WindsorContainer());
             messageSerializer = new ThrowingSerializer(new XmlMessageSerializer(new DefaultReflection(),
-                                                      new CastleServiceLocator(new WindsorContainer())));
+                                                      serviceLocator));
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),
@@ -41,7 +42,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 IsolationLevel.Serializable,
                 5,
                 false,
-                new RhinoQueuesMessageBuilder(messageSerializer)
+                new RhinoQueuesMessageBuilder(messageSerializer, serviceLocator)
                 );
             transport.Start();
             var count = 0;
@@ -59,8 +60,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
         [Fact]
         public void Arrived_Error_Will_Retry_Number_Of_Times_Configured()
         {
-            messageSerializer = new XmlMessageSerializer(new DefaultReflection(),
-                                                      new CastleServiceLocator(new WindsorContainer()));
+            var serviceLocator = new CastleServiceLocator(new WindsorContainer());
+            messageSerializer = new XmlMessageSerializer(new DefaultReflection(), serviceLocator);
             transport = new RhinoQueuesTransport(
                 new Uri("rhino.queues://localhost:23456/q"),
                 new EndpointRouter(),
@@ -70,7 +71,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 IsolationLevel.Serializable,
                 5,
                 false,
-                new RhinoQueuesMessageBuilder(messageSerializer)
+                new RhinoQueuesMessageBuilder(messageSerializer, serviceLocator)
                 );
             transport.Start();
             var count = 0;
