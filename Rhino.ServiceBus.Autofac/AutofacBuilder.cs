@@ -20,7 +20,7 @@ using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConf
 
 namespace Rhino.ServiceBus.Autofac
 {
-    public class AutofacBuilder : IBusContainerBuilder
+    public class AutofacBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
     {
         private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IContainer container;

@@ -25,7 +25,7 @@ using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConf
 
 namespace Rhino.ServiceBus.Castle
 {
-    public class CastleBuilder : IBusContainerBuilder 
+    public class CastleBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
     {
         private readonly IWindsorContainer container;
         private readonly AbstractRhinoServiceBusConfiguration config;

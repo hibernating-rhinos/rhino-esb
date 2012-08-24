@@ -23,7 +23,7 @@ using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConf
 namespace Rhino.ServiceBus.Spring
 {
     [CLSCompliant(false)]
-    public class SpringBuilder : IBusContainerBuilder
+    public class SpringBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
     {
         private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IConfigurableApplicationContext applicationContext;

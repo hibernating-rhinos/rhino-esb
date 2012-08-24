@@ -96,11 +96,11 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\Esent.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\SharedLibs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.PersistentHashTable, Version=1.7.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -111,6 +111,7 @@
       <HintPath>..\SharedLibs\3.5\Rhino.Queues.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -122,6 +123,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\IRhinoQueuesBusContainerBuilder.cs" />
+    <Compile Include="Config\RhinoQueuesOneWayBusConfiguration.cs" />
+    <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RhinoQueues\ErrorAction.cs" />
     <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />

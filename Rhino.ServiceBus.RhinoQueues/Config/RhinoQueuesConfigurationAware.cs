@@ -12,8 +12,11 @@ namespace Rhino.ServiceBus.Config
             if (busConfig == null)
                 return;
 
-            if (configuration.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) ==
-                false)
+            var containerBuilder = builder as IRhinoQueuesBusContainerBuilder;
+            if (containerBuilder == null)
+                return;
+
+            if (!configuration.Endpoint.Scheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase))
                 return;
 
             var busConfigSection = configuration.ConfigurationSection.Bus;
@@ -22,7 +25,7 @@ namespace Rhino.ServiceBus.Config
                 throw new ConfigurationErrorsException(
                     "Could not find attribute 'name' in node 'bus' in configuration");
 
-            builder.RegisterRhinoQueuesTransport();
+            containerBuilder.RegisterRhinoQueuesTransport();
         }
     }
 }

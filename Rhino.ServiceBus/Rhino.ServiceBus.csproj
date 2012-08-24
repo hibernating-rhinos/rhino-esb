@@ -259,7 +259,6 @@
     <Compile Include="Actions\IDeploymentAction.cs" />
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
     <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
-    <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="Convertors\ThrowingWireEncryptedMessageConvertor.cs" />
     <Compile Include="Convertors\WireEncryptedMessageConvertor.cs" />

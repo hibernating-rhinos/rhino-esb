@@ -21,7 +21,7 @@ using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConf
 
 namespace Rhino.ServiceBus.Unity
 {
-    public class UnityBuilder : IBusContainerBuilder
+    public class UnityBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
     {
         private readonly IUnityContainer container;
         private readonly AbstractRhinoServiceBusConfiguration config;

@@ -21,7 +21,7 @@ using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConf
 namespace Rhino.ServiceBus.StructureMap
 {
     [CLSCompliant(false)]
-    public class StructureMapBuilder : IBusContainerBuilder 
+    public class StructureMapBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
     {
         private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IContainer container;
