@@ -20,6 +20,7 @@ namespace Rhino.ServiceBus.Impl
         private BusConfigurationSection configurationSection;
         private Action readConfiguration;
         private IBusContainerBuilder busContainerBuilder;
+        protected List<Assembly> scanAssemblies = new List<Assembly>(new[] { typeof(IServiceBus).Assembly });
 
 
         protected AbstractRhinoServiceBusConfiguration()
@@ -33,16 +34,9 @@ namespace Rhino.ServiceBus.Impl
             Transactional = TransactionalOptions.FigureItOut;
         }
 
-        public virtual IEnumerable<Assembly> Assemblies
+        public IEnumerable<Assembly> Assemblies
         {
-            get
-            {
-                yield return typeof(IServiceBus).Assembly;
-                AssemblyElementCollection assemblies;
-                if (ConfigurationSection != null && (assemblies = ConfigurationSection.Assemblies) != null)
-                    foreach (AssemblyElement assembly in assemblies)
-                        yield return assembly.Assembly;
-            }
+            get { return scanAssemblies; }
         }
 
         public Uri Endpoint { get; set; }

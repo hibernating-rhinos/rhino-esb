@@ -19,10 +19,11 @@ namespace Rhino.ServiceBus.Config
             var messageOwners = new List<MessageOwner>();
             var messageOwnersReader = new MessageOwnersConfigReader(config.ConfigurationSection, messageOwners);
             messageOwnersReader.ReadMessageOwners();
-            oneWayConfig.MessageOwners = messageOwners.ToArray();
-            if (messageOwnersReader.EndpointScheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase) == false)
+
+            if (!messageOwnersReader.EndpointScheme.Equals("rhino.queues", StringComparison.InvariantCultureIgnoreCase))
                 return;
 
+            oneWayConfig.MessageOwners = messageOwners.ToArray();
             containerBuilder.RegisterRhinoQueuesOneWay();
         }
     }

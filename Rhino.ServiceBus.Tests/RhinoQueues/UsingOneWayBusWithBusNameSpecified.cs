@@ -4,6 +4,7 @@ using Castle.Windsor;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 using Xunit;
+using Rhino.ServiceBus.RhinoQueues;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
@@ -31,6 +32,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 Directory.Delete(alternateOneWayDirectory, true);
 
             var hostConfiguration = new HostConfiguration()
+                .AddAssembly(typeof(RhinoQueuesTransport).Assembly)
                 .Bus(null, ALTERNATE_BUS_NAME)
                 .Receive("System.string", "rhino.queues://nowhere/no_queue");
 

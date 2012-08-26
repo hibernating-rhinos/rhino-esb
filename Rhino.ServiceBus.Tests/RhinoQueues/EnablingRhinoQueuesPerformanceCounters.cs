@@ -10,6 +10,7 @@ using Rhino.ServiceBus.Impl;
 using Xunit;
 using Rhino.Queues.Monitoring;
 using Xunit.Sdk;
+using Rhino.ServiceBus.RhinoQueues;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
@@ -30,6 +31,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
 			Assert.Empty(inboundIntances);
 
 			var hostConfiguration = new HostConfiguration()
+                .AddAssembly(typeof(RhinoQueuesTransport).Assembly)
 				.EnablePerformanceCounters()
 				.Bus("rhino.queues://localhost/test_queue2", "test");
 

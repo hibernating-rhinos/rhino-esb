@@ -108,9 +108,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging">
-      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
-    </Reference>
     <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>

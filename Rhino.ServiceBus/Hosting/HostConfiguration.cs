@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Rhino.ServiceBus.Config;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -16,12 +17,14 @@ namespace Rhino.ServiceBus.Hosting
         private string Path { get; set; }
         private bool EnablePerformanceCounter { get; set; }
         private IDictionary<string, HostConfigMessageEndpoint> Messages { get; set; }
+        private IList<Assembly> ScanAssemblies { get; set; }
 
         public HostConfiguration()
         {
             ThreadCount = 1;
             NumberOfRetries = 5;
             Messages = new Dictionary<string, HostConfigMessageEndpoint>();
+            ScanAssemblies = new List<Assembly>();
         }
 
         public HostConfiguration Bus(string endpoint)
@@ -39,6 +42,12 @@ namespace Rhino.ServiceBus.Hosting
             Endpoint = endpoint;
             Name = name;
             Transactional = transactional;
+            return this;
+        }
+
+        public HostConfiguration AddAssembly(Assembly assembly)
+        {
+            ScanAssemblies.Add(assembly);
             return this;
         }
 
@@ -112,6 +121,8 @@ namespace Rhino.ServiceBus.Hosting
             config.Bus.Path = Path;
             config.Bus.EnablePerformanceCounters = EnablePerformanceCounter;
             config.Security.Key = SecurityKey;
+            foreach (var assembly in ScanAssemblies)
+                config.Assemblies.Add(new AssemblyElement { Assembly = assembly });
             foreach (var message in Messages)
             {
               config.MessageOwners.Add(new MessageOwnerElement
