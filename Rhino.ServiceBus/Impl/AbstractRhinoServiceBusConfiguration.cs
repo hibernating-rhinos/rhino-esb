@@ -38,9 +38,8 @@ namespace Rhino.ServiceBus.Impl
             get
             {
                 yield return typeof(IServiceBus).Assembly;
-                yield return GetType().Assembly;
-                var assemblies = ConfigurationSection.Assemblies;
-                if (assemblies != null)
+                AssemblyElementCollection assemblies;
+                if (ConfigurationSection != null && (assemblies = ConfigurationSection.Assemblies) != null)
                     foreach (AssemblyElement assembly in assemblies)
                         yield return assembly.Assembly;
             }

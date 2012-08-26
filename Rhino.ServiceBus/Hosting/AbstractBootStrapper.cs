@@ -12,13 +12,13 @@ namespace Rhino.ServiceBus.Hosting
 
         public virtual IEnumerable<Assembly> Assemblies
         {
-            get { return config.Assemblies; }
+            get { yield return GetType().Assembly; }
         }
 
         public virtual void InitializeContainer()
         {
-            CreateContainer();
             config = CreateConfiguration();
+            CreateContainer();
             ConfigureBusFacility(config);
         }
 
