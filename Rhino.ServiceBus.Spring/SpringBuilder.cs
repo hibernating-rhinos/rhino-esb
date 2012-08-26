@@ -19,6 +19,8 @@ using Spring.Context;
 
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Spring
 {
@@ -40,10 +42,11 @@ namespace Rhino.ServiceBus.Spring
             applicationContext.ObjectFactory.AddObjectPostProcessor(new ConsumerInterceptor(interceptor, applicationContext));
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             applicationContext.RegisterSingleton<IServiceLocator>(() => new SpringServiceLocator(applicationContext));
-            applicationContext.RegisterSingletons<IBusConfigurationAware>(typeof(IServiceBus).Assembly);
+            foreach (var assembly in assemblies)
+                applicationContext.RegisterSingletons<IBusConfigurationAware>(assembly);
 
             foreach (var busConfigurationAware in applicationContext.GetAll<IBusConfigurationAware>())
             {

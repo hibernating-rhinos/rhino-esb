@@ -136,9 +136,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\AssemblyNameConverter.cs" />
     <Compile Include="Config\BusConfigurationSection.cs" />
     <Compile Include="Config\BusElement.cs" />
     <Compile Include="Config\ConsumerInterceptor.cs" />
+    <Compile Include="Config\AssemblyElement.cs" />
+    <Compile Include="Config\AssemblyElementCollection.cs" />
     <Compile Include="Config\IBusConfigurationAware.cs" />
     <Compile Include="Config\IConsumerInterceptor.cs" />
     <Compile Include="Config\KeyElement.cs" />

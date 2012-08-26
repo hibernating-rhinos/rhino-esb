@@ -22,6 +22,7 @@ using Rhino.ServiceBus.RhinoQueues;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Castle
 {
@@ -50,17 +51,17 @@ namespace Rhino.ServiceBus.Castle
                 };
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             if (!container.Kernel.HasComponent(typeof(IWindsorContainer)))
                 container.Register(Component.For<IWindsorContainer>().Instance(container));
 
             container.Register(Component.For<IServiceLocator>().ImplementedBy<CastleServiceLocator>());
-
-            container.Register(
-                AllTypes.FromAssembly(typeof(IServiceBus).Assembly)
-                    .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
-                );
+            foreach (var assembly in assemblies)
+                container.Register(
+                    AllTypes.FromAssembly(assembly)
+                        .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
+                    );
 
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
             {

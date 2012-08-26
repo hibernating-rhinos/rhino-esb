@@ -7,10 +7,11 @@ using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Serializers;
 using System.Transactions;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Impl
 {
-    public abstract class AbstractRhinoServiceBusConfiguration 
+    public abstract class AbstractRhinoServiceBusConfiguration
     {
         private readonly List<Type> messageModules = new List<Type>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
@@ -32,6 +33,19 @@ namespace Rhino.ServiceBus.Impl
             Transactional = TransactionalOptions.FigureItOut;
         }
 
+        public virtual IEnumerable<Assembly> Assemblies
+        {
+            get
+            {
+                yield return typeof(IServiceBus).Assembly;
+                yield return GetType().Assembly;
+                var assemblies = ConfigurationSection.Assemblies;
+                if (assemblies != null)
+                    foreach (AssemblyElement assembly in assemblies)
+                        yield return assembly.Assembly;
+            }
+        }
+
         public Uri Endpoint { get; set; }
 
         public int NumberOfRetries { get; set; }
@@ -42,7 +56,7 @@ namespace Rhino.ServiceBus.Impl
 
         public bool DisableAutoQueueCreation { get; set; }
 
-		public TransactionalOptions Transactional { get; set; }
+        public TransactionalOptions Transactional { get; set; }
 
         public BusConfigurationSection ConfigurationSection
         {
@@ -84,7 +98,7 @@ namespace Rhino.ServiceBus.Impl
         public AbstractRhinoServiceBusConfiguration InsertMessageModuleAtFirst<TModule>()
             where TModule : IMessageModule
         {
-            messageModules.Insert(0, typeof (TModule));
+            messageModules.Insert(0, typeof(TModule));
             return this;
         }
 
@@ -94,7 +108,7 @@ namespace Rhino.ServiceBus.Impl
 
             ApplyConfiguration();
 
-            Builder.RegisterDefaultServices();
+            Builder.RegisterDefaultServices(Assemblies);
         }
 
         protected abstract void ApplyConfiguration();

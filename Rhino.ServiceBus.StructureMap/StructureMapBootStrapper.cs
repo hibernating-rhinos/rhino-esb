@@ -8,7 +8,7 @@ using StructureMap;
 namespace Rhino.ServiceBus.StructureMap
 {
     [CLSCompliant(false)]
-    public class StructureMapBootStrapper : AbstractBootStrapper 
+    public class StructureMapBootStrapper : AbstractBootStrapper
     {
         private IContainer container;
 
@@ -40,37 +40,32 @@ namespace Rhino.ServiceBus.StructureMap
             ConfigureContainer();
         }
 
-        protected virtual void ConfigureContainer() {
-          container.Configure(c => {
-            c.Scan(s => {
-                      s.Assembly(typeof(IServiceBus).Assembly);
-                      s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
-                      s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == true);
+        protected virtual void ConfigureContainer()
+        {
+            container.Configure(c =>
+            {
+                foreach (var assembly in Assemblies)
+                    c.Scan(s =>
+                    {
+                        s.Assembly(assembly);
+                        s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
+                        s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t));
+                        s.AddAllTypesOf<IDeploymentAction>();
+                        s.AddAllTypesOf<IEnvironmentValidationAction>();
                     });
-            c.Scan(s => {
-                      s.Assembly(GetType().Assembly);
-                      s.AddAllTypesOf<IMessageConsumer>().NameBy(t => t.FullName);
-                      s.Exclude(t => typeof(IOccasionalMessageConsumer).IsAssignableFrom(t) == true);
-                      s.AddAllTypesOf<IDeploymentAction>();
-                      s.AddAllTypesOf<IEnvironmentValidationAction>();
-                    });
-          });
+            });
         }
 
         public override void ExecuteDeploymentActions(string user)
         {
             foreach (var action in container.GetAllInstances<IDeploymentAction>())
-            {
                 action.Execute(user);
-            }
         }
 
         public override void ExecuteEnvironmentValidationActions()
         {
             foreach (var action in container.GetAllInstances<IEnvironmentValidationAction>())
-            {
                 action.Execute();
-            }
         }
 
         public override T GetInstance<T>()

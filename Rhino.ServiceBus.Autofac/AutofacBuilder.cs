@@ -17,6 +17,7 @@ using Rhino.ServiceBus.Msmq.TransportActions;
 using Rhino.ServiceBus.RhinoQueues;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Autofac
 {
@@ -39,17 +40,18 @@ namespace Rhino.ServiceBus.Autofac
             builder.Update(container);
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             var builder = new ContainerBuilder();
             builder.RegisterInstance(container);
             builder.RegisterType<AutofacServiceLocator>()
                 .As<IServiceLocator>()
                 .SingleInstance();
-            builder.RegisterAssemblyTypes(typeof(IServiceBus).Assembly)
-                .AssignableTo<IBusConfigurationAware>()
-                .As<IBusConfigurationAware>()
-                .SingleInstance();
+            foreach (var assembly in assemblies)
+                builder.RegisterAssemblyTypes(assembly)
+                    .AssignableTo<IBusConfigurationAware>()
+                    .As<IBusConfigurationAware>()
+                    .SingleInstance();
             builder.RegisterType<DefaultReflection>()
                 .As<IReflection>()
                 .SingleInstance();

@@ -17,6 +17,8 @@ using Rhino.ServiceBus.RhinoQueues;
 using StructureMap;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.StructureMap
 {
@@ -33,16 +35,17 @@ namespace Rhino.ServiceBus.StructureMap
             config.BuildWith(this);
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             container.Configure(c =>
             {
                 c.For<IServiceLocator>().Use<StructureMapServiceLocator>();
-                c.Scan(s =>
-                {
-                    s.AssemblyContainingType(typeof(IServiceBus));
-                    s.AddAllTypesOf<IBusConfigurationAware>();
-                });
+                foreach (var assembly in assemblies)
+                    c.Scan(s =>
+                    {
+                        s.Assembly(assembly);
+                        s.AddAllTypesOf<IBusConfigurationAware>();
+                    });
             });
 
             foreach (var busConfigurationAware in container.GetAllInstances<IBusConfigurationAware>())

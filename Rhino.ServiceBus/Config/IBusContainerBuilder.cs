@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Config
 {
     public interface IBusContainerBuilder
     {
         void WithInterceptor(IConsumerInterceptor interceptor);
-        void RegisterDefaultServices();
+        void RegisterDefaultServices(IEnumerable<Assembly> assemblies);
         void RegisterBus();
         void RegisterPrimaryLoadBalancer();
         void RegisterSecondaryLoadBalancer();
@@ -15,8 +17,6 @@ namespace Rhino.ServiceBus.Config
         void RegisterMsmqTransport(Type queueStrategyType);
         void RegisterQueueCreation();
         void RegisterMsmqOneWay();
-        //void RegisterRhinoQueuesTransport();
-        //void RegisterRhinoQueuesOneWay();
         void RegisterSecurity(byte[] key);
         void RegisterNoSecurity();
     }

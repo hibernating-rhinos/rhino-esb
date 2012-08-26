@@ -35,18 +35,19 @@ namespace Rhino.ServiceBus.Unity
 
         protected virtual void ConfigureContainer()
         {
-            container.RegisterTypesFromAssembly<IDeploymentAction>(Assembly);
-            container.RegisterTypesFromAssembly<IEnvironmentValidationAction>(Assembly);
-
-            ConfigureConsumers(typeof(IServiceBus).Assembly);
-            ConfigureConsumers(Assembly);
+            foreach (var assembly in Assemblies)
+            {
+                container.RegisterTypesFromAssembly<IDeploymentAction>(assembly);
+                container.RegisterTypesFromAssembly<IEnvironmentValidationAction>(assembly);
+                ConfigureConsumers(assembly);
+            }
         }
 
-        private void ConfigureConsumers(Assembly assemblyToScan)
+        protected virtual void ConfigureConsumers(Assembly assembly)
         {
-            var consumers = assemblyToScan.GetTypes().Where(type =>
-                                                      typeof (IMessageConsumer).IsAssignableFrom(type) &&
-                                                      typeof (IOccasionalMessageConsumer).IsAssignableFrom(type) == false &&
+            var consumers = assembly.GetTypes().Where(type =>
+                                                      typeof(IMessageConsumer).IsAssignableFrom(type) &&
+                                                      !typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) &&
                                                       IsTypeAcceptableForThisBootStrapper(type)).ToList();
             consumers.ForEach(consumer => container.RegisterType(typeof(IMessageConsumer), consumer, consumer.FullName, new TransientLifetimeManager()));
         }
@@ -60,17 +61,13 @@ namespace Rhino.ServiceBus.Unity
         public override void ExecuteDeploymentActions(string user)
         {
             foreach (var action in container.ResolveAll<IDeploymentAction>())
-            {
                 action.Execute(user);
-            }
         }
 
         public override void ExecuteEnvironmentValidationActions()
         {
             foreach (var action in container.ResolveAll<IEnvironmentValidationAction>())
-            {
                 action.Execute();
-            }
         }
 
         public override T GetInstance<T>()

@@ -18,6 +18,8 @@ using Rhino.ServiceBus.RhinoQueues;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Rhino.ServiceBus.Unity
 {
@@ -38,13 +40,14 @@ namespace Rhino.ServiceBus.Unity
             container.AddExtension(new ConsumerExtension(interceptor));
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             if (!container.IsRegistered(typeof(IUnityContainer)))
                 container.RegisterInstance(container);
 
             container.RegisterType<IServiceLocator, UnityServiceLocator>();
-            container.RegisterTypesFromAssembly<IBusConfigurationAware>(typeof(IServiceBus).Assembly);
+            foreach (var assembly in assemblies)
+                container.RegisterTypesFromAssembly<IBusConfigurationAware>(assembly);
 
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
             {

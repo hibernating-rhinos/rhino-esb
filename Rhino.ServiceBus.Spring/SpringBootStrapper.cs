@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-
+using System.Reflection;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
-
 using Spring.Context;
 using Spring.Context.Support;
 using Spring.Objects.Factory.Config;
@@ -40,17 +39,13 @@ namespace Rhino.ServiceBus.Spring
         public override void ExecuteDeploymentActions(string user)
         {
             foreach (IDeploymentAction action in applicationContext.GetAll<IDeploymentAction>())
-            {
                 action.Execute(user);
-            }
         }
 
         public override void ExecuteEnvironmentValidationActions()
         {
             foreach (IEnvironmentValidationAction action in applicationContext.GetAll<IEnvironmentValidationAction>())
-            {
                 action.Execute();
-            }
         }
 
         public override T GetInstance<T>()
@@ -73,16 +68,19 @@ namespace Rhino.ServiceBus.Spring
 
         protected virtual void ConfigureContainer()
         {
-            applicationContext.RegisterSingletons<IDeploymentAction>(Assembly);
-            applicationContext.RegisterSingletons<IEnvironmentValidationAction>(Assembly);
-            RegisterConsumers();
+            foreach (var assembly in Assemblies)
+            {
+                applicationContext.RegisterSingletons<IDeploymentAction>(assembly);
+                applicationContext.RegisterSingletons<IEnvironmentValidationAction>(assembly);
+                RegisterConsumersFrom(assembly);
+            }
         }
 
-        protected virtual void RegisterConsumers()
+        protected virtual void RegisterConsumersFrom(Assembly assembly)
         {
-            Assembly.GetTypes()
-                .Where(t => typeof (IMessageConsumer).IsAssignableFrom(t)
-                            && !typeof (IOccasionalMessageConsumer).IsAssignableFrom(t)
+            assembly.GetTypes()
+                .Where(t => typeof(IMessageConsumer).IsAssignableFrom(t)
+                            && !typeof(IOccasionalMessageConsumer).IsAssignableFrom(t)
                             && IsTypeAcceptableForThisBootStrapper(t)
                             && !t.IsInterface
                             && !t.IsAbstract)
