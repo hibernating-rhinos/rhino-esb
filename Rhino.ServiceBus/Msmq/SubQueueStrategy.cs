@@ -91,5 +91,10 @@ namespace Rhino.ServiceBus.Msmq
 		{
 			queue.Send(message);
 		}
+
+        public OpenedQueue OpenSubQueue(OpenedQueue queue, SubQueue subQueue, QueueAccessMode accessMode)
+        {
+            return queue.OpenSubQueue(subQueue, accessMode);
+        }
 	}
 }

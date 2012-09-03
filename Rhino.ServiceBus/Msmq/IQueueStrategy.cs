@@ -36,5 +36,7 @@ namespace Rhino.ServiceBus.Msmq
 		bool TryMoveMessage(OpenedQueue queue, Message message, SubQueue subQueue, out string msgId);
 
 		void SendToErrorQueue(OpenedQueue queue, Message message);
+
+        OpenedQueue OpenSubQueue(OpenedQueue queue, SubQueue subQueue, QueueAccessMode accessMode);
     }
 }

@@ -118,7 +118,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 		private void ReadUrisFromSubQueue(Set<Uri> set, SubQueue subQueue)
 		{
 			using (var q = MsmqUtil.GetQueuePath(Endpoint).Open(QueueAccessMode.Receive))
-			using (var sq = q.OpenSubQueue(subQueue, QueueAccessMode.SendAndReceive))
+			using (var sq = this.queueStrategy.OpenSubQueue(q, subQueue, QueueAccessMode.SendAndReceive))
 			{
 				var messages = sq.GetAllMessagesWithStringFormatter();
 				foreach (var message in messages)

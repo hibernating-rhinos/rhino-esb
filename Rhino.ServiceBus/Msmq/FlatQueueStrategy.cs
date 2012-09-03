@@ -173,6 +173,11 @@ namespace Rhino.ServiceBus.Msmq
     		}
     	}
 
+        public OpenedQueue OpenSubQueue(OpenedQueue queue, SubQueue subQueue, QueueAccessMode accessMode)
+        {
+            return queue.OpenSiblngQueue(subQueue, accessMode);
+        }
+
     	/// <summary>
         /// Gets the errors queue path.
         /// </summary>
