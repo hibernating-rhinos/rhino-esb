@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Rhino.ServiceBus.Impl;
 using Xunit;
+using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Actions;
 
 namespace Rhino.ServiceBus.Tests.Containers.Castle
 {
@@ -52,6 +55,33 @@ namespace Rhino.ServiceBus.Tests.Containers.Castle
 
             Assert.Equal(1, ConsumerWithDisposableDependency.ConsumedMessages);
             Assert.Equal(0, DisposableDependency.NotDisposedInstances);
+        }
+
+
+        [Fact]
+        public void QueueCreationModule_can_be_resolved()
+        {
+            var container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .Configure();
+
+            var allBusAware = container.ResolveAll<IServiceBusAware>().ToList();
+            Assert.NotEmpty(allBusAware);
+            Assert.IsType<QueueCreationModule>(allBusAware.First());
+        }
+
+        [Fact]
+        public void DeploymentActions_can_be_resolved()
+        {
+            var container = new WindsorContainer();
+            new RhinoServiceBusConfiguration()
+                .UseCastleWindsor(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
+
+            var actions = container.ResolveAll<IDeploymentAction>().ToList();
+            Assert.True(actions.Count >= 2);
         }
     }
 

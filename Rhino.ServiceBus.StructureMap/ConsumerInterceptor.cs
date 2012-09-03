@@ -7,7 +7,7 @@ using StructureMap.Interceptors;
 namespace Rhino.ServiceBus.StructureMap
 {
     [CLSCompliant(false)]
-    public  class ConsumerInterceptor : TypeInterceptor
+    public class ConsumerInterceptor : TypeInterceptor
     {
         private readonly IConsumerInterceptor interceptor;
         private readonly IContainer container;
@@ -28,7 +28,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public bool MatchesType(Type type)
         {
-            return typeof (IMessageConsumer).IsAssignableFrom(type);
+            return typeof(IMessageConsumer).IsAssignableFrom(type);
         }
     }
 }

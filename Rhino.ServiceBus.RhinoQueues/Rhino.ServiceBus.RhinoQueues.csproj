@@ -123,8 +123,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\IRhinoQueuesBusContainerBuilder.cs" />
-    <Compile Include="Config\RhinoQueuesOneWayBusConfiguration.cs" />
+    <Compile Include="Config\RhinoQueuesOneWayBusConfigurationAware.cs" />
     <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RhinoQueues\ErrorAction.cs" />

@@ -51,7 +51,6 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual void OnBeginStart()
         {
-
         }
 
         public void BeginStart()
@@ -67,7 +66,6 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual void OnEndStart()
         {
-
         }
 
         public abstract void Dispose();

@@ -14,10 +14,15 @@ namespace Rhino.ServiceBus.Config
         void RegisterReadyForWork();
         void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint);
         void RegisterLoggingEndpoint(Uri logEndpoint);
-        void RegisterMsmqTransport(Type queueStrategyType);
-        void RegisterQueueCreation();
-        void RegisterMsmqOneWay();
         void RegisterSecurity(byte[] key);
         void RegisterNoSecurity();
+        void RegisterSingleton<T>(Func<T> func)
+            where T : class;
+        void RegisterSingleton<T>(string name, Func<T> func)
+            where T : class;
+        void RegisterAll<T>(params Type[] excludes)
+            where T : class;
+        void RegisterAll<T>(Predicate<Type> condition)
+            where T : class;
     }
 }

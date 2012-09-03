@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -6,6 +7,8 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using StructureMap;
 using Xunit;
+using Rhino.ServiceBus.Msmq;
+using Rhino.ServiceBus.Actions;
 
 namespace Rhino.ServiceBus.Tests.Containers.StructureMap
 {
@@ -108,6 +111,32 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
             var loadBalancerMessageModule = container.GetInstance<LoadBalancerMessageModule>();
             Assert.NotNull(loadBalancerMessageModule);
         }
+
+        [Fact]
+        public void QueueCreationModule_can_be_resolved()
+        {
+            var container = new Container();
+            new RhinoServiceBusConfiguration()
+                .UseStructureMap(container)
+                .Configure();
+
+            var allBusAware = container.GetAllInstances<IServiceBusAware>().ToList();
+            Assert.NotEmpty(allBusAware);
+            Assert.IsType<QueueCreationModule>(allBusAware.First());
+        }
+
+        //[Fact]
+        //public void DeploymentActions_can_be_resolved()
+        //{
+        //    var container = new Container();
+        //    new RhinoServiceBusConfiguration()
+        //        .UseStructureMap(container)
+        //        .UseStandaloneConfigurationFile("BusWithLogging.config")
+        //        .Configure();
+
+        //    var actions = container.GetAllInstances<IDeploymentAction>().ToList();
+        //    Assert.True(actions.Count >= 2);
+        //}
     }
 
     public class TestConsumer : ConsumerOf<string>

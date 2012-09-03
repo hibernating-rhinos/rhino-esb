@@ -108,10 +108,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Rhino.Queues, Version=1.2.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="Spring.Aop">
       <HintPath>$(LibDir)Spring.Aop.dll</HintPath>
     </Reference>
@@ -139,10 +135,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Rhino.ServiceBus.RhinoQueues\Rhino.ServiceBus.RhinoQueues.csproj">
-      <Project>{9748B2BF-41EA-487A-944C-A4ABEFFA2087}</Project>
-      <Name>Rhino.ServiceBus.RhinoQueues</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
       <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
       <Name>Rhino.ServiceBus</Name>

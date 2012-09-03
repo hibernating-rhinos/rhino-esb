@@ -7,25 +7,21 @@ namespace Rhino.ServiceBus.Unity
 {
     public static class ContainerExtensions
     {
-        public static void RegisterTypesFromAssembly(this IUnityContainer container, Assembly assemlyToScan, Type basedOn, params Type[] exclude)
+        public static void RegisterTypesFromAssembly(this IUnityContainer container, Assembly assemlyToScan, Type basedOn, Predicate<Type> condition)
         {
             assemlyToScan.GetTypes()
-                .Where(t => IsMatch(t, basedOn, exclude)).ToList()
+                .Where(t => condition(t)).ToList()
                 .ForEach(type => container.RegisterType(basedOn, type, Guid.NewGuid().ToString(), new ContainerControlledLifetimeManager()));
         }
 
-        private static bool IsMatch(Type candidate, Type basedOn, Type[] exclude)
+        public static void RegisterTypesFromAssembly<TBasedOn>(this IUnityContainer container, Assembly assemlyToScan, params Type[] excludes)
         {
-            return basedOn.IsAssignableFrom(candidate)
-                   && !candidate.Equals(basedOn)
-                   && !candidate.IsInterface
-                   && !candidate.IsAbstract
-                   && !exclude.Contains(candidate);
+            RegisterTypesFromAssembly<TBasedOn>(container, assemlyToScan, (Predicate<Type>)(x => !x.IsAbstract && !x.IsInterface && typeof(TBasedOn).IsAssignableFrom(x) && !excludes.Contains(x)));
         }
 
-        public static void RegisterTypesFromAssembly<TBasedOn>(this IUnityContainer container, Assembly assemlyToScan, params Type[] exclude)
+        public static void RegisterTypesFromAssembly<TBasedOn>(this IUnityContainer container, Assembly assemlyToScan, Predicate<Type> condition)
         {
-            RegisterTypesFromAssembly(container, assemlyToScan, typeof(TBasedOn), exclude);
+            RegisterTypesFromAssembly(container, assemlyToScan, typeof(TBasedOn), condition);
         }
     }
 }

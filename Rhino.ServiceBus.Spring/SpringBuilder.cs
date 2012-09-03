@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
 using System.Messaging;
-
-using Rhino.Queues;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Convertors;
@@ -13,10 +11,7 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
-using Rhino.ServiceBus.RhinoQueues;
-
 using Spring.Context;
-
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
 using System.Collections.Generic;
@@ -25,7 +20,7 @@ using System.Reflection;
 namespace Rhino.ServiceBus.Spring
 {
     [CLSCompliant(false)]
-    public class SpringBuilder : IBusContainerBuilder, IRhinoQueuesBusContainerBuilder
+    public class SpringBuilder : IBusContainerBuilder
     {
         private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IConfigurableApplicationContext applicationContext;
@@ -48,16 +43,12 @@ namespace Rhino.ServiceBus.Spring
             foreach (var assembly in assemblies)
                 applicationContext.RegisterSingletons<IBusConfigurationAware>(assembly);
 
+            var locator = applicationContext.Get<IServiceLocator>();
             foreach (var busConfigurationAware in applicationContext.GetAll<IBusConfigurationAware>())
-            {
-                busConfigurationAware.Configure(config, this);
-            }
+                busConfigurationAware.Configure(config, this, locator);
 
             foreach (var module in config.MessageModules)
-            {
                 applicationContext.RegisterSingleton(module, module.FullName);
-            }
-
 
             applicationContext.RegisterSingleton<IReflection>(() => new SpringReflection());
             applicationContext.RegisterSingleton(config.SerializerType);
@@ -66,7 +57,7 @@ namespace Rhino.ServiceBus.Spring
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusConfiguration) config;
+            var busConfig = (RhinoServiceBusConfiguration)config;
 
             applicationContext.RegisterSingleton<IStartableServiceBus>(() => new DefaultServiceBus(applicationContext.Get<IServiceLocator>(),
                                                    applicationContext.Get<ITransport>(),
@@ -81,7 +72,7 @@ namespace Rhino.ServiceBus.Spring
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
 
             applicationContext.RegisterSingleton(() =>
                 {
@@ -101,7 +92,7 @@ namespace Rhino.ServiceBus.Spring
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
 
             applicationContext.RegisterSingleton<MsmqLoadBalancer>(() =>
                 {
@@ -122,7 +113,7 @@ namespace Rhino.ServiceBus.Spring
 
         public void RegisterReadyForWork()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
 
             applicationContext.RegisterSingleton(() => new MsmqReadyForWorkListener(applicationContext.Get<IQueueStrategy>(),
                                                                                     loadBalancerConfig.ReadyForWork,
@@ -137,107 +128,131 @@ namespace Rhino.ServiceBus.Spring
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
-            applicationContext.RegisterSingleton(typeof (LoadBalancerMessageModule).FullName, () => new LoadBalancerMessageModule(
-                                                                                                                                loadBalancerEndpoint, 
+            applicationContext.RegisterSingleton(typeof(LoadBalancerMessageModule).FullName, () => new LoadBalancerMessageModule(
+                                                                                                                                loadBalancerEndpoint,
                                                                                                                                 applicationContext.Get<IEndpointRouter>()));
         }
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-            applicationContext.RegisterSingleton(typeof (MessageLoggingModule).FullName, () => new MessageLoggingModule(applicationContext.Get<IEndpointRouter>(), logEndpoint));
+            applicationContext.RegisterSingleton(typeof(MessageLoggingModule).FullName, () => new MessageLoggingModule(applicationContext.Get<IEndpointRouter>(), logEndpoint));
             applicationContext.RegisterSingleton<IDeploymentAction>(() => new CreateLogQueueAction(applicationContext.Get<MessageLoggingModule>(), applicationContext.Get<ITransport>()));
         }
 
-        public void RegisterMsmqTransport(Type queueStrategyType)
+        public void RegisterSingleton<T>(Func<T> func)
+            where T : class
         {
-            if (queueStrategyType.GetConstructor(new[] {typeof (IQueueStrategy), typeof (Uri)}) != null)
-            {
-                applicationContext.RegisterSingleton(queueStrategyType, typeof (IQueueStrategy).FullName, applicationContext.Get<IEndpointRouter>(), config.Endpoint);
-            }
-            else
-            {
-                // use default
-                applicationContext.RegisterSingleton(queueStrategyType);
-            }
+            T singleton = null;
+            applicationContext.RegisterSingleton<T>(() => singleton == null ? singleton = func() : singleton);
+        }
+        public void RegisterSingleton<T>(string name, Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            applicationContext.RegisterSingleton<T>(name, () => singleton == null ? singleton = func() : singleton);
+        }
 
-            applicationContext.RegisterSingleton<IMessageBuilder<Message>>(() => new MsmqMessageBuilder(
-                                                           applicationContext.Get<IMessageSerializer>(),
-                                                           applicationContext.Get<IServiceLocator>()));
-
-            applicationContext.RegisterSingleton<IMsmqTransportAction>(() => new ErrorAction(
-                                                           config.NumberOfRetries,
-                                                           applicationContext.Get<IQueueStrategy>()));
-
-            applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new MsmqSubscriptionStorage(
-                                                           applicationContext.Get<IReflection>(),
-                                                           applicationContext.Get<IMessageSerializer>(),
-                                                           config.Endpoint,
-                                                           applicationContext.Get<IEndpointRouter>(),
-                                                           applicationContext.Get<IQueueStrategy>()));
-
-            applicationContext.RegisterSingleton<ITransport>(typeof (MsmqTransport).FullName, () => new MsmqTransport(
-                                                                                                        applicationContext.Get<IMessageSerializer>(),
-                                                                                                        applicationContext.Get<IQueueStrategy>(),
-                                                                                                        config.Endpoint,
-                                                                                                        config.ThreadCount,
-                                                                                                        applicationContext.GetAll<IMsmqTransportAction>().ToArray(),
-                                                                                                        applicationContext.Get<IEndpointRouter>(),
-                                                                                                        config.IsolationLevel,
-                                                                                                        config.Transactional,
-                                                                                                        config.ConsumeInTransaction,
-                                                                                                        applicationContext.Get<IMessageBuilder<Message>>()));
-
-            typeof (IMsmqTransportAction).Assembly.GetTypes()
-                .Where(x => typeof (IMsmqTransportAction).IsAssignableFrom(x) && x != typeof (ErrorAction) && !x.IsAbstract && !x.IsInterface)
+        public void RegisterAll<T>(params Type[] excludes)
+            where T : class { RegisterAll<T>((Predicate<Type>)(x => !x.IsAbstract && !x.IsInterface && typeof(T).IsAssignableFrom(x) && !excludes.Contains(x))); }
+        public void RegisterAll<T>(Predicate<Type> condition)
+            where T : class
+        {
+            typeof(T).Assembly.GetTypes()
+                .Where(x => condition(x))
                 .ToList()
                 .ForEach(x => applicationContext.RegisterSingleton(x, x.FullName));
         }
 
-        public void RegisterQueueCreation()
-        {
-            applicationContext.RegisterSingleton(() => new QueueCreationModule(applicationContext.Get<IQueueStrategy>()));
-        }
+        //public void RegisterMsmqTransport(Type queueStrategyType)
+        //{
+        //    if (queueStrategyType.GetConstructor(new[] {typeof (IQueueStrategy), typeof (Uri)}) != null)
+        //    {
+        //        applicationContext.RegisterSingleton(queueStrategyType, typeof (IQueueStrategy).FullName, applicationContext.Get<IEndpointRouter>(), config.Endpoint);
+        //    }
+        //    else
+        //    {
+        //        // use default
+        //        applicationContext.RegisterSingleton(queueStrategyType);
+        //    }
 
-        public void RegisterMsmqOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+        //    applicationContext.RegisterSingleton<IMessageBuilder<Message>>(() => new MsmqMessageBuilder(
+        //                                                   applicationContext.Get<IMessageSerializer>(),
+        //                                                   applicationContext.Get<IServiceLocator>()));
 
-            applicationContext.RegisterSingleton<IMessageBuilder<Message>>(() => new MsmqMessageBuilder(applicationContext.Get<IMessageSerializer>(), applicationContext.Get<IServiceLocator>()));
-            applicationContext.RegisterSingleton<IOnewayBus>(() => new MsmqOnewayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageBuilder<Message>>()));
-        }
+        //    applicationContext.RegisterSingleton<IMsmqTransportAction>(() => new ErrorAction(
+        //                                                   config.NumberOfRetries,
+        //                                                   applicationContext.Get<IQueueStrategy>()));
 
-        public void RegisterRhinoQueuesTransport()
-        {
-            var busConfig = config.ConfigurationSection.Bus;
-            applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new PhtSubscriptionStorage(busConfig.SubscriptionPath,
-                                                                                  applicationContext.Get<IMessageSerializer>(),
-                                                                                  applicationContext.Get<IReflection>()));
+        //    applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new MsmqSubscriptionStorage(
+        //                                                   applicationContext.Get<IReflection>(),
+        //                                                   applicationContext.Get<IMessageSerializer>(),
+        //                                                   config.Endpoint,
+        //                                                   applicationContext.Get<IEndpointRouter>(),
+        //                                                   applicationContext.Get<IQueueStrategy>()));
 
-            applicationContext.RegisterSingleton<ITransport>(typeof (RhinoQueuesTransport).FullName, () => new RhinoQueuesTransport(config.Endpoint,
-                                                                                                                                    applicationContext.Get<IEndpointRouter>(),
-                                                                                                                                    applicationContext.Get<IMessageSerializer>(),
-                                                                                                                                    config.ThreadCount,
-                                                                                                                                    busConfig.QueuePath,
-                                                                                                                                    config.IsolationLevel,
-                                                                                                                                    config.NumberOfRetries,
-                                                                                                                                    busConfig.EnablePerformanceCounters,
-                                                                                                                                    applicationContext.Get<IMessageBuilder<MessagePayload>>()));
+        //    applicationContext.RegisterSingleton<ITransport>(typeof (MsmqTransport).FullName, () => new MsmqTransport(
+        //                                                                                                applicationContext.Get<IMessageSerializer>(),
+        //                                                                                                applicationContext.Get<IQueueStrategy>(),
+        //                                                                                                config.Endpoint,
+        //                                                                                                config.ThreadCount,
+        //                                                                                                applicationContext.GetAll<IMsmqTransportAction>().ToArray(),
+        //                                                                                                applicationContext.Get<IEndpointRouter>(),
+        //                                                                                                config.IsolationLevel,
+        //                                                                                                config.Transactional,
+        //                                                                                                config.ConsumeInTransaction,
+        //                                                                                                applicationContext.Get<IMessageBuilder<Message>>()));
 
-            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
-                applicationContext.Get<IMessageSerializer>(),
-                applicationContext.Get<IServiceLocator>()));
-        }
+        //    typeof (IMsmqTransportAction).Assembly.GetTypes()
+        //        .Where(x => typeof (IMsmqTransportAction).IsAssignableFrom(x) && x != typeof (ErrorAction) && !x.IsAbstract && !x.IsInterface)
+        //        .ToList()
+        //        .ForEach(x => applicationContext.RegisterSingleton(x, x.FullName));
+        //}
 
-        public void RegisterRhinoQueuesOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            var busConfig = config.ConfigurationSection.Bus;
+        //public void RegisterQueueCreation()
+        //{
+        //    applicationContext.RegisterSingleton(() => new QueueCreationModule(applicationContext.Get<IQueueStrategy>()));
+        //}
 
-            applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
-                applicationContext.Get<IMessageSerializer>(),
-                applicationContext.Get<IServiceLocator>()));
-            applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.QueuePath, busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
-        }
+        //public void RegisterMsmqOneWay()
+        //{
+        //    var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+
+        //    applicationContext.RegisterSingleton<IMessageBuilder<Message>>(() => new MsmqMessageBuilder(applicationContext.Get<IMessageSerializer>(), applicationContext.Get<IServiceLocator>()));
+        //    applicationContext.RegisterSingleton<IOnewayBus>(() => new MsmqOnewayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageBuilder<Message>>()));
+        //}
+
+        //public void RegisterRhinoQueuesTransport()
+        //{
+        //    var busConfig = config.ConfigurationSection.Bus;
+        //    applicationContext.RegisterSingleton<ISubscriptionStorage>(() => new PhtSubscriptionStorage(busConfig.SubscriptionPath,
+        //                                                                          applicationContext.Get<IMessageSerializer>(),
+        //                                                                          applicationContext.Get<IReflection>()));
+
+        //    applicationContext.RegisterSingleton<ITransport>(typeof (RhinoQueuesTransport).FullName, () => new RhinoQueuesTransport(config.Endpoint,
+        //                                                                                                                            applicationContext.Get<IEndpointRouter>(),
+        //                                                                                                                            applicationContext.Get<IMessageSerializer>(),
+        //                                                                                                                            config.ThreadCount,
+        //                                                                                                                            busConfig.QueuePath,
+        //                                                                                                                            config.IsolationLevel,
+        //                                                                                                                            config.NumberOfRetries,
+        //                                                                                                                            busConfig.EnablePerformanceCounters,
+        //                                                                                                                            applicationContext.Get<IMessageBuilder<MessagePayload>>()));
+
+        //    applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
+        //        applicationContext.Get<IMessageSerializer>(),
+        //        applicationContext.Get<IServiceLocator>()));
+        //}
+
+        //public void RegisterRhinoQueuesOneWay()
+        //{
+        //    var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
+        //    var busConfig = config.ConfigurationSection.Bus;
+
+        //    applicationContext.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => new RhinoQueuesMessageBuilder(
+        //        applicationContext.Get<IMessageSerializer>(),
+        //        applicationContext.Get<IServiceLocator>()));
+        //    applicationContext.RegisterSingleton<IOnewayBus>(() => new RhinoQueuesOneWayBus(oneWayConfig.MessageOwners, applicationContext.Get<IMessageSerializer>(), busConfig.QueuePath, busConfig.EnablePerformanceCounters, applicationContext.Get<IMessageBuilder<MessagePayload>>()));
+        //}
 
         public void RegisterSecurity(byte[] key)
         {
