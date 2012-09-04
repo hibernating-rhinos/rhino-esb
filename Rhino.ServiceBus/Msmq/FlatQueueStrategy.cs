@@ -67,6 +67,11 @@ namespace Rhino.ServiceBus.Msmq
 	                    MsmqUtil.OpenOrCreateQueue(GetKnownWorkersQueuePath(), QueueAccessMode.SendAndReceive, queue),
 	                    MsmqUtil.OpenOrCreateQueue(GetKnownEndpointsQueuePath(), QueueAccessMode.SendAndReceive, queue),
 	                };
+                case QueueType.Raw:
+                    return new[]
+	                {
+	                    queue,
+	                };
                 default:
                     throw new ArgumentOutOfRangeException("queueType", "Can't handle queue type: " + queueType);
             }
