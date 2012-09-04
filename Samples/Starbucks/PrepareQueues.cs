@@ -49,6 +49,9 @@ namespace Starbucks
                     PurgeSubqueue(queuePath, "endpoints");
                     PurgeSubqueue(queuePath, "workers");
                     break;
+                case QueueType.Raw:
+                    // no subqueues here
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("queueType", "Can't handle queue type: " + queueType);
             }
