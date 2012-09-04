@@ -1,38 +1,21 @@
-﻿using System.Messaging;
-using Rhino.ServiceBus.LoadBalancer;
+﻿using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Actions
 {
-    public class CreateReadyForWorkQueuesAction: IDeploymentAction
+    public class CreateReadyForWorkQueuesAction : AbstractCreateQueuesAction
     {
-        private IQueueStrategy queueStrategy;
-        private MsmqReadyForWorkListener readyForWorkListener;
+        private readonly MsmqReadyForWorkListener readyForWorkListener;
 
         public CreateReadyForWorkQueuesAction(IQueueStrategy queueStrategy, MsmqReadyForWorkListener readyForWorkListener)
+            : base(queueStrategy)
         {
-            this.queueStrategy = queueStrategy;
             this.readyForWorkListener = readyForWorkListener;
         }
 
-        public void Execute(string user)
+        public override void Execute(string user)
         {
-            // will create the queues if they are not already there
-            var queues = queueStrategy.InitializeQueue(readyForWorkListener.Endpoint, QueueType.Raw);
-            foreach (var queue in queues)
-            {
-                queue.SetPermissions(user,
-                                     MessageQueueAccessRights.DeleteMessage |
-                                     MessageQueueAccessRights.DeleteJournalMessage |
-                                     MessageQueueAccessRights.GenericRead |
-                                     MessageQueueAccessRights.GenericWrite |
-                                     MessageQueueAccessRights.GetQueuePermissions |
-                                     MessageQueueAccessRights.PeekMessage |
-                                     MessageQueueAccessRights.ReceiveJournalMessage |
-                                     MessageQueueAccessRights.ReceiveMessage |
-                                     MessageQueueAccessRights.WriteMessage,
-                                     AccessControlEntryType.Allow);
-            }
+            this.CreateQueues(QueueType.Raw, readyForWorkListener.Endpoint, user);
         }
     }
 }

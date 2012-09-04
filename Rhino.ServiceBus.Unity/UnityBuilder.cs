@@ -159,6 +159,7 @@ namespace Rhino.ServiceBus.Unity
             container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString(), 
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
+                    new ResolvedParameter<IQueueStrategy>(),
                     new ResolvedParameter<MessageLoggingModule>(typeof(MessageLoggingModule).FullName),
                     new ResolvedParameter<ITransport>()));
         }
