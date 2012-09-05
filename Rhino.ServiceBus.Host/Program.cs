@@ -43,6 +43,7 @@ namespace Rhino.ServiceBus.Host
 
         	try
             {
+                log.Debug("Executing action: " + action);
                 actions[action].Execute(executingOptions);
 
                 return 0;
