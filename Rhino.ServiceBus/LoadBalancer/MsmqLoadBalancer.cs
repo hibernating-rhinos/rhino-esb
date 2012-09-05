@@ -478,7 +478,7 @@ namespace Rhino.ServiceBus.LoadBalancer
 				Body = work.Endpoint.ToString(),
 				Label = ("Known worker: " + work.Endpoint).EnsureLabelLength()
 			};
-			logger.DebugFormat("New worker: {0}", work.Endpoint);
+			logger.InfoFormat("New worker: {0}", work.Endpoint);
 			queue.Send(persistedWorker.SetSubQueueToSendTo(SubQueue.Workers));
 
 			SendToQueue(secondaryLoadBalancer, new NewWorkerPersisted
