@@ -144,6 +144,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\AbstractCreateQueuesAction.cs" />
     <Compile Include="Config\BusConfigurationSection.cs" />
     <Compile Include="Config\BusElement.cs" />
     <Compile Include="Config\ConsumerInterceptor.cs" />

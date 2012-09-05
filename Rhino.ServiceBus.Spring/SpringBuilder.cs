@@ -142,7 +142,7 @@ namespace Rhino.ServiceBus.Spring
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
             applicationContext.RegisterSingleton(typeof (MessageLoggingModule).FullName, () => new MessageLoggingModule(applicationContext.Get<IEndpointRouter>(), logEndpoint));
-            applicationContext.RegisterSingleton<IDeploymentAction>(() => new CreateLogQueueAction(applicationContext.Get<MessageLoggingModule>(), applicationContext.Get<ITransport>()));
+            applicationContext.RegisterSingleton<IDeploymentAction>(() => new CreateLogQueueAction(applicationContext.Get<IQueueStrategy>(), applicationContext.Get<MessageLoggingModule>(), applicationContext.Get<ITransport>()));
         }
 
         public void RegisterMsmqTransport(Type queueStrategyType)
