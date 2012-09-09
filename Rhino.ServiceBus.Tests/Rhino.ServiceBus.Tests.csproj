@@ -347,4 +347,349 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EAC59871-8B6B-4A1B-A2AE-69F7194F047E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rhino.ServiceBus.Tests</RootNamespace>
+    <AssemblyName>Rhino.ServiceBus.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ayende-open-source.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(LibDir)' == '' ">
+    <LibDir>..\SharedLibs\4.0\</LibDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\Rhino.ServiceBus.Tests.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\Rhino.ServiceBus.Tests.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\Rhino.ServiceBus.Tests.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\Rhino.ServiceBus.Tests.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>$(LibDir)Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>$(LibDir)Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.configuration">
+      <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.DistributedHashTable">
+      <HintPath>..\SharedLibs\Rhino.DistributedHashTable.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\SharedLibs\Rhino.Mocks.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.PersistentHashTable">
+      <HintPath>$(LibDir)Rhino.PersistentHashTable.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Queues">
+      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>$(LibDir)Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Wintellect.Threading">
+      <HintPath>..\SharedLibs\Wintellect.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit">
+      <HintPath>..\SharedLibs\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>..\SharedLibs\xunit.extensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bugs\Can_read_subscriptions_from_queue.cs" />
+    <Compile Include="Bugs\When_subscribing_instance_subscriptions.cs" />
+    <Compile Include="Bugs\FIeldProblem_Nick.cs" />
+    <Compile Include="Bugs\MsmqFlatSubscriptionsTests.cs" />
+    <Compile Include="Bugs\MsmqSubQueueSubscriptionTests.cs" />
+    <Compile Include="Bugs\Occasional_consumer_resolving_when_not_subscribed.cs" />
+    <Compile Include="Bugs\Private_queue_formatting.cs" />
+    <Compile Include="Bugs\Serialization_roundtrip.cs" />
+    <Compile Include="Bugs\WhenTransactionCommitErrors_ShouldNotCrash.cs" />
+    <Compile Include="Bugs\When_transaction_rolled_back_nested_transactions_fail.cs" />
+    <Compile Include="Bugs\When_using_ip_of_machine.cs" />
+    <Compile Include="Bugs\Resolving_consumer_from_container.cs" />
+    <Compile Include="Bugs\Restarting_server_when_using_flat_queue_strategy.cs" />
+    <Compile Include="Bugs\When_cannot_resolve_consumer_should_error.cs" />
+    <Compile Include="Bugs\When_error_occured_on_transactional_queue.cs" />
+    <Compile Include="Bugs\When_handler_consumes_two_messages.cs" />
+    <Compile Include="Bugs\When_running_on_MTA_thread.cs" />
+    <Compile Include="Bugs\Will_dispose_subscription_storage_when_bus_disposed.cs" />
+    <Compile Include="Bugs\Will_send_invalid_admin_message_to_error_queue.cs" />
+    <Compile Include="Bugs\Wrong_time_on_delay_messages.cs" />
+    <Compile Include="BugWithLogTest.cs" />
+    <Compile Include="BusSubscriptionTests.cs" />
+    <Compile Include="CanCustomizeOutgoingMessagesWithMsmq.cs" />
+    <Compile Include="ConfigReaderTests.cs" />
+    <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Autofac\ContainerTests.cs" />
+    <Compile Include="Containers\Autofac\QueueCreationTests.cs" />
+    <Compile Include="Containers\Castle\ContainerTests.cs" />
+    <Compile Include="Containers\Spring\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Spring\ContainerTests.cs" />
+    <Compile Include="Containers\StructureMap\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\StructureMap\ContainerTests.cs" />
+    <Compile Include="Containers\Unity\Can_host_in_another_app_domain.cs" />
+    <Compile Include="Containers\Unity\ContainerTests.cs" />
+    <Compile Include="RhinoQueues\UsingOneWayBusWithBusNameSpecified.cs" />
+    <Compile Include="RhinoQueues\CustomizingMessageConstruction.cs" />
+    <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
+    <Compile Include="CanSendMsgsFromOneWayBus.cs" />
+    <Compile Include="CanSendMsgsFromOneWayBusUsingRhinoQueues.cs" />
+    <Compile Include="DelayedMessages.cs" />
+    <Compile Include="DataStructures\LRUSetTest.cs" />
+    <Compile Include="DataStructures\HashtableTest.cs" />
+    <Compile Include="DefaultReflectionTests.cs" />
+    <Compile Include="FailureToProcessMessage.cs" />
+    <Compile Include="CanCreateInstancesOfServiceBusFromContainer.cs" />
+    <Compile Include="FlatQueuesDelayedMessages.cs" />
+    <Compile Include="FlatQueueStrategyTests.cs" />
+    <Compile Include="Hosting\Can_host_in_another_app_domain.cs" />
+    <Compile Include="LoadBalancer\Full_test_of_load_balancer_and_failover.cs" />
+    <Compile Include="LoadBalancer\Full_test_of_load_balancer_and_failover_and_recovery.cs" />
+    <Compile Include="LoadBalancer\LoadBalancingTestBase.cs" />
+    <Compile Include="LoadBalancer\With_accepting_work_queue.cs" />
+    <Compile Include="LoadBalancer\With_fail_over.cs" />
+    <Compile Include="LoadBalancer\With_load_balancing.cs" />
+    <Compile Include="LoadBalancer\with_secondary_failover.cs" />
+    <Compile Include="MessageLoggingTests.cs" />
+    <Compile Include="MessageModuleTests.cs" />
+    <Compile Include="Messages_that_have_no_handlers.cs" />
+    <Compile Include="MsmqFlatQueueSubscriptionTests.cs" />
+    <Compile Include="MsmqFlatQueueTestBase.cs" />
+    <Compile Include="MsmqSubscriptionTests.cs" />
+    <Compile Include="MsmqTestBase.cs" />
+    <Compile Include="MsmqTests.cs" />
+    <Compile Include="OnBusStart.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublishingTests.cs" />
+    <Compile Include="QueueCreationModuleTests.cs" />
+    <Compile Include="RequestAndReply.cs" />
+    <Compile Include="RequestReplyWorksWithNoAutomaticSubscriptionConsumer.cs" />
+    <Compile Include="RhinoQueues\EnablingRhinoQueuesPerformanceCounters.cs" />
+    <Compile Include="RhinoQueues\MessageLoggingTests.cs" />
+    <Compile Include="RhinoQueues\RhinoQueue_Messages_that_have_no_handlers.cs" />
+    <Compile Include="RhinoQueues\PhtSubscriptionStorageFixture.cs" />
+    <Compile Include="RhinoQueues\UsingOneWayBusWithAlternateStorageLocation.cs" />
+    <Compile Include="RhinoQueues\UsingRhinoQueuesBus.cs" />
+    <Compile Include="RhinoQueues\UsingRhinoQueuesBusWithAlternateStorageLocation.cs" />
+    <Compile Include="RhinoQueues\UsingRhinoQueuesTransport.cs" />
+    <Compile Include="RhinoQueues\WhenErrorOccurs.cs" />
+    <Compile Include="RhinoQueues\WhenReceivingTimedMessage.cs" />
+    <Compile Include="RhinoQueues\WithDebugging.cs" />
+    <Compile Include="SagaFinderTests.cs" />
+    <Compile Include="SagaTests.cs" />
+    <Compile Include="TestExtensions.cs" />
+    <Compile Include="Warnings\Warnings_would_be_generated.cs" />
+    <Compile Include="When_custom_element_serialization_is_used.cs" />
+    <Compile Include="When_Security_Is_Not_Specified_In_Config.cs" />
+    <Compile Include="When_Security_Is_Specified_In_Config.cs" />
+    <Compile Include="SendAndReceiveMessages.cs" />
+    <Compile Include="SendByMessageOwner.cs" />
+    <Compile Include="TwoBusesCommunicating.cs" />
+    <Compile Include="UnserializableMessageWillBeForwardedToErrorQueue.cs" />
+    <Compile Include="When_queue_does_not_exists.cs" />
+    <Compile Include="XmlSerializerTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rhino.ServiceBus.Autofac\Rhino.ServiceBus.Autofac.csproj">
+      <Project>{E18B8442-40AF-4FA2-9FB0-FC05FC994CEA}</Project>
+      <Name>Rhino.ServiceBus.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Castle\Rhino.ServiceBus.Castle.csproj">
+      <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
+      <Name>Rhino.ServiceBus.Castle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Spring\Rhino.ServiceBus.Spring.csproj">
+      <Project>{E18B8442-40AF-F3A1-9FB0-F1C5FC994CEA}</Project>
+      <Name>Rhino.ServiceBus.Spring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.StructureMap\Rhino.ServiceBus.StructureMap.csproj">
+      <Project>{C0B1E3BD-3481-4E0E-866F-5BEC471C2F4C}</Project>
+      <Name>Rhino.ServiceBus.StructureMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.Unity\Rhino.ServiceBus.Unity.csproj">
+      <Project>{DB720C4D-1508-4510-AED4-80C905095CE5}</Project>
+      <Name>Rhino.ServiceBus.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus\Rhino.ServiceBus.csproj">
+      <Project>{1B21C8A5-5E0E-412B-A7F4-9F28B4427F21}</Project>
+      <Name>Rhino.ServiceBus</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AnotherBus.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="App.config" />
+    <None Include="Bugs\Bus_with_ip.config" />
+    <None Include="BusWithLogging.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="BusOnTransactionalQueue.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ReceiveOneWayBusRhinoQueues.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="OneWayBusRhinoQueues.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer\BusWithAcceptingWorkLoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer\ReceivingBusWithLoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer\SendingBusToLoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="OneWayBus.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="DhtService.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="InitBus.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="LoadBalancer\BusWithLoadBalancer.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="RhinoQueues\RhinoQueues.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
