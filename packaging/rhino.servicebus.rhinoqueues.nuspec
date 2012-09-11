@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Rhino.ServiceBus</id>
-    <title>Rhino.ServiceBus</title>
+    <id>Rhino.ServiceBus.RhinoQueues</id>
+    <title>Rhino.ServiceBus.RhinoQueues</title>
     <version>0.0.0</version>
     <authors>Ayende Rahien, Corey Kaylor</authors>
     <owners>Corey Kaylor</owners>
@@ -13,16 +13,19 @@
     <description>A developer friendly service bus for .NET</description>
     <tags>rhino servicebus bus msmq messaging cqrs async queue publish subscribe pub sub</tags>
     <dependencies>
-      <dependency id="Common.Logging" version="2.1.1"/>
+      <dependency id="Rhino.ServiceBus.References"/>
+      <dependency id="Rhino.PersistentHashTable"/>
+      <dependency id="Rhino.ServiceBus"/>
+      <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="build\3.5\Rhino.ServiceBus.dll" target="lib\3.5" />
-    <file src="build\3.5\Rhino.ServiceBus.xml" target="lib\3.5" />
-    <file src="build\3.5\Rhino.ServiceBus.pdb" target="lib\3.5" />
-    <file src="build\4.0\Rhino.ServiceBus.dll" target="lib\4.0" />
-    <file src="build\4.0\Rhino.ServiceBus.xml" target="lib\4.0" />
-    <file src="build\4.0\Rhino.ServiceBus.pdb" target="lib\4.0" />
-    <file src="Rhino.ServiceBus\**\*.cs" target="src\Rhino.ServiceBus" />
+    <file src="build\3.5\Rhino.ServiceBus.RhinoQueues.dll" target="lib\3.5" />
+    <file src="build\3.5\Rhino.ServiceBus.RhinoQueues.xml" target="lib\3.5" />
+    <file src="build\3.5\Rhino.ServiceBus.RhinoQueues.pdb" target="lib\3.5" />
+    <file src="build\4.0\Rhino.ServiceBus.RhinoQueues.dll" target="lib\4.0" />
+    <file src="build\4.0\Rhino.ServiceBus.RhinoQueues.xml" target="lib\4.0" />
+    <file src="build\4.0\Rhino.ServiceBus.RhinoQueues.pdb" target="lib\4.0" />
+    <file src="Rhino.ServiceBus.RhinoQueues\**\*.cs" target="src\Rhino.ServiceBus.RhinoQueues" />
   </files>
 </package>

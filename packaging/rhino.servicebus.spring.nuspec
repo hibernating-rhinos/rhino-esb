@@ -15,7 +15,6 @@
       <dependency id="Rhino.ServiceBus"/>
       <dependency id="Spring.Aop" version="1.3.2" />
       <dependency id="Spring.Core" version="1.3.2" />
-      <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
   <files>

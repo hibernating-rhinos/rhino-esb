@@ -9,6 +9,5 @@ namespace Rhino.ServiceBus.Unity
         {
             return new LoadBalancerConfiguration();
         }
-
     }
 }
