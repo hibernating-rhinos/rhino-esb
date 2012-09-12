@@ -7,10 +7,11 @@ using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Serializers;
 using System.Transactions;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Impl
 {
-    public abstract class AbstractRhinoServiceBusConfiguration 
+    public abstract class AbstractRhinoServiceBusConfiguration
     {
         private readonly List<Type> messageModules = new List<Type>();
         private Type serializerImpl = typeof(XmlMessageSerializer);
@@ -19,6 +20,7 @@ namespace Rhino.ServiceBus.Impl
         private BusConfigurationSection configurationSection;
         private Action readConfiguration;
         private IBusContainerBuilder busContainerBuilder;
+        protected List<Assembly> scanAssemblies = new List<Assembly>(new[] { typeof(IServiceBus).Assembly });
 
 
         protected AbstractRhinoServiceBusConfiguration()
@@ -32,6 +34,11 @@ namespace Rhino.ServiceBus.Impl
             Transactional = TransactionalOptions.FigureItOut;
         }
 
+        public IEnumerable<Assembly> Assemblies
+        {
+            get { return scanAssemblies; }
+        }
+
         public Uri Endpoint { get; set; }
 
         public int NumberOfRetries { get; set; }
@@ -42,7 +49,7 @@ namespace Rhino.ServiceBus.Impl
 
         public bool DisableAutoQueueCreation { get; set; }
 
-		public TransactionalOptions Transactional { get; set; }
+        public TransactionalOptions Transactional { get; set; }
 
         public BusConfigurationSection ConfigurationSection
         {
@@ -84,7 +91,7 @@ namespace Rhino.ServiceBus.Impl
         public AbstractRhinoServiceBusConfiguration InsertMessageModuleAtFirst<TModule>()
             where TModule : IMessageModule
         {
-            messageModules.Insert(0, typeof (TModule));
+            messageModules.Insert(0, typeof(TModule));
             return this;
         }
 
@@ -94,7 +101,7 @@ namespace Rhino.ServiceBus.Impl
 
             ApplyConfiguration();
 
-            Builder.RegisterDefaultServices();
+            Builder.RegisterDefaultServices(Assemblies);
         }
 
         protected abstract void ApplyConfiguration();

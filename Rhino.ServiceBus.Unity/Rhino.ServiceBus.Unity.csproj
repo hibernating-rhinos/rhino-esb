@@ -130,10 +130,6 @@
     <Reference Include="Microsoft.Practices.Unity.Interception.configuration">
       <HintPath>..\SharedLibs\Microsoft.Practices.Unity.Interception.configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Queues">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />

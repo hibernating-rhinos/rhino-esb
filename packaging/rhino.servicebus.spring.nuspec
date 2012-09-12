@@ -15,7 +15,6 @@
       <dependency id="Rhino.ServiceBus"/>
       <dependency id="Spring.Aop" version="1.3.2" />
       <dependency id="Spring.Core" version="1.3.2" />
-      <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
   <files>
@@ -25,6 +24,7 @@
     <file src="build\4.0\Rhino.ServiceBus.Spring.dll" target="lib\4.0" />
     <file src="build\4.0\Rhino.ServiceBus.Spring.xml" target="lib\4.0" />
     <file src="build\4.0\Rhino.ServiceBus.Spring.pdb" target="lib\4.0" />
+    <file src="Rhino.ServiceBus.Spring\app.config.transform" target="content" />
     <file src="Rhino.ServiceBus.Spring\**\*.cs" target="src/Rhino.ServiceBus.Spring" />
   </files>
 </package>

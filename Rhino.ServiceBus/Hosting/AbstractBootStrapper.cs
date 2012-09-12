@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Impl;
+using System.Collections.Generic;
 
 namespace Rhino.ServiceBus.Hosting
 {
@@ -9,15 +10,15 @@ namespace Rhino.ServiceBus.Hosting
     {
         private AbstractRhinoServiceBusConfiguration config;
 
-        public virtual Assembly Assembly
+        public virtual IEnumerable<Assembly> Assemblies
         {
-            get { return GetType().Assembly; }
+            get { yield return GetType().Assembly; }
         }
 
         public virtual void InitializeContainer()
         {
-            CreateContainer();
             config = CreateConfiguration();
+            CreateContainer();
             ConfigureBusFacility(config);
         }
 
@@ -34,7 +35,7 @@ namespace Rhino.ServiceBus.Hosting
 
         public abstract T GetInstance<T>();
 
-    	protected virtual bool IsTypeAcceptableForThisBootStrapper(Type t)
+        protected virtual bool IsTypeAcceptableForThisBootStrapper(Type t)
         {
             return true;
         }
@@ -50,7 +51,6 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual void OnBeginStart()
         {
-            
         }
 
         public void BeginStart()
@@ -66,7 +66,6 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual void OnEndStart()
         {
-            
         }
 
         public abstract void Dispose();

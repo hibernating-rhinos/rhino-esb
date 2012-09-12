@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Transactions;
@@ -7,61 +8,60 @@ using Rhino.ServiceBus.Msmq;
 
 namespace Rhino.ServiceBus.Impl
 {
-	public class RhinoServiceBusConfiguration : AbstractRhinoServiceBusConfiguration
+    public class RhinoServiceBusConfiguration : AbstractRhinoServiceBusConfiguration
     {
         private readonly List<MessageOwner> messageOwners = new List<MessageOwner>();
 
-	    public IEnumerable<MessageOwner> MessageOwners
-	    {
+        public IEnumerable<MessageOwner> MessageOwners
+        {
             get { return messageOwners; }
-	    }
+        }
 
-	    protected override void ReadBusConfiguration()
-	    {
-	        base.ReadBusConfiguration();
-	        new MessageOwnersConfigReader(ConfigurationSection, messageOwners).ReadMessageOwners();
-	    }
+        protected override void ReadBusConfiguration()
+        {
+            base.ReadBusConfiguration();
+            new MessageOwnersConfigReader(ConfigurationSection, messageOwners).ReadMessageOwners();
+        }
 
         protected override void ApplyConfiguration()
         {
-            BusElement busConfig = ConfigurationSection.Bus;
+            var busConfig = ConfigurationSection.Bus;
             if (busConfig == null)
                 throw new ConfigurationErrorsException("Could not find 'bus' node in configuration");
 
-            if(busConfig.NumberOfRetries.HasValue)
+            if (busConfig.NumberOfRetries.HasValue)
                 NumberOfRetries = busConfig.NumberOfRetries.Value;
 
-            if(busConfig.ThreadCount.HasValue)
+            if (busConfig.ThreadCount.HasValue)
                 ThreadCount = busConfig.ThreadCount.Value;
 
-            string isolationLevel = busConfig.QueueIsolationLevel;
-			if (!string.IsNullOrEmpty(isolationLevel))
-				queueIsolationLevel = (IsolationLevel)Enum.Parse(typeof(IsolationLevel), isolationLevel);
+            var isolationLevel = busConfig.QueueIsolationLevel;
+            if (!string.IsNullOrEmpty(isolationLevel))
+                queueIsolationLevel = (IsolationLevel)Enum.Parse(typeof(IsolationLevel), isolationLevel);
 
-            if(busConfig.ConsumeInTransaction.HasValue)
+            if (busConfig.ConsumeInTransaction.HasValue)
                 consumeInTxn = busConfig.ConsumeInTransaction.Value;
 
-            string uriString = busConfig.Endpoint;
+            var uriString = busConfig.Endpoint;
             Uri endpoint;
-            if (Uri.TryCreate(uriString, UriKind.Absolute, out endpoint) == false)
-            {
+            if (!Uri.TryCreate(uriString, UriKind.Absolute, out endpoint))
                 throw new ConfigurationErrorsException(
                     "Attribute 'endpoint' on 'bus' has an invalid value '" + uriString + "'");
-            }
             Endpoint = endpoint;
 
-            string transactionalString = busConfig.Transactional;
+            var transactionalString = busConfig.Transactional;
 
-        	bool temp;
-			if (bool.TryParse(transactionalString, out temp))
-			{
-				Transactional = temp ? TransactionalOptions.Transactional : TransactionalOptions.NonTransactional;
-			}
-			else if(transactionalString != null)
-			{
-				throw new ConfigurationErrorsException(
-					"Attribute 'transactional' on 'bus' has an invalid value '" + transactionalString + "'");
-			}
+            bool temp;
+            if (bool.TryParse(transactionalString, out temp))
+                Transactional = temp ? TransactionalOptions.Transactional : TransactionalOptions.NonTransactional;
+            else if (transactionalString != null)
+                throw new ConfigurationErrorsException(
+                    "Attribute 'transactional' on 'bus' has an invalid value '" + transactionalString + "'");
+
+            var assemblies = ConfigurationSection.Assemblies;
+            if (assemblies != null)
+                foreach (AssemblyElement assembly in assemblies)
+                    scanAssemblies.Add(assembly.Assembly);
         }
 
         public override void Configure()
@@ -70,10 +70,10 @@ namespace Rhino.ServiceBus.Impl
             Builder.RegisterBus();
         }
 
-		public AbstractRhinoServiceBusConfiguration UseFlatQueueStructure()
-	    {
-	        UseFlatQueue = true;
-	        return this;
-	    }
+        public AbstractRhinoServiceBusConfiguration UseFlatQueueStructure()
+        {
+            UseFlatQueue = true;
+            return this;
+        }
     }
 }

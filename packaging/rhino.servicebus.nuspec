@@ -13,8 +13,6 @@
     <description>A developer friendly service bus for .NET</description>
     <tags>rhino servicebus bus msmq messaging cqrs async queue publish subscribe pub sub</tags>
     <dependencies>
-      <dependency id="Rhino.ServiceBus.References"/>
-      <dependency id="Rhino.PersistentHashTable"/>
       <dependency id="Common.Logging" version="2.1.1"/>
     </dependencies>
   </metadata>

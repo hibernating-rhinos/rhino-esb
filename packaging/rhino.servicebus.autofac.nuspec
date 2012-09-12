@@ -14,7 +14,6 @@
     <dependencies>
       <dependency id="Rhino.ServiceBus"/>
       <dependency id="Autofac" version="[2.5.2.830]"/>
-      <dependency id="Rhino.Queues"/>
     </dependencies>
   </metadata>
   <files>

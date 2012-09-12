@@ -112,9 +112,6 @@
     <Reference Include="Autofac">
       <HintPath>$(LibDir)Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Queues">
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />

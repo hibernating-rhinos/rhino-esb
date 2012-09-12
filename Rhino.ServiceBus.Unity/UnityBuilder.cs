@@ -3,7 +3,6 @@ using System.Linq;
 using System.Messaging;
 using System.Transactions;
 using Microsoft.Practices.Unity;
-using Rhino.Queues;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Convertors;
@@ -14,10 +13,11 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
-using Rhino.ServiceBus.RhinoQueues;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Rhino.ServiceBus.Unity
 {
@@ -38,18 +38,18 @@ namespace Rhino.ServiceBus.Unity
             container.AddExtension(new ConsumerExtension(interceptor));
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             if (!container.IsRegistered(typeof(IUnityContainer)))
                 container.RegisterInstance(container);
 
             container.RegisterType<IServiceLocator, UnityServiceLocator>();
-            container.RegisterTypesFromAssembly<IBusConfigurationAware>(typeof(IServiceBus).Assembly);
+            foreach (var assembly in assemblies)
+                container.RegisterTypesFromAssembly<IBusConfigurationAware>(assembly);
 
+            var locator = container.Resolve<IServiceLocator>();
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
-            {
-                configurationAware.Configure(config, this);
-            }
+                configurationAware.Configure(config, this, locator);
 
             foreach (var messageModule in config.MessageModules)
             {
@@ -156,120 +156,32 @@ namespace Rhino.ServiceBus.Unity
                     new ResolvedParameter<IEndpointRouter>(),
                     new InjectionParameter<Uri>(logEndpoint)));
 
-            container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString(), 
+            container.RegisterType<IDeploymentAction, CreateLogQueueAction>(Guid.NewGuid().ToString(),
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<MessageLoggingModule>(typeof(MessageLoggingModule).FullName),
                     new ResolvedParameter<ITransport>()));
         }
 
-        public void RegisterMsmqTransport(Type queueStrategyType)
+        public void RegisterSingleton<T>(Func<T> func)
+            where T : class
         {
-            if (queueStrategyType.Equals(typeof(FlatQueueStrategy)))
-            {
-                container.RegisterType(typeof(IQueueStrategy), queueStrategyType,
-                                       new ContainerControlledLifetimeManager(),
-                                       new InjectionConstructor(
-                                           new ResolvedParameter<IEndpointRouter>(),
-                                           new InjectionParameter<Uri>(config.Endpoint)));
-            }
-            else
-            {
-                container.RegisterType(typeof(IQueueStrategy), queueStrategyType);
-            }
-
-            container.RegisterType<IMessageBuilder<Message>, MsmqMessageBuilder>(
-                new ContainerControlledLifetimeManager());
-            container.RegisterType<IMsmqTransportAction, ErrorAction>(Guid.NewGuid().ToString(),
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new InjectionParameter<int>(config.NumberOfRetries),
-                    new ResolvedParameter<IQueueStrategy>()));
-            container.RegisterType<ISubscriptionStorage, MsmqSubscriptionStorage>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new ResolvedParameter<IReflection>(),
-                    new ResolvedParameter<IMessageSerializer>(),
-                    new InjectionParameter<Uri>(config.Endpoint),
-                    new ResolvedParameter<IEndpointRouter>(),
-                    new ResolvedParameter<IQueueStrategy>()));
-            container.RegisterType<ITransport, MsmqTransport>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new ResolvedParameter<IMessageSerializer>(),
-                    new ResolvedParameter<IQueueStrategy>(),
-                    new InjectionParameter<Uri>(config.Endpoint),
-                    new InjectionParameter<int>(config.ThreadCount),
-                    new ResolvedParameter<IMsmqTransportAction[]>(),
-                    new ResolvedParameter<IEndpointRouter>(),
-                    new InjectionParameter<IsolationLevel>(config.IsolationLevel),
-                    new InjectionParameter<TransactionalOptions>(config.Transactional),
-                    new InjectionParameter<bool>(config.ConsumeInTransaction),
-                    new ResolvedParameter<IMessageBuilder<Message>>()));
-
-            container.RegisterTypesFromAssembly<IMsmqTransportAction>(typeof(IMsmqTransportAction).Assembly, typeof(ErrorAction));
+            T singleton = null;
+            container.RegisterType<T>(new InjectionFactory(x => singleton == null ? singleton = func() : singleton));
+        }
+        public void RegisterSingleton<T>(string name, Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            container.RegisterType<T>(name, new InjectionFactory(x => singleton == null ? singleton = func() : singleton));
         }
 
-        public void RegisterQueueCreation()
+        public void RegisterAll<T>(params Type[] excludes)
+            where T : class { RegisterAll<T>((Predicate<Type>)(x => !x.IsAbstract && !x.IsInterface && typeof(T).IsAssignableFrom(x) && !excludes.Contains(x))); }
+        public void RegisterAll<T>(Predicate<Type> condition)
+            where T : class
         {
-            container.RegisterType<IServiceBusAware, QueueCreationModule>(typeof(QueueCreationModule).FullName, new ContainerControlledLifetimeManager());
-        }
-
-        public void RegisterMsmqOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
-            container.RegisterType<IMessageBuilder<Message>, MsmqMessageBuilder>(
-                new ContainerControlledLifetimeManager());
-            container.RegisterType<IOnewayBus, MsmqOnewayBus>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new InjectionParameter<MessageOwner[]>(oneWayConfig.MessageOwners),
-                    new ResolvedParameter<IMessageBuilder<Message>>()
-                    ));
-        }
-
-        public void RegisterRhinoQueuesTransport()
-        {
-            var busConfig = config.ConfigurationSection.Bus;
-            container.RegisterType<ISubscriptionStorage, PhtSubscriptionStorage>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new InjectionParameter<string>(busConfig.SubscriptionPath),
-                    new ResolvedParameter<IMessageSerializer>(),
-                    new ResolvedParameter<IReflection>()));
-
-            container.RegisterType<ITransport, RhinoQueuesTransport>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new InjectionParameter<Uri>(config.Endpoint),
-                    new ResolvedParameter<IEndpointRouter>(),
-                    new ResolvedParameter<IMessageSerializer>(),
-                    new InjectionParameter<int>(config.ThreadCount),
-                    new InjectionParameter<string>(busConfig.QueuePath),
-                    new InjectionParameter<IsolationLevel>(config.IsolationLevel),
-                    new InjectionParameter<int>(config.NumberOfRetries),
-                    new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
-                    new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
-
-            container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(
-                new ContainerControlledLifetimeManager());
-        }
-
-        public void RegisterRhinoQueuesOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration)config;
-            var busConfig = config.ConfigurationSection.Bus;
-
-            container.RegisterType<IMessageBuilder<MessagePayload>, RhinoQueuesMessageBuilder>(
-                new ContainerControlledLifetimeManager());
-            container.RegisterType<IOnewayBus, RhinoQueuesOneWayBus>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new InjectionParameter<MessageOwner[]>(oneWayConfig.MessageOwners),
-                    new ResolvedParameter<IMessageSerializer>(),
-                    new InjectionParameter<string>(busConfig.QueuePath),
-                    new InjectionParameter<bool>(busConfig.EnablePerformanceCounters),
-                    new ResolvedParameter<IMessageBuilder<MessagePayload>>()));
+            container.RegisterTypesFromAssembly<T>(typeof(T).Assembly, condition);
         }
 
         public void RegisterSecurity(byte[] key)

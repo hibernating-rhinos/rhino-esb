@@ -20,7 +20,7 @@ namespace Rhino.ServiceBus.Unity
 
         private void TypeRegistering(object sender, RegisterEventArgs args)
         {
-            if (typeof (IMessageConsumer).IsAssignableFrom(args.TypeTo) == false)
+            if (!typeof(IMessageConsumer).IsAssignableFrom(args.TypeTo))
                 return;
 
             args.LifetimeManager = new TransientLifetimeManager();

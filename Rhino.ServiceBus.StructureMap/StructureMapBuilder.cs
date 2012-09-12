@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Messaging;
 using System.Transactions;
-using Rhino.Queues;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Convertors;
@@ -13,15 +12,16 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
-using Rhino.ServiceBus.RhinoQueues;
 using StructureMap;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.StructureMap
 {
     [CLSCompliant(false)]
-    public class StructureMapBuilder : IBusContainerBuilder 
+    public class StructureMapBuilder : IBusContainerBuilder
     {
         private readonly AbstractRhinoServiceBusConfiguration config;
         private readonly IContainer container;
@@ -33,22 +33,22 @@ namespace Rhino.ServiceBus.StructureMap
             config.BuildWith(this);
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             container.Configure(c =>
             {
                 c.For<IServiceLocator>().Use<StructureMapServiceLocator>();
-                c.Scan(s =>
-                {
-                    s.AssemblyContainingType(typeof(IServiceBus));
-                    s.AddAllTypesOf<IBusConfigurationAware>();
-                });
+                foreach (var assembly in assemblies)
+                    c.Scan(s =>
+                    {
+                        s.Assembly(assembly);
+                        s.AddAllTypesOf<IBusConfigurationAware>();
+                    });
             });
 
+            var locator = container.GetInstance<IServiceLocator>();
             foreach (var busConfigurationAware in container.GetAllInstances<IBusConfigurationAware>())
-            {
-                busConfigurationAware.Configure(config, this);
-            }
+                busConfigurationAware.Configure(config, this, locator);
 
             container.Configure(c =>
             {
@@ -74,7 +74,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusConfiguration) config;
+            var busConfig = (RhinoServiceBusConfiguration)config;
             container.Configure(c =>
             {
                 c.For<IDeploymentAction>().Use<CreateQueuesAction>();
@@ -87,7 +87,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Configure(c =>
             {
                 c.For<MsmqLoadBalancer>().Singleton().Use<MsmqLoadBalancer>()
@@ -102,7 +102,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Configure(c =>
             {
                 c.For<MsmqLoadBalancer>().Singleton().Use<MsmqSecondaryLoadBalancer>()
@@ -117,7 +117,7 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterReadyForWork()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Configure(c =>
             {
                 c.For<MsmqReadyForWorkListener>().Singleton().Use<MsmqReadyForWorkListener>()
@@ -136,87 +136,47 @@ namespace Rhino.ServiceBus.StructureMap
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
-          container.Configure(c =>
-          {
-            c.For<MessageLoggingModule>().Singleton().Use<MessageLoggingModule>()
-              .Ctor<Uri>().Is(logEndpoint);
-            c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
-          });
+            container.Configure(c =>
+            {
+                c.For<MessageLoggingModule>().Singleton().Use<MessageLoggingModule>()
+                  .Ctor<Uri>().Is(logEndpoint);
+                c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
+            });
         }
 
-        public void RegisterMsmqTransport(Type queueStrategyType)
+        public void RegisterSingleton<T>(Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            container.Configure(c =>
+            {
+                c.For<T>().Use(x => singleton == null ? singleton = func() : singleton);
+            });
+        }
+        public void RegisterSingleton<T>(string name, Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            container.Configure(c =>
+            {
+                c.For<T>().Use(x => singleton == null ? singleton = func() : singleton).Named(name);
+            });
+        }
+
+        public void RegisterAll<T>(params Type[] excludes)
+            where T : class { RegisterAll<T>((Predicate<Type>)(x => !x.IsAbstract && !x.IsInterface && !excludes.Contains(x))); }
+        public void RegisterAll<T>(Predicate<Type> condition)
+            where T : class
         {
             container.Configure(c =>
             {
-                c.For(typeof (IQueueStrategy)).Singleton().Use(queueStrategyType)
-                    .Child("endpoint").Is(config.Endpoint);
-                c.For<IMessageBuilder<Message>>().Singleton().Use<MsmqMessageBuilder>();
-                c.For<IMsmqTransportAction>().Singleton().Use<ErrorAction>()
-                    .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries);
-                c.For<ISubscriptionStorage>().Singleton().Use<MsmqSubscriptionStorage>()
-                    .Ctor<Uri>().Is(config.Endpoint);
-                c.For<ITransport>().Singleton().Use<MsmqTransport>()
-                    .Ctor<int>("threadCount").Is(config.ThreadCount)
-                    .Ctor<Uri>().Is(config.Endpoint)
-                    .Ctor<IsolationLevel>().Is(config.IsolationLevel)
-                    .Ctor<TransactionalOptions>().Is(config.Transactional)
-                    .Ctor<bool>().Is(config.ConsumeInTransaction);
                 c.Scan(s =>
                 {
-                    s.Assembly(typeof(IMsmqTransportAction).Assembly);
-                    s.With(new SingletonConvention<IMsmqTransportAction>());
-                    s.AddAllTypesOf<IMsmqTransportAction>();
-                    s.Exclude(t => t == typeof(ErrorAction));
+                    s.Assembly(typeof(T).Assembly);
+                    s.With(new SingletonConvention<T>());
+                    s.AddAllTypesOf<T>();
+                    s.Exclude(t => !condition(t));
                 });
-            });
-        }
-
-        public void RegisterQueueCreation()
-        {
-            container.Configure(c => c.For<QueueCreationModule>().Singleton().Use<QueueCreationModule>());
-        }
-
-        public void RegisterMsmqOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            container.Configure(c =>
-            {
-                c.For<IMessageBuilder<Message>>().Singleton().Use<MsmqMessageBuilder>();
-                c.For<IOnewayBus>().Singleton().Use<MsmqOnewayBus>()
-                    .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners);
-            });
-        }
-
-        public void RegisterRhinoQueuesTransport()
-        {
-            container.Configure(c =>
-            {
-                var busConfig = config.ConfigurationSection.Bus;
-                c.For<ISubscriptionStorage>().Singleton().Use<PhtSubscriptionStorage>()
-                    .Ctor<string>().Is(busConfig.SubscriptionPath);
-                c.For<ITransport>().Singleton().Use<RhinoQueuesTransport>()
-                    .Ctor<int>("threadCount").Is(config.ThreadCount)
-                    .Ctor<Uri>().Is(config.Endpoint)
-                    .Ctor<IsolationLevel>().Is(config.IsolationLevel)
-                    .Ctor<int>("numberOfRetries").Is(config.NumberOfRetries)
-                    .Ctor<string>().Is(busConfig.QueuePath)
-                    .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
-                c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
-            });
-        }
-
-        public void RegisterRhinoQueuesOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            var busConfig = config.ConfigurationSection.Bus;
-
-            container.Configure(c =>
-            {
-                c.For<IMessageBuilder<MessagePayload>>().Singleton().Use<RhinoQueuesMessageBuilder>();
-                c.For<IOnewayBus>().Singleton().Use<RhinoQueuesOneWayBus>()
-                    .Ctor<MessageOwner[]>().Is(oneWayConfig.MessageOwners)
-                    .Ctor<string>().Is(busConfig.QueuePath)
-                    .Ctor<bool>().Is(busConfig.EnablePerformanceCounters);
             });
         }
 

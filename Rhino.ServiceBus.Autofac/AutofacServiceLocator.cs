@@ -37,14 +37,14 @@ namespace Rhino.ServiceBus
             return container.Resolve<IEnumerable<T>>();
         }
 
-      public IEnumerable<IHandler> GetAllHandlersFor(Type type)
-      {
-        var services = container.ComponentRegistry.Registrations
-          .SelectMany(r => r.Services.OfType<TypedService>())
-          .Where(pService => type.IsAssignableFrom(pService.ServiceType));
+        public IEnumerable<IHandler> GetAllHandlersFor(Type type)
+        {
+            var services = container.ComponentRegistry.Registrations
+              .SelectMany(r => r.Services.OfType<TypedService>())
+              .Where(pService => type.IsAssignableFrom(pService.ServiceType));
 
-        return services.Select(service => (IHandler)new DefaultHandler(type, service.ServiceType, () => container.ResolveService(service)));
-      }
+            return services.Select(service => (IHandler)new DefaultHandler(type, service.ServiceType, () => container.ResolveService(service)));
+        }
 
         public void Release(object item)
         {

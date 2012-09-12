@@ -35,17 +35,13 @@ namespace Rhino.ServiceBus.Castle
         public override void ExecuteDeploymentActions(string user)
         {
             foreach (var action in container.ResolveAll<IDeploymentAction>())
-            {
                 action.Execute(user);
-            }
         }
 
         public override void ExecuteEnvironmentValidationActions()
         {
             foreach (var action in container.ResolveAll<IEnvironmentValidationAction>())
-            {
                 action.Execute();
-            }
         }
 
         public override T GetInstance<T>()
@@ -68,36 +64,39 @@ namespace Rhino.ServiceBus.Castle
 
         protected virtual void ConfigureContainer()
         {
-            container.Register(
-                 AllTypes.FromAssembly(Assembly)
-                     .BasedOn<IDeploymentAction>(),
-                 AllTypes.FromAssembly(Assembly)
-                     .BasedOn<IEnvironmentValidationAction>()
-                 );
-            RegisterConsumersFrom(Assembly);
+            foreach (var assembly in Assemblies)
+            {
+                container.Register(
+                     AllTypes.FromAssembly(assembly)
+                         .BasedOn<IDeploymentAction>(),
+                     AllTypes.FromAssembly(assembly)
+                         .BasedOn<IEnvironmentValidationAction>()
+                     );
+                RegisterConsumersFrom(assembly);
+            }
         }
 
         protected virtual void RegisterConsumersFrom(Assembly assembly)
-		{
-			container.Register (
-				 AllTypes
-					.FromAssembly (assembly)
-					.Where (type =>
-						typeof (IMessageConsumer).IsAssignableFrom (type) &&
-						typeof (IOccasionalMessageConsumer).IsAssignableFrom (type) == false &&
-						IsTypeAcceptableForThisBootStrapper (type)
-					)
-					.Configure (registration =>
-					{
-						registration.LifeStyle.Is(LifestyleType.Transient);
-						ConfigureConsumer (registration);
-					})
-				);
-		}
+        {
+            container.Register(
+                 AllTypes
+                    .FromAssembly(assembly)
+                    .Where(type =>
+                        typeof(IMessageConsumer).IsAssignableFrom(type) &&
+                        !typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) &&
+                        IsTypeAcceptableForThisBootStrapper(type)
+                    )
+                    .Configure(registration =>
+                    {
+                        registration.LifeStyle.Is(LifestyleType.Transient);
+                        ConfigureConsumer(registration);
+                    })
+                );
+        }
 
-    	protected virtual void ConfigureConsumer(ComponentRegistration registration)
-    	{
-    		registration.Named(registration.Implementation.FullName);
-    	}
+        protected virtual void ConfigureConsumer(ComponentRegistration registration)
+        {
+            registration.Named(registration.Implementation.FullName);
+        }
     }
 }

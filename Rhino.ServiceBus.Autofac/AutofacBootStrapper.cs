@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
 using Autofac.Core;
-using Autofac.Core.Registration;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
@@ -35,18 +34,14 @@ namespace Rhino.ServiceBus.Autofac
 
         public override void ExecuteDeploymentActions(string user)
         {
-            foreach(var action in container.Resolve<IEnumerable<IDeploymentAction>>())
-            {
+            foreach (var action in container.Resolve<IEnumerable<IDeploymentAction>>())
                 action.Execute(user);
-            }
         }
 
         public override void ExecuteEnvironmentValidationActions()
         {
-            foreach(var action in container.Resolve<IEnumerable<IEnvironmentValidationAction>>())
-            {
+            foreach (var action in container.Resolve<IEnumerable<IEnvironmentValidationAction>>())
                 action.Execute();
-            }
         }
 
         public override T GetInstance<T>()
@@ -61,7 +56,7 @@ namespace Rhino.ServiceBus.Autofac
 
         public override void CreateContainer()
         {
-            if(container == null)
+            if (container == null)
                 container = new ContainerBuilder().Build();
 
             ConfigureContainer();
@@ -70,17 +65,20 @@ namespace Rhino.ServiceBus.Autofac
         protected virtual void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
+            foreach (var assembly in Assemblies)
+            {
+                builder.RegisterAssemblyTypes(assembly)
+                    .AssignableTo<IDeploymentAction>()
+                    .SingleInstance();
+                builder.RegisterAssemblyTypes(assembly)
+                    .AssignableTo<IEnvironmentValidationAction>()
+                    .SingleInstance();
+            }
 
-            builder.RegisterAssemblyTypes(Assembly)
-                .AssignableTo<IDeploymentAction>()
-                .SingleInstance();
-            builder.RegisterAssemblyTypes(Assembly)
-                .AssignableTo<IEnvironmentValidationAction>()
-                .SingleInstance();
-            
             builder.Update(container);
-            
-            RegisterConsumersFrom(Assembly);
+
+            foreach (var assembly in Assemblies)
+                RegisterConsumersFrom(assembly);
         }
 
         protected virtual void RegisterConsumersFrom(Assembly assembly)
@@ -90,7 +88,7 @@ namespace Rhino.ServiceBus.Autofac
             builder.RegisterAssemblyTypes(assembly)
                 .Where(type =>
                     typeof(IMessageConsumer).IsAssignableFrom(type) &&
-                        typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) == false &&
+                        !typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) &&
                             IsTypeAcceptableForThisBootStrapper(type))
                 .OnRegistered(e => ConfigureConsumer(e.ComponentRegistration))
                 .InstancePerDependency();

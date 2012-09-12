@@ -37,6 +37,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Rhino.ServiceBus.xml</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(LibDir)' == '' ">
     <LibDir>..\SharedLibs\4.0\</LibDir>
@@ -117,15 +118,6 @@
     <Reference Include="Common.Logging">
       <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Esent.Interop">
-      <HintPath>..\SharedLibs\Esent.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.PersistentHashTable">
-      <HintPath>$(LibDir)Rhino.PersistentHashTable.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Queues">
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
@@ -144,20 +136,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\AssemblyNameConverter.cs" />
     <Compile Include="Config\BusConfigurationSection.cs" />
     <Compile Include="Config\BusElement.cs" />
     <Compile Include="Config\ConsumerInterceptor.cs" />
+    <Compile Include="Config\AssemblyElement.cs" />
+    <Compile Include="Config\AssemblyElementCollection.cs" />
     <Compile Include="Config\IBusConfigurationAware.cs" />
     <Compile Include="Config\IConsumerInterceptor.cs" />
     <Compile Include="Config\KeyElement.cs" />
-    <Compile Include="Config\LoadBalancerConfiguration.cs" />
+    <Compile Include="Config\LoadBalancerConfigurationAware.cs" />
     <Compile Include="Config\LoadBalancerElement.cs" />
-    <Compile Include="Config\LoadBalancerEndpointConfiguration.cs" />
-    <Compile Include="Config\LoggingConfiguration.cs" />
+    <Compile Include="Config\LoadBalancerEndpointConfigurationAware.cs" />
+    <Compile Include="Config\LoggingConfigurationAware.cs" />
     <Compile Include="Config\MessageOwnerElement.cs" />
     <Compile Include="Config\MessageOwnerElementCollection.cs" />
-    <Compile Include="Config\OneWayBusConfiguration.cs" />
-    <Compile Include="Config\SecurityConfiguration.cs" />
+    <Compile Include="Config\OneWayBusConfigurationAware.cs" />
+    <Compile Include="Config\SecurityConfigurationAware.cs" />
     <Compile Include="Config\SecurityElement.cs" />
     <Compile Include="ConsumerOf.cs" />
     <Compile Include="Convertors\ThrowingWireEncryptedStringConvertor.cs" />
@@ -203,8 +198,6 @@
     <Compile Include="Msmq\AbstractMsmqListener.cs" />
     <Compile Include="Msmq\QueueCreationModule.cs" />
     <Compile Include="OutgoingMessageInformation.cs" />
-    <Compile Include="RhinoQueues\RhinoQueuesMessageBuilder.cs" />
-    <Compile Include="RhinoQueues\RhinoQueuesOneWayBus.cs" />
     <Compile Include="ServiceBusExtensions.cs" />
     <Compile Include="Transport\SubQueue.cs" />
     <Compile Include="Msmq\TransportActions\ShutDownAction.cs" />
@@ -269,7 +262,6 @@
     <Compile Include="Actions\IDeploymentAction.cs" />
     <Compile Include="Actions\IEnvironmentValidationAction.cs" />
     <Compile Include="Config\MsmqTransportConfigurationAware.cs" />
-    <Compile Include="Config\RhinoQueuesConfigurationAware.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="Convertors\ThrowingWireEncryptedMessageConvertor.cs" />
     <Compile Include="Convertors\WireEncryptedMessageConvertor.cs" />
@@ -309,13 +301,9 @@
     <Compile Include="Msmq\QueueInfo.cs" />
     <Compile Include="Msmq\QueueType.cs" />
     <Compile Include="Msmq\TransactionalOptions.cs" />
-    <Compile Include="RhinoQueues\ErrorAction.cs" />
-    <Compile Include="RhinoQueues\PhtSubscriptionStorage.cs" />
-    <Compile Include="RhinoQueues\RhinoQueueCurrentMessageInformation.cs" />
-    <Compile Include="RhinoQueues\RhinoQueuesTransport.cs" />
-    <Compile Include="RhinoQueues\TimeoutAction.cs" />
     <Compile Include="Transport\TransportUtil.cs" />
     <Compile Include="Util\CurrentMessage.cs" />
+    <Compile Include="Util\GuidCombGenerator.cs" />
     <Compile Include="Util\SerializationExtensions.cs" />
     <Compile Include="Util\UriExtensions.cs" />
     <None Include="PublicApi.cd" />

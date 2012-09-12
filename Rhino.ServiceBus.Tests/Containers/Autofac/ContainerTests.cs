@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Messaging;
 using Autofac.Core;
 using Rhino.ServiceBus.Exceptions;
@@ -10,6 +11,8 @@ using Autofac;
 using Rhino.ServiceBus.Msmq;
 using Xunit;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
+using Rhino.ServiceBus.Actions;
+using System.Collections.Generic;
 
 namespace Rhino.ServiceBus.Tests.Containers.Autofac
 {
@@ -27,7 +30,7 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         public void Consumer_must_be_transient()
         {
             var builder = new ContainerBuilder();
-            
+
             builder.RegisterType<TestConsumer>()
                 .AsSelf()
                 .SingleInstance();
@@ -102,9 +105,9 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
             {
                 Uri = new Uri("msmq://localhost/test.balancer.acceptingwork")
             });
-            if(MessageQueue.Exists(queuePath.QueuePath) == false)
+            if (MessageQueue.Exists(queuePath.QueuePath) == false)
                 MessageQueue.Create(queuePath.QueuePath);
-            if(MessageQueue.Exists(queueAcceptingPath.QueuePath) == false)
+            if (MessageQueue.Exists(queueAcceptingPath.QueuePath) == false)
                 MessageQueue.Create(queueAcceptingPath.QueuePath);
 
             new LoadBalancerConfiguration()
@@ -142,12 +145,36 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
         }
 
         [Fact]
+        public void QueueCreationModule_can_be_resolved()
+        {
+            new RhinoServiceBusConfiguration()
+                .UseAutofac(container)
+                .Configure();
+
+            var allBusAware = container.Resolve<IEnumerable<IServiceBusAware>>().ToList();
+            Assert.NotEmpty(allBusAware);
+            Assert.IsType<QueueCreationModule>(allBusAware.First());
+        }
+
+        [Fact]
+        public void DeploymentActions_can_be_resolved()
+        {
+            new RhinoServiceBusConfiguration()
+                .UseAutofac(container)
+                .UseStandaloneConfigurationFile("BusWithLogging.config")
+                .Configure();
+
+            var actions = container.Resolve<IEnumerable<IDeploymentAction>>().ToList();
+            Assert.True(actions.Count >= 2);
+        }
+
+        [Fact]
         public void Dispose_dose_not_throws()
         {
             new RhinoServiceBusConfiguration()
                 .UseAutofac(container)
                 .Configure();
-            
+
             container.Dispose();
         }
 
@@ -161,7 +188,7 @@ namespace Rhino.ServiceBus.Tests.Containers.Autofac
     {
         public void Consume(string message)
         {
-            
+
         }
     }
 }

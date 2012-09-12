@@ -271,6 +271,10 @@
       <Project>{4D65E756-C0C9-42AA-9B73-75E85E77EA7B}</Project>
       <Name>Rhino.ServiceBus.Castle</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Rhino.ServiceBus.RhinoQueues\Rhino.ServiceBus.RhinoQueues.csproj">
+      <Project>{9748B2BF-41EA-487A-944C-A4ABEFFA2087}</Project>
+      <Name>Rhino.ServiceBus.RhinoQueues</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.ServiceBus.Spring\Rhino.ServiceBus.Spring.csproj">
       <Project>{E18B8442-40AF-F3A1-9FB0-F1C5FC994CEA}</Project>
       <Name>Rhino.ServiceBus.Spring</Name>

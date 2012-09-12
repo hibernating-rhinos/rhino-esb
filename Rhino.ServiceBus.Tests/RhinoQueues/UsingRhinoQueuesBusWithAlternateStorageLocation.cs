@@ -5,6 +5,7 @@ using Castle.Windsor;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 using Xunit;
+using Rhino.ServiceBus.RhinoQueues;
 
 namespace Rhino.ServiceBus.Tests.RhinoQueues
 {
@@ -33,6 +34,7 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
             }
 
             var hostConfiguration = new HostConfiguration()
+                .AddAssembly(typeof(RhinoQueuesTransport).Assembly)
                 .StoragePath(alternateStorageLocation)
                 .Bus("rhino.queues://localhost/test_queue2", "test")
                 .Receive("Rhino.ServiceBus.Tests", "rhino.queues://localhost/test_queue");

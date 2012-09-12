@@ -117,9 +117,6 @@
     <Reference Include="Castle.Windsor">
       <HintPath>$(LibDir)Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Queues">
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />

@@ -7,7 +7,6 @@ using Castle.Core.Configuration;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
-using Rhino.Queues;
 using Rhino.ServiceBus.Actions;
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Convertors;
@@ -18,14 +17,14 @@ using Rhino.ServiceBus.LoadBalancer;
 using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Msmq;
 using Rhino.ServiceBus.Msmq.TransportActions;
-using Rhino.ServiceBus.RhinoQueues;
 using ErrorAction = Rhino.ServiceBus.Msmq.TransportActions.ErrorAction;
 using IStartable = Rhino.ServiceBus.Internal.IStartable;
 using LoadBalancerConfiguration = Rhino.ServiceBus.LoadBalancer.LoadBalancerConfiguration;
+using System.Reflection;
 
 namespace Rhino.ServiceBus.Castle
 {
-    public class CastleBuilder : IBusContainerBuilder 
+    public class CastleBuilder : IBusContainerBuilder
     {
         private readonly IWindsorContainer container;
         private readonly AbstractRhinoServiceBusConfiguration config;
@@ -50,30 +49,27 @@ namespace Rhino.ServiceBus.Castle
                 };
         }
 
-        public void RegisterDefaultServices()
+        public void RegisterDefaultServices(IEnumerable<Assembly> assemblies)
         {
             if (!container.Kernel.HasComponent(typeof(IWindsorContainer)))
                 container.Register(Component.For<IWindsorContainer>().Instance(container));
 
             container.Register(Component.For<IServiceLocator>().ImplementedBy<CastleServiceLocator>());
+            foreach (var assembly in assemblies)
+                container.Register(
+                    AllTypes.FromAssembly(assembly)
+                        .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
+                    );
 
-            container.Register(
-                AllTypes.FromAssembly(typeof(IServiceBus).Assembly)
-                    .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
-                );
-
+            var locator = container.Resolve<IServiceLocator>();
             foreach (var configurationAware in container.ResolveAll<IBusConfigurationAware>())
-            {
-                configurationAware.Configure(config, this);
-            }
+                configurationAware.Configure(config, this, locator);
 
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
 
             foreach (var type in config.MessageModules)
-            {
-                if (container.Kernel.HasComponent(type) == false)
+                if (!container.Kernel.HasComponent(type))
                     container.Register(Component.For(type).Named(type.FullName));
-            }
 
             container.Register(
                 Component.For<IReflection>()
@@ -84,13 +80,12 @@ namespace Rhino.ServiceBus.Castle
                     .LifeStyle.Is(LifestyleType.Singleton)
                     .ImplementedBy(config.SerializerType),
                 Component.For<IEndpointRouter>()
-                    .ImplementedBy<EndpointRouter>()
-                );
+                    .ImplementedBy<EndpointRouter>());
         }
 
         public void RegisterBus()
         {
-            var busConfig = (RhinoServiceBusConfiguration) config;
+            var busConfig = (RhinoServiceBusConfiguration)config;
 
             container.Register(
                 Component.For<IDeploymentAction>()
@@ -104,23 +99,20 @@ namespace Rhino.ServiceBus.Castle
                     {
                         messageOwners = busConfig.MessageOwners.ToArray(),
                     })
-                    .DependsOn(Dependency.OnConfigValue("modules",CreateModuleConfigurationNode(busConfig.MessageModules)))
-                );
+                    .DependsOn(Dependency.OnConfigValue("modules", CreateModuleConfigurationNode(busConfig.MessageModules))));
         }
 
         private static IConfiguration CreateModuleConfigurationNode(IEnumerable<Type> messageModules)
         {
             var config = new MutableConfiguration("array");
             foreach (Type type in messageModules)
-            {
                 config.CreateChild("item", "${" + type.FullName + "}");
-            }
             return config;
         }
 
         public void RegisterPrimaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Register(Component.For<MsmqLoadBalancer, IStartable>()
                                    .ImplementedBy(loadBalancerConfig.LoadBalancerType)
                                    .LifeStyle.Is(LifestyleType.Singleton)
@@ -134,13 +126,12 @@ namespace Rhino.ServiceBus.Castle
 
             container.Register(
                 Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLoadBalancerQueuesAction>()
-                );
+                    .ImplementedBy<CreateLoadBalancerQueuesAction>());
         }
 
         public void RegisterSecondaryLoadBalancer()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Register(Component.For<MsmqLoadBalancer>()
                                        .ImplementedBy(loadBalancerConfig.LoadBalancerType)
                                        .LifeStyle.Is(LifestyleType.Singleton)
@@ -155,13 +146,12 @@ namespace Rhino.ServiceBus.Castle
 
             container.Register(
                 Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateLoadBalancerQueuesAction>()
-                );
+                    .ImplementedBy<CreateLoadBalancerQueuesAction>());
         }
 
         public void RegisterReadyForWork()
         {
-            var loadBalancerConfig = (LoadBalancerConfiguration) config;
+            var loadBalancerConfig = (LoadBalancerConfiguration)config;
             container.Register(Component.For<MsmqReadyForWorkListener>()
                                     .LifeStyle.Is(LifestyleType.Singleton)
                                     .DependsOn(new
@@ -170,171 +160,86 @@ namespace Rhino.ServiceBus.Castle
                                         threadCount = loadBalancerConfig.ThreadCount,
                                         transactional = loadBalancerConfig.Transactional
                                     }));
-                container.Register(
-                Component.For<IDeploymentAction>()
-                    .ImplementedBy<CreateReadyForWorkQueuesAction>()
-                );
+            container.Register(
+            Component.For<IDeploymentAction>()
+                .ImplementedBy<CreateReadyForWorkQueuesAction>());
         }
 
         public void RegisterLoadBalancerEndpoint(Uri loadBalancerEndpoint)
         {
             container.Register(
                 Component.For<LoadBalancerMessageModule>()
-                    .DependsOn(new {loadBalancerEndpoint})
-                );
+                    .DependsOn(new { loadBalancerEndpoint }));
         }
 
         public void RegisterLoggingEndpoint(Uri logEndpoint)
         {
             container.Register(
                 Component.For<MessageLoggingModule>()
-                    .DependsOn(new {logQueue = logEndpoint})
-                );
+                    .DependsOn(new { logQueue = logEndpoint }));
         }
 
-        public void RegisterMsmqTransport(Type queueStrategyType)
+        public void RegisterSingleton<T>(Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            container.Register(
+                Component.For<T>()
+                    .UsingFactoryMethod<T>(x => singleton == null ? singleton = func() : singleton));
+        }
+        public void RegisterSingleton<T>(string name, Func<T> func)
+            where T : class
+        {
+            T singleton = null;
+            container.Register(
+                Component.For<T>()
+                    .UsingFactoryMethod<T>(x => singleton == null ? singleton = func() : singleton).Named(name));
+        }
+
+        public void RegisterAll<T>(params Type[] excludes)
+            where T : class { RegisterAll<T>((Predicate<Type>)(x => !excludes.Contains(x))); }
+        public void RegisterAll<T>(Predicate<Type> condition)
+            where T : class
         {
             container.Kernel.Register(
-                Component.For<IQueueStrategy>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(queueStrategyType)
-                    .DependsOn(new {endpoint = config.Endpoint}),
-                Component.For<IMessageBuilder<Message>>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy<MsmqMessageBuilder>(),
-                Component.For<IMsmqTransportAction>()
-                    .ImplementedBy<ErrorAction>()
-                    .DependsOn(new { numberOfRetries = config.NumberOfRetries}),
-                Component.For<ISubscriptionStorage>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqSubscriptionStorage))
-                    .DependsOn(new
-                    {
-                        queueBusListensTo = config.Endpoint
-                    }),
-                Component.For<ITransport>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(MsmqTransport))
-                    .DependsOn(new
-                    {
-                        threadCount = config.ThreadCount,
-                        endpoint = config.Endpoint,
-                        queueIsolationLevel = config.IsolationLevel,
-                        transactional = config.Transactional,
-                        consumeInTransaction = config.ConsumeInTransaction,
-                    }),
-                AllTypes.FromAssembly(typeof(IMsmqTransportAction).Assembly)
-                    .BasedOn<IMsmqTransportAction>()
-                    .Unless(x => x == typeof(ErrorAction))
+                AllTypes.FromAssembly(typeof(T).Assembly)
+                    .BasedOn<T>()
+                    .Unless(x => !condition(x))
                     .WithService.FirstInterface()
                     .Configure(registration =>
-                               registration.LifeStyle.Is(LifestyleType.Singleton))
-                );
-        }
-
-        public void RegisterQueueCreation()
-        {
-            container.Kernel.Register(Component.For<IServiceBusAware>()
-                .ImplementedBy<QueueCreationModule>());
-        }
-
-        public void RegisterMsmqOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            container.Register(
-                   Component.For<IMessageBuilder<Message>>()
-                       .LifeStyle.Is(LifestyleType.Singleton)
-                       .ImplementedBy<MsmqMessageBuilder>(),
-                   Component.For<IOnewayBus>()
-                       .LifeStyle.Is(LifestyleType.Singleton)
-                       .ImplementedBy<MsmqOnewayBus>()
-                       .DependsOn(new { messageOwners = oneWayConfig.MessageOwners }));
-        }
-
-        public void RegisterRhinoQueuesTransport()
-        {
-            var busConfig = config.ConfigurationSection.Bus;
-            container.Register(
-                Component.For<ISubscriptionStorage>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(PhtSubscriptionStorage))
-                    .DependsOn(new
-                    {
-                        subscriptionPath = busConfig.SubscriptionPath
-                    }),
-                Component.For<ITransport>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                    .ImplementedBy(typeof(RhinoQueuesTransport))
-                    .DependsOn(new
-                    {
-                        threadCount = config.ThreadCount,
-                        endpoint = config.Endpoint,
-                        queueIsolationLevel = config.IsolationLevel,
-                        numberOfRetries = config.NumberOfRetries,
-                        path = busConfig.QueuePath,
-                        enablePerformanceCounters = busConfig.EnablePerformanceCounters
-                    }),
-                Component.For<IMessageBuilder<MessagePayload>>()
-                    .ImplementedBy<RhinoQueuesMessageBuilder>()
-                    .LifeStyle.Is(LifestyleType.Singleton)
-                );
-        }
-
-        public void RegisterRhinoQueuesOneWay()
-        {
-            var oneWayConfig = (OnewayRhinoServiceBusConfiguration) config;
-            var busConfig = config.ConfigurationSection.Bus;
-            container.Register(
-                     Component.For<IMessageBuilder<MessagePayload>>()
-                        .ImplementedBy<RhinoQueuesMessageBuilder>()
-                        .LifeStyle.Is(LifestyleType.Singleton),
-                    Component.For<IOnewayBus>()
-                        .LifeStyle.Is(LifestyleType.Singleton)
-                        .ImplementedBy<RhinoQueuesOneWayBus>()
-                        .DependsOn(new
-                        {
-                            messageOwners = oneWayConfig.MessageOwners.ToArray(),
-                            path = busConfig.QueuePath,
-                            enablePerformanceCounters = busConfig.EnablePerformanceCounters
-                        })
-                    );
+                            registration.LifeStyle.Is(LifestyleType.Singleton)));
         }
 
         public void RegisterSecurity(byte[] key)
         {
             container.Register(
-				Component.For<IEncryptionService>()
-					.ImplementedBy<RijndaelEncryptionService>()
-					.DependsOn(new
-					{
-						key,
-					})
-					.Named("esb.security")
-				);
+                Component.For<IEncryptionService>()
+                    .ImplementedBy<RijndaelEncryptionService>()
+                    .DependsOn(new
+                    {
+                        key,
+                    })
+                    .Named("esb.security"));
 
             container.Register(
                 Component.For<IValueConvertor<WireEncryptedString>>()
                     .ImplementedBy<WireEncryptedStringConvertor>()
-                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security"))
-                );
+                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security")));
 
-        	container.Register(
-				Component.For<IElementSerializationBehavior>()
-					.ImplementedBy<WireEncryptedMessageConvertor>()
-                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security"))
-        		);
+            container.Register(
+                Component.For<IElementSerializationBehavior>()
+                    .ImplementedBy<WireEncryptedMessageConvertor>()
+                    .DependsOn(Dependency.OnComponent("encryptionService", "esb.security")));
         }
 
         public void RegisterNoSecurity()
         {
             container.Register(
                    Component.For<IValueConvertor<WireEncryptedString>>()
-                       .ImplementedBy<ThrowingWireEncryptedStringConvertor>()
-                   );
+                       .ImplementedBy<ThrowingWireEncryptedStringConvertor>());
             container.Register(
                 Component.For<IElementSerializationBehavior>()
-                    .ImplementedBy<ThrowingWireEncryptedMessageConvertor>()
-                );
+                    .ImplementedBy<ThrowingWireEncryptedMessageConvertor>());
         }
     }
 }

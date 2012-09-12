@@ -111,9 +111,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Rhino.Queues">
-      <HintPath>$(LibDir)Rhino.Queues.dll</HintPath>
-    </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\SharedLibs\StructureMap.dll</HintPath>
     </Reference>

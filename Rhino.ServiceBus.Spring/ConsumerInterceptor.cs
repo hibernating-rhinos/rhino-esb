@@ -1,15 +1,13 @@
 ﻿using System;
-
 using Rhino.ServiceBus.Config;
 using Rhino.ServiceBus.Internal;
-
 using Spring.Context;
 using Spring.Objects.Factory.Config;
 
 namespace Rhino.ServiceBus.Spring
 {
     [CLSCompliant(false)]
-    public  class ConsumerInterceptor : IObjectPostProcessor
+    public class ConsumerInterceptor : IObjectPostProcessor
     {
         private readonly IConsumerInterceptor interceptor;
         private readonly IConfigurableApplicationContext applicationContext;
