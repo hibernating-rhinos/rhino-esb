@@ -1,9 +1,12 @@
 using System;
+using Common.Logging;
 
 namespace Rhino.ServiceBus.Host.Actions
 {
     public class DebugAction : IAction
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+
         public void Execute(ExecutingOptions options)
         {
             var host = new RhinoServiceBusHost();
@@ -31,6 +34,7 @@ namespace Rhino.ServiceBus.Host.Actions
             }
             catch (Exception e)
             {
+                Log.Fatal("Host has crashed", e);
                 Console.WriteLine(e);
                 Console.ReadKey();
             }

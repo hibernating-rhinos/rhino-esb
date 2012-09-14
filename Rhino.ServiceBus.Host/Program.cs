@@ -43,13 +43,15 @@ namespace Rhino.ServiceBus.Host
 
         	try
             {
+                log.Debug("Executing action: " + action);
                 actions[action].Execute(executingOptions);
 
                 return 0;
             }
             catch (Exception e)
             {
-                log.Fatal("Host has crashed because of an error",e);
+                Console.WriteLine(e);
+                log.Fatal("Host has crashed because of an error", e);
 				// want to put the error in the error log
 				if(action == Action.Server)
 					throw;

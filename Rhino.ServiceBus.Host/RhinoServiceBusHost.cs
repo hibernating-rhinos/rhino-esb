@@ -1,7 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Common.Logging;
 
 namespace Rhino.ServiceBus.Host
 {
@@ -10,6 +10,8 @@ namespace Rhino.ServiceBus.Host
 
     internal partial class RhinoServiceBusHost : ServiceBase
     {
+        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+
         private RemoteAppDomainHost host;
         private string asm;
         private string cfg;
@@ -31,24 +33,32 @@ namespace Rhino.ServiceBus.Host
 
         protected override void OnStart(string[] ignored)
         {
-            if (string.IsNullOrEmpty(bootStrapper) == false)
+            try
             {
-                var assembly = LoadAssembly();
-                var bootStrapperType = LoadBootStrapperType(assembly);
-                host = new RemoteAppDomainHost(bootStrapperType);
-                host.Configuration(cfg);
-            }
-            else
-            {
-                host = new RemoteAppDomainHost(asm, cfg);
-            }
+                if (string.IsNullOrEmpty(bootStrapper) == false)
+                {
+                    var assembly = LoadAssembly();
+                    var bootStrapperType = LoadBootStrapperType(assembly);
+                    host = new RemoteAppDomainHost(bootStrapperType);
+                    host.Configuration(cfg);
+                }
+                else
+                {
+                    host = new RemoteAppDomainHost(asm, cfg);
+                }
 
-            if (string.IsNullOrEmpty(hostType) == false)
-            {
-                host.SetHostType(hostType);
-            }
+                if (string.IsNullOrEmpty(hostType) == false)
+                {
+                    host.SetHostType(hostType);
+                }
 
-            host.Start();
+                host.Start();
+            }
+            catch (Exception x)
+            {
+                Log.Fatal("Hosted service failed to start", x);
+                throw;
+            }
         }
 
         private Assembly LoadAssembly()
@@ -77,8 +87,16 @@ namespace Rhino.ServiceBus.Host
 
         protected override void OnStop()
         {
-            if (host != null)
-                host.Close();
+            try
+            {
+                if (host != null)
+                    host.Close();
+            }
+            catch (Exception x)
+            {
+                Log.Fatal("Hosted service failed to stop", x);
+                throw;
+            }
         }
 
         public void DebugStart(string[] arguments)
