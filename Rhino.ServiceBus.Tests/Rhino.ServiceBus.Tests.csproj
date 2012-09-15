@@ -192,6 +192,8 @@
     <Compile Include="BugWithLogTest.cs" />
     <Compile Include="BusSubscriptionTests.cs" />
     <Compile Include="CanCustomizeOutgoingMessagesWithMsmq.cs" />
+    <Compile Include="ConfigReaderTests.cs" />
+
     <Compile Include="Containers\Autofac\Can_host_in_another_app_domain.cs" />
     <Compile Include="Containers\Autofac\ContainerTests.cs" />
     <Compile Include="Containers\Autofac\QueueCreationTests.cs" />
@@ -346,5 +348,6 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
+
   -->
 </Project>
