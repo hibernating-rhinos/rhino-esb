@@ -29,7 +29,7 @@ namespace Rhino.ServiceBus.Tests
         public void Can_get_path_variable_replacement()
         {
             var bus = new BusElement();
-            var expected = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "app", "one_way");
+            var expected = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "app"), "one_way");
             bus.Path = "%APPDATA%/app";
 
             Assert.Equal(expected+".esent", bus.QueuePath);
