@@ -18,8 +18,8 @@ namespace Rhino.ServiceBus.Tests
         public void Can_get_path_variable()
         {
             var bus = new BusElement();
-            var expected = "folder/app/one_way";
-            bus.Path = "folder/app";
+            var expected = @"folder\app\one_way";
+            bus.Path = @"folder\app";
 
             Assert.Equal(expected+".esent", bus.QueuePath);
             Assert.Equal(expected + "_subscriptions.esent", bus.SubscriptionPath);
@@ -30,7 +30,7 @@ namespace Rhino.ServiceBus.Tests
         {
             var bus = new BusElement();
             var expected = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "app"), "one_way");
-            bus.Path = "%APPDATA%/app";
+            bus.Path = @"%APPDATA%\app";
 
             Assert.Equal(expected+".esent", bus.QueuePath);
             Assert.Equal(expected + "_subscriptions.esent", bus.SubscriptionPath);
