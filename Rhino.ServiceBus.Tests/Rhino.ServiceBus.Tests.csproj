@@ -207,6 +207,7 @@
     <Compile Include="CanRouteMessageToConsumerThroughContainer.cs" />
     <Compile Include="CanSendMsgsFromOneWayBus.cs" />
     <Compile Include="CanSendMsgsFromOneWayBusUsingRhinoQueues.cs" />
+    <Compile Include="ConfigReaderTests.cs" />
     <Compile Include="DelayedMessages.cs" />
     <Compile Include="DataStructures\LRUSetTest.cs" />
     <Compile Include="DataStructures\HashtableTest.cs" />

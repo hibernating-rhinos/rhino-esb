@@ -72,7 +72,9 @@ namespace Rhino.ServiceBus.Config
         {
             get
             {
-                var basePath = Path ?? System.IO.Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+                var basePath = (Path == null) ?
+                    System.IO.Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory) :
+                    Environment.ExpandEnvironmentVariables(Path); 
                 
                 //Due to validation checks elsewhere, path should never be null except in the cases of a one-way bus
                 var folderName = Name == null || Name.Trim().Length == 0 ? "one_way" : Name;
