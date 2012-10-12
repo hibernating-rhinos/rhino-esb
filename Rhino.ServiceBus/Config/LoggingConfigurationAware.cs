@@ -1,7 +1,6 @@
 using System;
 using System.Configuration;
 using Rhino.ServiceBus.Impl;
-using Rhino.ServiceBus.MessageModules;
 using Rhino.ServiceBus.Internal;
 
 namespace Rhino.ServiceBus.Config
@@ -24,7 +23,6 @@ namespace Rhino.ServiceBus.Config
                     "Attribute 'logEndpoint' on 'bus' has an invalid value '" + uriString + "'");
 
             builder.RegisterLoggingEndpoint(logEndpoint);
-            config.InsertMessageModuleAtFirst<MessageLoggingModule>();
         }
     }
 }

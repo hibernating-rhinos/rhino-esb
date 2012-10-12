@@ -138,8 +138,8 @@ namespace Rhino.ServiceBus.StructureMap
         {
             container.Configure(c =>
             {
-                c.For<MessageLoggingModule>().Singleton().Use<MessageLoggingModule>()
-                  .Ctor<Uri>().Is(logEndpoint);
+                c.For<IMessageModule>().Singleton()
+                    .Use(ctx => new MessageLoggingModule(ctx.GetInstance<IEndpointRouter>(), logEndpoint));
                 c.For<IDeploymentAction>().Use<CreateLogQueueAction>();
             });
         }

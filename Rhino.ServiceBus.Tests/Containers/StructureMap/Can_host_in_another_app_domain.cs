@@ -69,6 +69,10 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
     [CLSCompliant(false)]
     public class SimpleBootStrapper : StructureMapBootStrapper
     {
+        public SimpleBootStrapper()
+        {
+        }
+
         public SimpleBootStrapper(IContainer container) : base(container)
         {
         }
