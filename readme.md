@@ -14,5 +14,5 @@ From a powershell window
 
 ## MORE INFORMATION
 
-More documentation and links to other resources can be found [here](http://hibernatingrhinos.com/open-source/rhino-service-bus).
+More documentation and links to other resources can be found [here](http://hibernatingrhinos.com/oss/rhino-service-bus).
 Ask questions and report issues [here](http://groups.google.com/group/rhino-tools-dev).
