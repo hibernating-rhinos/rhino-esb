@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Rhino.ServiceBus.Unity</id>
-    <version>0.0.0</version>
+    <version>$version$</version>
     <authors>Rene Andersen</authors>
     <owners>Corey Kaylor</owners>
     <licenseUrl>https://raw.github.com/hibernating-rhinos/rhino-esb/master/license.txt</licenseUrl>
@@ -12,7 +12,7 @@
     <description>Unity integration with Rhino.ServiceBus</description>
     <tags>rhino unity servicebus bus msmq messaging cqrs</tags>
     <dependencies>
-      <dependency id="Rhino.ServiceBus"/>
+      <dependency id="Rhino.ServiceBus" version="$version$"/>
       <dependency id="Unity" version="2.1.505.0" />
       <dependency id="Unity.Interception" version="2.1.505.0" />
     </dependencies>
