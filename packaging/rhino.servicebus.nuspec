@@ -3,7 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Rhino.ServiceBus</id>
     <title>Rhino.ServiceBus</title>
-    <version>0.0.0</version>
+    <version>$version$</version>
     <authors>Ayende Rahien, Corey Kaylor</authors>
     <owners>Corey Kaylor</owners>
     <licenseUrl>https://raw.github.com/hibernating-rhinos/rhino-esb/master/license.txt</licenseUrl>

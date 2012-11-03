@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>Rhino.ServiceBus.Castle</id>
-    <version>0.0.0</version>
+    <version>$version$</version>
     <authors>Corey Kaylor</authors>
     <owners>Corey Kaylor</owners>
     <licenseUrl>https://raw.github.com/hibernating-rhinos/rhino-esb/master/license.txt</licenseUrl>
@@ -14,7 +14,7 @@
     <dependencies>
       <dependency id="Castle.Core" version="3.1.0" />
       <dependency id="Castle.Windsor" version="3.1.0" />
-      <dependency id="Rhino.ServiceBus"/>
+      <dependency id="Rhino.ServiceBus" version="$version$"/>
     </dependencies>
   </metadata>
   <files>
