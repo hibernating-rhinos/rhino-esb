@@ -1,4 +1,5 @@
 using System;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus
 {
@@ -11,19 +12,10 @@ namespace Rhino.ServiceBus
         public Uri Uri
         {
             get { return uri; }
-            set
+            set 
             {
-                if (value.Host.Equals("localhost",StringComparison.InvariantCultureIgnoreCase))
-                {
-                    uri = new UriBuilder(value)
-                    {
-                        Host = Environment.MachineName
-                    }.Uri;
-                }
-                else
-                {
-                    uri = value;
-                }
+                if (uri == null) throw new ArgumentNullException();
+                uri = value.NormalizeLocalhost(); 
             }
         }
 

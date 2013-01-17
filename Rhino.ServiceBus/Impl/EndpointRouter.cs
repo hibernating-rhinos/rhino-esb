@@ -14,13 +14,13 @@ namespace Rhino.ServiceBus.Impl
 
         public void RemapEndpoint(Uri originalEndpoint, Uri newEndpoint)
         {
-            mapping.Write(writer => writer.Add(originalEndpoint, newEndpoint));
+            mapping.Write(writer => writer.Add(originalEndpoint.NormalizeLocalhost(), newEndpoint.NormalizeLocalhost()));
         }
 
         public Endpoint GetRoutedEndpoint(Uri endpoint)
         {
             Uri newEndpoint = null;
-            mapping.Read(reader => reader.TryGetValue(endpoint, out newEndpoint));
+            mapping.Read(reader => reader.TryGetValue(endpoint.NormalizeLocalhost(), out newEndpoint));
             return new Endpoint
             {
                 Uri = newEndpoint ?? endpoint
