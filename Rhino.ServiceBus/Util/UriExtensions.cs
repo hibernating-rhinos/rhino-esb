@@ -20,5 +20,16 @@ namespace Rhino.ServiceBus.Util
         {
             return self.AbsolutePath.Substring(1).Split('/').First();
         }
+
+        private static HashSet<string> localhosts = new HashSet<string>(new[]{"localhost","127.0.0.1"}, StringComparer.OrdinalIgnoreCase);
+
+        public static Uri NormalizeLocalhost(this Uri uri)
+        {
+            if (localHosts.Contains(uri.Host))
+            {
+                return new UriBuilder(uri){ Host = Environment.MachineName }.Uri;
+            }
+            return uri;
+        }
     }
 }
