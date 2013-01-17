@@ -78,20 +78,7 @@ namespace Rhino.ServiceBus.Castle
 
         protected virtual void RegisterConsumersFrom(Assembly assembly)
         {
-            container.Register(
-                 AllTypes
-                    .FromAssembly(assembly)
-                    .Where(type =>
-                        typeof(IMessageConsumer).IsAssignableFrom(type) &&
-                        !typeof(IOccasionalMessageConsumer).IsAssignableFrom(type) &&
-                        IsTypeAcceptableForThisBootStrapper(type)
-                    )
-                    .Configure(registration =>
-                    {
-                        registration.LifeStyle.Is(LifestyleType.Transient);
-                        ConfigureConsumer(registration);
-                    })
-                );
+            container.RegisterConsumersFrom(assembly, ConfigureConsumer);
         }
 
         protected virtual void ConfigureConsumer(ComponentRegistration registration)
