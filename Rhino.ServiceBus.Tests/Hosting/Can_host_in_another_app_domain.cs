@@ -32,6 +32,16 @@ namespace Rhino.ServiceBus.Tests.Hosting
         }
 
         [Fact]
+        public void Can_use_different_config_correctly()
+        {
+            var bootStrapper = new SimpleBootStrapper(windsorContainer);
+            var differentConfig = new BusConfigurationSection();
+            bootStrapper.UseConfiguration(differentConfig);
+            bootStrapper.InitializeContainer();
+            Assert.AreEqual(differentConfig, bootStrapper.ConfigurationSectionInUse);
+        }
+
+        [Fact]
         public void Components_are_registered_using_their_full_name()
         {
             var windsorContainer = new WindsorContainer(new XmlInterpreter());
@@ -78,9 +88,16 @@ namespace Rhino.ServiceBus.Tests.Hosting
 
     public class SimpleBootStrapper : CastleBootStrapper
     {
+        public BusConfigurationSection ConfigurationSectionInUse {get ; private set;}
+
         public SimpleBootStrapper(IWindsorContainer container) : base(container)
         {
             
+        }
+
+        protected override void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
+        {
+            ConfigurationSectionInUse = configuration.ConfigurationSection;
         }
     }
 

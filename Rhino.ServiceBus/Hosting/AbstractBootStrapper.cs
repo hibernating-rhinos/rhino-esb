@@ -9,6 +9,7 @@ namespace Rhino.ServiceBus.Hosting
     public abstract class AbstractBootStrapper : IDisposable
     {
         private AbstractRhinoServiceBusConfiguration config;
+        private BusConfigurationSection busSection;
 
         public virtual IEnumerable<Assembly> Assemblies
         {
@@ -24,7 +25,7 @@ namespace Rhino.ServiceBus.Hosting
 
         public virtual void UseConfiguration(BusConfigurationSection configurationSection)
         {
-            config.UseConfiguration(configurationSection);
+            busSection = configurationSection;
         }
 
         public abstract void CreateContainer();
@@ -42,7 +43,9 @@ namespace Rhino.ServiceBus.Hosting
 
         protected virtual AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {
-            return new RhinoServiceBusConfiguration();
+            var cfg = new RhinoServiceBusConfiguration();
+            if (busSection!=null) config.UseConfiguration(configurationSection);
+            return cfg;
         }
 
         protected virtual void ConfigureBusFacility(AbstractRhinoServiceBusConfiguration configuration)
