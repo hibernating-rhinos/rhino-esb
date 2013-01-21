@@ -44,7 +44,7 @@ namespace Rhino.ServiceBus.Hosting
         protected virtual AbstractRhinoServiceBusConfiguration CreateConfiguration()
         {
             var cfg = new RhinoServiceBusConfiguration();
-            if (busSection!=null) config.UseConfiguration(configurationSection);
+            if (busSection!=null) cfg.UseConfiguration(busSection);
             return cfg;
         }
 

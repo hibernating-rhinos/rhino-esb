@@ -78,7 +78,7 @@ namespace Rhino.ServiceBus.Castle
 
         protected virtual void RegisterConsumersFrom(Assembly assembly)
         {
-            container.RegisterConsumersFrom(assembly, ConfigureConsumer);
+            container.RegisterConsumersFrom(assembly, ConfigureConsumer, IsTypeAcceptableForThisBootStrapper);
         }
 
         protected virtual void ConfigureConsumer(ComponentRegistration registration)
