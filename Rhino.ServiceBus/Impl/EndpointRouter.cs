@@ -1,6 +1,7 @@
 using System;
 using Rhino.ServiceBus.DataStructures;
 using Rhino.ServiceBus.Internal;
+using Rhino.ServiceBus.Util;
 
 namespace Rhino.ServiceBus.Impl
 {

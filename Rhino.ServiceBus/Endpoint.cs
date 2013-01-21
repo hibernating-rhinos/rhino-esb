@@ -14,7 +14,7 @@ namespace Rhino.ServiceBus
             get { return uri; }
             set 
             {
-                if (uri == null) throw new ArgumentNullException();
+                if (value == null) throw new ArgumentNullException();
                 uri = value.NormalizeLocalhost(); 
             }
         }
