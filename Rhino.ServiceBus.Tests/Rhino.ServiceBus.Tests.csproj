@@ -212,6 +212,7 @@
     <Compile Include="DataStructures\LRUSetTest.cs" />
     <Compile Include="DataStructures\HashtableTest.cs" />
     <Compile Include="DefaultReflectionTests.cs" />
+    <Compile Include="EndpointRouterTests.cs" />
     <Compile Include="FailureToProcessMessage.cs" />
     <Compile Include="CanCreateInstancesOfServiceBusFromContainer.cs" />
     <Compile Include="FlatQueuesDelayedMessages.cs" />
