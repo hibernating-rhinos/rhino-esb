@@ -14,7 +14,7 @@ properties {
   $run_tests = $true
 }
 
-$framework = '4.0'
+Framework "4.0"
 
 include .\psake_ext.ps1
 	
