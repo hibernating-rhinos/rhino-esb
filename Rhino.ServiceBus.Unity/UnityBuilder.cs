@@ -196,7 +196,7 @@ namespace Rhino.ServiceBus.Unity
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEncryptionService>("esb.security")));
-            container.RegisterType<IElementSerializationBehavior, WireEncryptedMessageConvertor>(
+            container.RegisterType<IElementSerializationBehavior, WireEncryptedMessageConvertor>("WireEncryptedMessageConvertor",
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IEncryptionService>("esb.security")));
@@ -206,7 +206,7 @@ namespace Rhino.ServiceBus.Unity
         {
             container.RegisterType<IValueConvertor<WireEncryptedString>, ThrowingWireEncryptedStringConvertor>(
                 new ContainerControlledLifetimeManager());
-            container.RegisterType<IElementSerializationBehavior, ThrowingWireEncryptedMessageConvertor>(
+            container.RegisterType<IElementSerializationBehavior, ThrowingWireEncryptedMessageConvertor>("ThrowingWireEncryptedMessageConvertor",
                 new ContainerControlledLifetimeManager());
         }
     }
