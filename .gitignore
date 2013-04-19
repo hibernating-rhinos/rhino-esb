@@ -9,6 +9,7 @@ nuget/
 *.sln.cache
 _ReSharper.*/
 AssemblyInfo.cs
+*DotSettings*
 *.user
 push.cmd
 *.metaproj

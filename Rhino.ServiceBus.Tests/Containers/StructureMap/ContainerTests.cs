@@ -19,7 +19,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         [Fact]
         public void Consumer_must_be_transient()
         {
-            var container = ObjectFactory.Container;
+            var container = new Container();
             container.Configure(c => c.For<TestConsumer>().Singleton().Use<TestConsumer>());
             new RhinoServiceBusConfiguration()
                 .UseStructureMap(container)
@@ -38,18 +38,20 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         [Fact]
         public void Can_register_log_endpoint()
         {
-            var host = new DefaultHost();
-            host.BusConfiguration(x => x.Bus("rhino.queues://localhost/test_queue", "test_queue")
-                                           .AddAssembly(typeof (ServiceBus.RhinoQueues.RhinoQueuesTransport).Assembly)
-                                           .Receive("Rhino", "rhino.queues://localhost/test_queue")
-                                           .Logging("rhino.queues://localhost/log_queue"));
-            host.Start<SimpleBootStrapper>();
+            using (var host = new DefaultHost())
+            {
+                host.BusConfiguration(x => x.Bus("rhino.queues://localhost/test_queue", "test_queue")
+                                          .AddAssembly(typeof(ServiceBus.RhinoQueues.RhinoQueuesTransport).Assembly)
+                                          .Receive("Rhino", "rhino.queues://localhost/test_queue")
+                                          .Logging("rhino.queues://localhost/log_queue"));
+                host.Start<SimpleBootStrapper>();
+            }
         }
 
         [Fact]
         public void Bus_instance_is_singleton()
         {
-            var container = ObjectFactory.Container;
+            var container = new Container();
             new RhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .Configure();
@@ -62,7 +64,7 @@ namespace Rhino.ServiceBus.Tests.Containers.StructureMap
         [Fact]
         public void Oneway_bus_is_singleton()
         {
-            var container = ObjectFactory.Container;
+            var container = new Container();
             new OnewayRhinoServiceBusConfiguration()
                 .UseStructureMap(container)
                 .Configure();
