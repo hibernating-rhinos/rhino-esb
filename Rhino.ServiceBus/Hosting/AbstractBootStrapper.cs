@@ -26,6 +26,7 @@ namespace Rhino.ServiceBus.Hosting
         public virtual void UseConfiguration(BusConfigurationSection configurationSection)
         {
             busSection = configurationSection;
+            if (config != null) config.UseConfiguration(busSection);
         }
 
         public abstract void CreateContainer();
