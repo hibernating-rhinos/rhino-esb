@@ -30,6 +30,7 @@ namespace Rhino.ServiceBus.Config
         private void RegisterRhinoQueuesTransport(AbstractRhinoServiceBusConfiguration c, IBusContainerBuilder b, IServiceLocator l)
         {
             var busConfig = c.ConfigurationSection.Bus;
+            var queueManagerConfiguration = new QueueManagerConfiguration();
 
             b.RegisterSingleton<ISubscriptionStorage>(() => (ISubscriptionStorage)new PhtSubscriptionStorage(
                 busConfig.SubscriptionPath,
@@ -45,11 +46,14 @@ namespace Rhino.ServiceBus.Config
                 c.IsolationLevel,
                 c.NumberOfRetries,
                 busConfig.EnablePerformanceCounters,
-                l.Resolve<IMessageBuilder<MessagePayload>>()));
+                l.Resolve<IMessageBuilder<MessagePayload>>(),
+                queueManagerConfiguration));
 
             b.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => (IMessageBuilder<MessagePayload>)new RhinoQueuesMessageBuilder(
                 l.Resolve<IMessageSerializer>(),
                 l.Resolve<IServiceLocator>()));
+
+            b.RegisterSingleton<QueueManagerConfiguration>(() => queueManagerConfiguration);
         }
     }
 }

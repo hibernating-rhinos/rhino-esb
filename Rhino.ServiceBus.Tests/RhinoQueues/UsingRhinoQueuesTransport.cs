@@ -5,6 +5,7 @@ using System.Threading;
 using System.Transactions;
 using Castle.MicroKernel;
 using Castle.Windsor;
+using Rhino.Queues;
 using Rhino.ServiceBus.Castle;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.RhinoQueues;
@@ -36,7 +37,8 @@ namespace Rhino.ServiceBus.Tests.RhinoQueues
                 IsolationLevel.Serializable, 
                 5,
                 false,
-                new RhinoQueuesMessageBuilder(messageSerializer, serviceLocator)
+                new RhinoQueuesMessageBuilder(messageSerializer, serviceLocator),
+                new QueueManagerConfiguration()
                 );
             transport.Start();
         }

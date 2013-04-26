@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
+using Rhino.Queues;
 using Rhino.ServiceBus.Hosting;
 using Rhino.ServiceBus.Impl;
 using Rhino.ServiceBus.Internal;
@@ -62,7 +63,8 @@ namespace Rhino.ServiceBus.Tests
                         Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "one_way.esent"),
                         false,
                         new RhinoQueuesMessageBuilder(container.Resolve<IMessageSerializer>(),
-                            container.Resolve<IServiceLocator>())))
+                            container.Resolve<IServiceLocator>()),
+                        new QueueManagerConfiguration()))
                 {
                     oneWay.Send("hello there, one way");
 

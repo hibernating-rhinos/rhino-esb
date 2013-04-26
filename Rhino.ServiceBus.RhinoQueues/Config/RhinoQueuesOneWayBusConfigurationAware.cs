@@ -30,6 +30,7 @@ namespace Rhino.ServiceBus.Config
         {
             var oneWayConfig = (OnewayRhinoServiceBusConfiguration)c;
             var busConfig = c.ConfigurationSection.Bus;
+            var queueManagerConfiguration = new QueueManagerConfiguration();
 
             b.RegisterSingleton<IMessageBuilder<MessagePayload>>(() => (IMessageBuilder<MessagePayload>)new RhinoQueuesMessageBuilder(
                 l.Resolve<IMessageSerializer>(),
@@ -40,7 +41,10 @@ namespace Rhino.ServiceBus.Config
                 l.Resolve<IMessageSerializer>(),
                 busConfig.QueuePath,
                 busConfig.EnablePerformanceCounters,
-                l.Resolve<IMessageBuilder<MessagePayload>>()));
+                l.Resolve<IMessageBuilder<MessagePayload>>(),
+                queueManagerConfiguration));
+
+            b.RegisterSingleton<QueueManagerConfiguration>(() => queueManagerConfiguration);
         }
     }
 }
