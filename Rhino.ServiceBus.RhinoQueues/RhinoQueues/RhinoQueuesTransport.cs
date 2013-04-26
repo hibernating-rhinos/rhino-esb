@@ -41,6 +41,7 @@ namespace Rhino.ServiceBus.RhinoQueues
         private readonly int numberOfRetries;
         private readonly bool enablePerformanceCounters;
         private readonly IMessageBuilder<MessagePayload> messageBuilder;
+        private readonly QueueManagerConfiguration queueManagerConfiguration;
 
         [ThreadStatic]
         private static RhinoQueueCurrentMessageInformation currentMessageInformation;
@@ -58,13 +59,15 @@ namespace Rhino.ServiceBus.RhinoQueues
             IsolationLevel queueIsolationLevel,
             int numberOfRetries,
             bool enablePerformanceCounters,
-            IMessageBuilder<MessagePayload> messageBuilder)
+            IMessageBuilder<MessagePayload> messageBuilder,
+            QueueManagerConfiguration queueManagerConfiguration)
         {
             this.endpoint = endpoint;
             this.queueIsolationLevel = queueIsolationLevel;
             this.numberOfRetries = numberOfRetries;
             this.enablePerformanceCounters = enablePerformanceCounters;
             this.messageBuilder = messageBuilder;
+            this.queueManagerConfiguration = queueManagerConfiguration;
             this.endpointRouter = endpointRouter;
             this.messageSerializer = messageSerializer;
             this.threadCount = threadCount;
@@ -210,7 +213,7 @@ namespace Rhino.ServiceBus.RhinoQueues
 
         private void ConfigureAndStartQueueManager(int port)
         {
-            queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path);
+            queueManager = new QueueManager(new IPEndPoint(IPAddress.Any, port), path, queueManagerConfiguration);
             queueManager.CreateQueues(queueName);
 
             if (enablePerformanceCounters)
