@@ -85,6 +85,8 @@ namespace Rhino.ServiceBus.StructureMap
                     .Ctor<MessageOwner[]>().Is(busConfig.MessageOwners.ToArray());
                 c.Forward<IStartableServiceBus, IStartable>();
                 c.Forward<IStartableServiceBus, IServiceBus>();
+                c.For<IStartable>().Singleton();
+                c.For<IServiceBus>().Singleton();
             });
         }
 
