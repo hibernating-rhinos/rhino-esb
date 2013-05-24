@@ -62,8 +62,8 @@ namespace Rhino.ServiceBus.Autofac
             foreach (var module in config.MessageModules)
             {
                 builder.RegisterType(module)
-                    .Named<string>(module.FullName)
-                    .As(typeof(IMessageModule))
+                    .Named<IMessageModule>(module.FullName)
+                    .As<IMessageModule>()
                     .SingleInstance();
             }
             builder.Update(container);
