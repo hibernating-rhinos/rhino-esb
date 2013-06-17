@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Transactions;
 using Rhino.ServiceBus.Config;
 using System.Reflection;
 
@@ -16,6 +17,7 @@ namespace Rhino.ServiceBus.Hosting
         protected string LogEndpoint { get; set; }
         private string Path { get; set; }
         private bool EnablePerformanceCounter { get; set; }
+        private IsolationLevel QueueIsolationLevel { get; set; }
         private IDictionary<string, HostConfigMessageEndpoint> Messages { get; set; }
         private IList<Assembly> ScanAssemblies { get; set; }
 
@@ -75,6 +77,12 @@ namespace Rhino.ServiceBus.Hosting
             return this;
         }
 
+        public HostConfiguration IsolationLevel(IsolationLevel isolationLevel)
+        {
+            QueueIsolationLevel = isolationLevel;
+            return this;
+        }
+
         public HostConfiguration Security(string key)
         {
             SecurityKey = key;
@@ -117,6 +125,7 @@ namespace Rhino.ServiceBus.Hosting
             config.Bus.Name = Name;
             config.Bus.LoadBalancerEndpoint = LoadBalancerEndpoint;
             config.Bus.LogEndpoint = LogEndpoint;
+            config.Bus.QueueIsolationLevel = QueueIsolationLevel.ToString();
             config.Bus.Transactional = Transactional.ToString();
             config.Bus.Path = Path;
             config.Bus.EnablePerformanceCounters = EnablePerformanceCounter;
@@ -136,16 +145,10 @@ namespace Rhino.ServiceBus.Hosting
         }
 
 
-        private class HostConfigMessageEndpoint {
-          public string Endpoint {
-            get;
-            set;
-          }
-
-          public bool Transactional {
-            get;
-            set;
-          }
+        private class HostConfigMessageEndpoint
+        {
+          public string Endpoint { get; set; }
+          public bool Transactional { get; set; }
         }
     }
 }

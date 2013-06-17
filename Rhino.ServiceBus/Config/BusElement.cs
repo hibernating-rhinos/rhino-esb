@@ -31,6 +31,7 @@ namespace Rhino.ServiceBus.Config
         public string QueueIsolationLevel
         {
             get { return this["queueIsolationLevel"] as string; }
+            set { this["queueIsolationLevel"] = value; }
         }
 
         public bool? ConsumeInTransaction
