@@ -72,6 +72,15 @@ namespace Rhino.ServiceBus.Hosting
         {
         }
 
+        public void EndInitializeBus()
+        {
+            OnEndInitializeBus();
+        }
+
+        protected virtual void OnEndInitializeBus()
+        {
+        }
+
         public abstract void Dispose();
     }
 }
