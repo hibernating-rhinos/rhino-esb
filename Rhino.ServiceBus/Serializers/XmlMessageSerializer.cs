@@ -6,8 +6,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Web.Caching;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Rhino.ServiceBus.Exceptions;
 using Rhino.ServiceBus.Internal;
 using System.Linq;
@@ -76,31 +78,38 @@ namespace Rhino.ServiceBus.Serializers
 
         private void WriteObject(string name, object value, XContainer parent, IDictionary<string, XNamespace> namespaces)
         {
-            if(HaveCustomValueConvertor(value.GetType()))
+            var valueType = value != null ? value.GetType() : null;
+            if(HaveCustomValueConvertor(valueType))
             {
                 var valueConvertorType = reflection.GetGenericTypeOf(typeof (IValueConvertor<>), value);
                 var convertor = serviceLocator.Resolve(valueConvertorType);
 
-                var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
+                var elementName = GetXmlNamespace(namespaces, valueType) + name;
 
                 var convertedValue = reflection.InvokeToElement(convertor, value, v => GetXmlNamespace(namespaces, v));
 
-            	convertedValue = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), convertedValue);
+            	convertedValue = ApplyMessageSerializationBehaviorIfNecessary(valueType, convertedValue);
 
                 parent.Add(new XElement(elementName, convertedValue));
             }
-			else if(HaveCustomSerializer(value.GetType()))
+			else if(HaveCustomSerializer(valueType))
 			{
-				var customSerializer = customElementSerializers.First(s => s.CanSerialize(value.GetType()));
-				var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
+				var customSerializer = customElementSerializers.First(s => s.CanSerialize(valueType));
+				var elementName = GetXmlNamespace(namespaces, valueType) + name;
 				var element = customSerializer.ToElement(value, v => GetXmlNamespace(namespaces, v));
 				var customElement = new XElement(elementName, element);
-				customElement = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), customElement);
+				customElement = ApplyMessageSerializationBehaviorIfNecessary(valueType, customElement);
 				parent.Add(customElement);
-			}
+            }
+            else if (value == null)
+            {
+                var ns = GetXmlNamespace(namespaces,  null);
+                var nil = new XAttribute(ns + "nil", true);
+                parent.Add(new XElement(name, nil));
+            }
             else if (ShouldPutAsString(value))
             {
-                var elementName = GetXmlNamespace(namespaces, value.GetType()) + name;
+                var elementName = GetXmlNamespace(namespaces, valueType) + name;
                 parent.Add(new XElement(elementName, FormatAsString(value)));
             }
 			else if (value is byte[])
@@ -108,7 +117,7 @@ namespace Rhino.ServiceBus.Serializers
 				var elementName = GetXmlNamespace(namespaces, typeof(byte[])) + name;
 				parent.Add(new XElement(elementName, Convert.ToBase64String((byte[]) value)));
 			}
-			else if (ShouldTreatAsDictionary(value.GetType()))
+			else if (ShouldTreatAsDictionary(valueType))
 			{
 				XElement list = GetContentWithNamespace(value, namespaces, name);
 				parent.Add(list);
@@ -142,8 +151,6 @@ namespace Rhino.ServiceBus.Serializers
                 var itemCount = 0;
                 foreach (var item in ((IEnumerable)value))
                 {
-                    if (item == null)
-                        continue;
                     itemCount += 1;
                     if (itemCount > MaxNumberOfAllowedItemsInCollection)
                         throw new UnboundedResultSetException("You cannot send collections with more than 256 items (" + value + " " + name + ")");
@@ -161,12 +168,12 @@ namespace Rhino.ServiceBus.Serializers
                         continue;
                     WriteObject(property, propVal, content, namespaces);
                 }
-            	content = ApplyMessageSerializationBehaviorIfNecessary(value.GetType(), content);
+            	content = ApplyMessageSerializationBehaviorIfNecessary(valueType, content);
 				parent.Add(content);
             }
         }
 
-    	private static bool ShouldTreatAsDictionary(Type type)
+        private static bool ShouldTreatAsDictionary(Type type)
     	{
     		if (type.IsGenericType == false)
 				return false;
@@ -215,13 +222,18 @@ namespace Rhino.ServiceBus.Serializers
         }
 
 		private bool HaveCustomSerializer(Type type)
-		{
+        {
+            if (type == null)
+                return false;
+
 			return customElementSerializers
 				.Any(s => s.CanSerialize(type));
 		}
 
         private bool HaveCustomValueConvertor(Type type)
         {
+            if (type == null)
+                return false;
             bool? hasConvertor = null;
             typeHasConvertorCache.Read(
                 reader =>
@@ -241,12 +253,12 @@ namespace Rhino.ServiceBus.Serializers
 
         private XElement GetContentWithNamespace(object value, IDictionary<string, XNamespace> namespaces, string name)
         {
-            var type = value.GetType();
+            var type = value != null ? value.GetType() : null;
             var xmlNsAlias = reflection.GetNamespacePrefixForXml(type);
             XNamespace xmlNs;
             if (namespaces.TryGetValue(xmlNsAlias, out xmlNs) == false)
             {
-                namespaces[xmlNsAlias] = xmlNs = reflection.GetNamespaceForXml(type);
+               namespaces[xmlNsAlias] = xmlNs = reflection.GetNamespaceForXml(type);
             }
 
             return new XElement(xmlNs + name);
@@ -372,7 +384,10 @@ namespace Rhino.ServiceBus.Serializers
                 throw new ArgumentNullException("type");
 
         	element = ApplyMessageDeserializationBehaviorIfNecessary(type, element);
-
+            if (ShouldTreatAsNullValue(element))
+            {
+                return null;
+            }
             if(HaveCustomValueConvertor(type))
             {
                 var convertorType = reflection.GetGenericTypeOf(typeof(IValueConvertor<>),type);
@@ -413,6 +428,19 @@ namespace Rhino.ServiceBus.Serializers
                     });
             }
             return instance;
+        }
+
+        private bool ShouldTreatAsNullValue(XElement element)
+        {
+            if (!element.IsEmpty)
+                return false;
+            XNamespace xsi = reflection.GetNamespaceForXml(null);
+            var nil = element.Attribute(xsi + "nil");
+            if (nil == null) 
+                return false;
+            bool nullable;
+            return Boolean.TryParse(nil.Value, out nullable) 
+                        && nullable;
         }
 
         private static bool CanParseFromString(Type type)

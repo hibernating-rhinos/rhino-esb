@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Common.Logging;
 using Rhino.ServiceBus.Internal;
 
@@ -307,6 +308,8 @@ namespace Rhino.ServiceBus.Impl
 
         public string GetNamespacePrefixForXml(Type type)
         {
+            if (type == null)
+                return "xsi";
             string value;
             if(typeToWellKnownTypeName.TryGetValue(type, out value))
                 return value;
@@ -337,6 +340,8 @@ namespace Rhino.ServiceBus.Impl
 
         public string GetNamespaceForXml(Type type)
         {
+            if (type == null)
+                return XmlSchema.InstanceNamespace;
             string value;
             if (typeToWellKnownTypeName.TryGetValue(type, out value))
                 return value;
