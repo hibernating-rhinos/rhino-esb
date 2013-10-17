@@ -118,6 +118,27 @@ namespace Rhino.ServiceBus.Tests
         }
 
         [Fact]
+        public void Can_serialize_and_deserialize_array_with_null_item()
+        {
+            var serializer = new XmlMessageSerializer(new DefaultReflection(),
+                                                      new CastleServiceLocator(new WindsorContainer()));
+            var stream = new MemoryStream();
+            serializer.Serialize(new object[]
+            {
+                new ClassWithObjectArray
+                {
+                    Items = new object[] {new OrderLine {Product = "ayende"}, null, new OrderLine {Product = "rahien"}}
+                }
+            }, stream);
+            stream.Position = 0;
+            var actual = (ClassWithObjectArray)serializer.Deserialize(stream)[0];
+            Assert.Equal(3, actual.Items.Length);
+            Assert.Equal("ayende", ((OrderLine)actual.Items[0]).Product);
+            Assert.Null(actual.Items[1]);
+            Assert.Equal("rahien", ((OrderLine)actual.Items[2]).Product);
+        }
+
+        [Fact]
         public void Trying_to_send_more_than_256_objects_will_fail()
         {
             var serializer = new XmlMessageSerializer(new DefaultReflection(),

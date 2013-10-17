@@ -67,9 +67,9 @@ namespace Rhino.ServiceBus.Castle
             foreach (var assembly in Assemblies)
             {
                 container.Register(
-                     AllTypes.FromAssembly(assembly)
+                     Classes.FromAssembly(assembly)
                          .BasedOn<IDeploymentAction>(),
-                     AllTypes.FromAssembly(assembly)
+                     Classes.FromAssembly(assembly)
                          .BasedOn<IEnvironmentValidationAction>()
                      );
                 RegisterConsumersFrom(assembly);

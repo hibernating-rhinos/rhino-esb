@@ -57,7 +57,7 @@ namespace Rhino.ServiceBus.Castle
             container.Register(Component.For<IServiceLocator>().ImplementedBy<CastleServiceLocator>());
             foreach (var assembly in assemblies)
                 container.Register(
-                    AllTypes.FromAssembly(assembly)
+                    Classes.FromAssembly(assembly)
                         .BasedOn<IBusConfigurationAware>().WithService.FirstInterface()
                     );
 
@@ -202,7 +202,7 @@ namespace Rhino.ServiceBus.Castle
             where T : class
         {
             container.Kernel.Register(
-                AllTypes.FromAssembly(typeof(T).Assembly)
+                Classes.FromAssembly(typeof(T).Assembly)
                     .BasedOn<T>()
                     .Unless(x => !condition(x))
                     .WithService.FirstInterface()
