@@ -21,5 +21,7 @@ namespace Rhino.ServiceBus
         /// The current endpoint.  This may be null on a one-way bus.
         /// </summary>
         public Endpoint Source { get; set; }
+
+        public bool UseDeadLetterQueue { get; set; }
     }
 }

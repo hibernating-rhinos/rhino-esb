@@ -8,11 +8,13 @@ namespace Rhino.ServiceBus.Msmq
     {
         private readonly MessageOwnersSelector messageOwners;
         private readonly IMessageBuilder<Message> messageBuilder;
+        private readonly bool _useDeadLetterQueue;
 
-        public MsmqOnewayBus(MessageOwner[] messageOwners, IMessageBuilder<Message> messageBuilder)
+        public MsmqOnewayBus(MessageOwner[] messageOwners, IMessageBuilder<Message> messageBuilder, bool useDeadLetterQueue)
         {
             this.messageOwners = new MessageOwnersSelector(messageOwners, new EndpointRouter());
             this.messageBuilder = messageBuilder;
+            _useDeadLetterQueue = useDeadLetterQueue;
         }
 
         public void Send(params object[] msgs)
@@ -22,6 +24,7 @@ namespace Rhino.ServiceBus.Msmq
             {
                 Destination = endpoint,
                 Messages = msgs,
+                UseDeadLetterQueue = _useDeadLetterQueue
             };
             using(var queue = endpoint.InitalizeQueue())
             {
