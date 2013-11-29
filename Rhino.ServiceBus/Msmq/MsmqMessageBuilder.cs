@@ -31,7 +31,7 @@ namespace Rhino.ServiceBus.Msmq
         {
             var msgs = messageInformation.Messages;
             var message = new Message();
-
+            message.UseDeadLetterQueue = messageInformation.UseDeadLetterQueue;
             var isAdmin = msgs.Any(x => x is AdministrativeMessage);
             try
             {

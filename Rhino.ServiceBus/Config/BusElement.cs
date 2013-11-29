@@ -16,6 +16,12 @@ namespace Rhino.ServiceBus.Config
             set { this["threadCount"] = value; }
         }
 
+        public bool UseDeadLetterQueue
+        {
+            get { return (bool)this["useDeadLetterQueue"]; }
+            set { this["useDeadLetterQueue"] = value; }
+        }
+
         public string Endpoint
         {
             get { return this["endpoint"] as string; }
@@ -113,6 +119,7 @@ namespace Rhino.ServiceBus.Config
             Properties.Add(new ConfigurationProperty("name", typeof(string), null));
             Properties.Add(new ConfigurationProperty("path", typeof(string), null));
             Properties.Add(new ConfigurationProperty("enablePerformanceCounters", typeof(bool), false));
+            Properties.Add(new ConfigurationProperty("useDeadLetterQueue", typeof(bool), false));
         }
     }
 }

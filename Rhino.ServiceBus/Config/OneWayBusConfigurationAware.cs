@@ -36,7 +36,7 @@ namespace Rhino.ServiceBus.Config
 
             b.RegisterSingleton<IOnewayBus>(() => (IOnewayBus)new MsmqOnewayBus(
                 oneWayConfig.MessageOwners,
-                l.Resolve<IMessageBuilder<Message>>()));
+                l.Resolve<IMessageBuilder<Message>>(),oneWayConfig.ConfigurationSection.Bus.UseDeadLetterQueue));
         }
     }
 }
