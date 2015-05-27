@@ -39,6 +39,13 @@ namespace Rhino.ServiceBus
 
         public IEnumerable<IHandler> GetAllHandlersFor(Type type)
         {
+            // Autofac lazily registers closing types upon request - without this check, available 
+            // open generic types will not be found by the select statement below
+            if (!CanResolve(type))
+            {
+                return Enumerable.Empty<IHandler>();
+            }
+
             var services = container.ComponentRegistry.Registrations
               .SelectMany(r => r.Services.OfType<TypedService>())
               .Where(pService => type.IsAssignableFrom(pService.ServiceType));
