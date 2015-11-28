@@ -21,14 +21,14 @@ namespace Rhino.ServiceBus.Spring
 
         public static IEnumerable<T> GetAll<T>(this IConfigurableApplicationContext context)
         {
-            IDictionary objectsOfType = context.GetObjectsOfType(typeof(T));
+            IDictionary<string, object> objectsOfType = context.GetObjectsOfType(typeof(T));
             return objectsOfType.Values.Cast<T>();
         }
 
         public static object Get(this IApplicationContext context, Type type)
         {
-            string[] objectNamesForType = context.GetObjectNamesForType(type);
-            if ((objectNamesForType == null) || (objectNamesForType.Length == 0))
+            IList<string> objectNamesForType = context.GetObjectNamesForType(type);
+            if ((objectNamesForType == null) || (objectNamesForType.Count == 0))
             {
                 throw new NoSuchObjectDefinitionException(type.FullName, "Requested Type not defined in the context.");
             }

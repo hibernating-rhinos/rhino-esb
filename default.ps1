@@ -108,6 +108,7 @@ task Release -depends Compile, Test {
     	*\Rhino.ServiceBus.Unity.dll `
     	*\Rhino.ServiceBus.Unity.pdb `
     	*\Common.Logging.dll `
+    	*\Common.Logging.Core.dll `
     	*\Spring.Aop.dll `
     	*\Spring.Aop.pdb `
     	*\Spring.Aop.xml `

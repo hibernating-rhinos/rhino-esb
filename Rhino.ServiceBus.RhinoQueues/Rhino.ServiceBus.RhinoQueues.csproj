@@ -99,6 +99,9 @@
     <Reference Include="Common.Logging">
       <HintPath>..\SharedLibs\3.5\Common.Logging.dll</HintPath>
     </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>..\SharedLibs\3.5\Common.Logging.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Esent.Interop">
       <HintPath>..\SharedLibs\Esent.Interop.dll</HintPath>
     </Reference>

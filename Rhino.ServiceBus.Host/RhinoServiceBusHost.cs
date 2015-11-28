@@ -10,7 +10,7 @@ namespace Rhino.ServiceBus.Host
 
     internal partial class RhinoServiceBusHost : ServiceBase
     {
-        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RhinoServiceBusHost));
 
         private RemoteAppDomainHost host;
         private string asm;
