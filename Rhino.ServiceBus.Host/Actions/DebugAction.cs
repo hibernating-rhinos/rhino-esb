@@ -5,7 +5,7 @@ namespace Rhino.ServiceBus.Host.Actions
 {
     public class DebugAction : IAction
     {
-        private static readonly ILog Log = LogManager.GetCurrentClassLogger();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(DebugAction));
 
         public void Execute(ExecutingOptions options)
         {

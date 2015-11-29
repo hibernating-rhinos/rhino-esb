@@ -43,9 +43,9 @@ namespace Rhino.ServiceBus
 
         public IEnumerable<IHandler> GetAllHandlersFor(Type type)
         {
-            IDictionary objectsOfType = applicationContext.GetObjectsOfType(type);
+            IDictionary<string, object> objectsOfType = applicationContext.GetObjectsOfType(type);
             List<IHandler> handlers = new List<IHandler>();
-            foreach (DictionaryEntry dictionaryEntry in objectsOfType)
+            foreach (KeyValuePair<string, object> dictionaryEntry in objectsOfType)
             {
                 string objectName = (string) dictionaryEntry.Key;
                 IObjectDefinition objectDefinition = applicationContext.ObjectFactory.GetObjectDefinition(objectName);

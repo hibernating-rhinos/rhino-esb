@@ -1276,19 +1276,19 @@
             <param name="targetType">the new object instance</param>
             <param name="targetName">the name of the object</param>
             <param name="customTargetSource">targetSource returned by TargetSource property:
-            may be ignored. Will be null unless a custom target source is in use.</param>
+              may be ignored. Will be null unless a custom target source is in use.</param>
             <returns>an array of additional interceptors for the particular object;
             or an empty array if no additional interceptors but just the common ones;
             or null if no proxy at all, not even with the common interceptors.</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.CreateProxy(System.Type,System.String,System.Object[],Spring.Aop.ITargetSource)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.CreateProxy(System.Type,System.String,System.Collections.Generic.IList{System.Object},Spring.Aop.ITargetSource)">
             <summary>
             Create an AOP proxy for the given object.
             </summary>
             <param name="targetType">Type of the object.</param>
             <param name="targetName">The name of the object.</param>
             <param name="specificInterceptors">The set of interceptors that is specific to this
-            object (may be empty but not null)</param>
+              object (may be empty but not null)</param>
             <param name="targetSource">The target source for the proxy, already pre-configured to access the object.</param>
             <returns>The AOP Proxy for the object.</returns>
         </member>
@@ -1298,14 +1298,14 @@
             </summary>
             <returns>A proxy factory instance for proxying a particular object</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.BuildAdvisors(System.String,System.Object[])">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.BuildAdvisors(System.String,System.Collections.Generic.IList{System.Object})">
             <summary>
             Determines the advisors for the given object, including the specific interceptors
             as well as the common interceptor, all adapted to the Advisor interface.
             </summary>
             <param name="targetName">The name of the object.</param>
             <param name="specificInterceptors">The set of interceptors that is specific to this
-            object (may be empty, but not null)</param>
+              object (may be empty, but not null)</param>
             <returns>The list of Advisors for the given object</returns>
         </member>
         <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.GetCacheKey(System.Type,System.String)">
@@ -1332,7 +1332,7 @@
             <param name="objectName">The object name.</param>
             <returns>true</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.PostProcessPropertyValues(Spring.Objects.IPropertyValues,System.Reflection.PropertyInfo[],System.Object,System.String)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAutoProxyCreator.PostProcessPropertyValues(Spring.Objects.IPropertyValues,System.Collections.Generic.IList{System.Reflection.PropertyInfo},System.Object,System.String)">
             <summary>
             Default behavior, return passed in PropertyValues
             </summary>
@@ -1476,7 +1476,7 @@
             <param name="targetType">the type of the target object</param>
             <param name="targetName">the name of the target object</param>
             <param name="customTargetSource">targetSource returned by TargetSource property:
-            may be ignored. Will be null unless a custom target source is in use.</param>
+              may be ignored. Will be null unless a custom target source is in use.</param>
             <returns>
             an array of additional interceptors for the particular object;
             or an empty array if no additional interceptors but just the common ones;
@@ -1502,7 +1502,7 @@
             <param name="targetName">the name of the object to be advised</param>
             <returns>the list of candidate advisors</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.FindAdvisorsThatCanApply(System.Collections.IList,System.Type,System.String)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.FindAdvisorsThatCanApply(System.Collections.Generic.IList{Spring.Aop.IAdvisor},System.Type,System.String)">
             <summary>
             From the given list of candidate advisors, select the ones that are applicable 
             to the given target specified by targetType and name.
@@ -1512,14 +1512,14 @@
             <param name="targetName">the target object's name</param>
             <returns>the list of applicable advisors</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.SortAdvisors(System.Collections.IList)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.SortAdvisors(System.Collections.Generic.IList{Spring.Aop.IAdvisor})">
             <summary>
             Sorts the advisors.
             </summary>
             <param name="advisors">The advisors.</param>
             <returns></returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.ExtendAdvisors(System.Collections.IList,System.Type,System.String)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.AbstractAdvisorAutoProxyCreator.ExtendAdvisors(System.Collections.Generic.IList{Spring.Aop.IAdvisor},System.Type,System.String)">
             <summary>
             Extension hook that subclasses can override to add additional advisors for the given object,
             given the sorted advisors obtained to date.<br/>
@@ -1582,7 +1582,7 @@
             <param name="targetName">the name of the object to be advised</param>
             <returns>A list of eligible <see cref="T:Spring.Aop.IAdvisor"/> instances</returns>
         </member>
-        <member name="M:Spring.Aop.Framework.AutoProxy.ObjectFactoryAdvisorRetrievalHelper.AddAdvisorCandidate(System.Collections.ArrayList,System.String)">
+        <member name="M:Spring.Aop.Framework.AutoProxy.ObjectFactoryAdvisorRetrievalHelper.AddAdvisorCandidate(System.Collections.Generic.List{Spring.Aop.IAdvisor},System.String)">
             <summary>
             Add the named advisor instance to the list of advisors.
             </summary>
@@ -4021,6 +4021,11 @@
             Gets the target object.
             </summary>
         </member>
+        <member name="P:Spring.Aop.Framework.AbstractMethodInvocation.CurrentInterceptorIndex">
+            <summary>
+            The index from 0 of the current interceptor we're invoking.
+            </summary>
+        </member>
         <member name="T:Spring.Aop.Framework.AdvisedSupport">
             <summary>
             Superclass for AOP proxy configuration managers.
@@ -4142,7 +4147,7 @@
             If the <paramref name="targetSource"/> is <cref lang="null"/>.
             </exception>
         </member>
-        <member name="M:Spring.Aop.Framework.AdvisedSupport.SetInterfacesInternal(System.Type[])">
+        <member name="M:Spring.Aop.Framework.AdvisedSupport.SetInterfacesInternal(System.Collections.Generic.IList{System.Type})">
             <summary>
             Set interfaces to be proxied, bypassing locking and <see cref="P:Spring.Aop.Framework.ProxyConfig.IsFrozen"/>
             </summary>
@@ -4720,7 +4725,7 @@
             instance.
             </param>
         </member>
-        <member name="M:Spring.Aop.Framework.AdvisedSupport.CopyConfigurationFrom(Spring.Aop.Framework.AdvisedSupport,Spring.Aop.ITargetSource,System.Collections.IList,System.Collections.IList)">
+        <member name="M:Spring.Aop.Framework.AdvisedSupport.CopyConfigurationFrom(Spring.Aop.Framework.AdvisedSupport,Spring.Aop.ITargetSource,System.Collections.Generic.IList{Spring.Aop.IAdvisor},System.Collections.Generic.IList{Spring.Aop.IIntroductionAdvisor})">
             <summary>
             Copies the configuration from the supplied other
             <see cref="T:Spring.Aop.Framework.AdvisedSupport"/> into this instance.
@@ -5215,6 +5220,23 @@
             <param name="objectType">The type to be checked.</param>
             <returns><see langword="true"/> if the supplied <paramref name="objectType"/> is a composition based AOP proxy type.</returns>
         </member>
+        <member name="M:Spring.Aop.Framework.AopUtils.IsInheritanceAopProxy(System.Object)">
+            <summary>
+            Is the supplied <paramref name="instance"/> an inheritance based AOP proxy?
+            </summary>
+            <param name="instance">The instance to be checked.</param>
+            <returns>
+            <see langword="true"/> if the supplied <paramref name="instance"/> is
+            an inheritacne based AOP proxy.
+            </returns>
+        </member>
+        <member name="M:Spring.Aop.Framework.AopUtils.IsInheritanceAopProxyType(System.Type)">
+            <summary>
+            Is the supplied <paramref name="objectType"/> an inheritance based AOP proxy type?
+            </summary>
+            <param name="objectType">The type to be checked.</param>
+            <returns><see langword="true"/> if the supplied <paramref name="objectType"/> is an inheritance based AOP proxy type.</returns>
+        </member>
         <member name="M:Spring.Aop.Framework.AopUtils.GetAllInterfaces(System.Object)">
             <summary>
             Gets all of the interfaces that the <see cref="T:System.Type"/> of the
@@ -5429,6 +5451,11 @@
             The new <see cref="T:AopAlliance.Intercept.IMethodInvocation"/> instance to use.
             </returns>
         </member>
+        <member name="P:Spring.Aop.Framework.DynamicMethodInvocation.ProxyMethod">
+            <summary>
+            The method invocation that is to be invoked on the proxy.
+            </summary>
+        </member>
         <member name="T:Spring.Aop.Framework.HashtableCachingAdvisorChainFactory">
             <summary> 
             <see cref="T:Spring.Aop.Framework.IAdvisorChainFactory"/> implementation
@@ -5503,6 +5530,11 @@
             <see cref="T:Spring.Aop.Framework.InterceptorAndDynamicMethodMatcher"/>
             instances for the supplied <paramref name="proxy"/>.
             </returns>
+        </member>
+        <member name="M:Spring.Aop.Framework.HashtableCachingAdvisorChainFactory.#ctor">
+            <summary>
+            Default c'tor
+            </summary>
         </member>
         <member name="M:Spring.Aop.Framework.HashtableCachingAdvisorChainFactory.GetInterceptors(Spring.Aop.Framework.IAdvised,System.Object,System.Reflection.MethodInfo,System.Type)">
             <summary>
@@ -6215,6 +6247,11 @@
             <returns>
             The new <see cref="T:AopAlliance.Intercept.IMethodInvocation"/> instance to use.
             </returns>
+        </member>
+        <member name="P:Spring.Aop.Framework.ReflectiveMethodInvocation.ProxyMethod">
+            <summary>
+            The method invocation that is to be invoked on the proxy.
+            </summary>
         </member>
         <member name="T:Spring.Aop.Support.AbstractGenericPointcutAdvisor">
             <summary>
@@ -10020,7 +10057,7 @@
             A dictionary containing all method arguments, keyed by method name.
             </returns>
         </member>
-        <member name="M:Spring.Aspects.Cache.BaseCacheAdvice.EvalCondition(System.String,Spring.Expressions.IExpression,System.Object,System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Cache.BaseCacheAdvice.EvalCondition(System.String,Spring.Expressions.IExpression,System.Object,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Evaluates a SpEL expression as a boolean value.
             </summary>
@@ -10280,7 +10317,7 @@
             throws an exception.
             </exception>
         </member>
-        <member name="M:Spring.Aspects.Cache.CacheResultAdvice.GetReturnValue(AopAlliance.Intercept.IMethodInvocation,Spring.Caching.CacheResultAttribute,System.Collections.IDictionary,System.Boolean@)">
+        <member name="M:Spring.Aspects.Cache.CacheResultAdvice.GetReturnValue(AopAlliance.Intercept.IMethodInvocation,Spring.Caching.CacheResultAttribute,System.Collections.Generic.IDictionary{System.String,System.Object},System.Boolean@)">
             <summary>
             Obtains return value either from cache or by invoking target method
             and caches it if necessary.
@@ -10303,7 +10340,7 @@
             Return value for the specified <paramref name="invocation"/>.
             </returns>
         </member>
-        <member name="M:Spring.Aspects.Cache.CacheResultAdvice.CacheResultItems(System.Collections.IEnumerable,Spring.Caching.CacheResultItemsAttribute[],System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Cache.CacheResultAdvice.CacheResultItems(System.Collections.IEnumerable,Spring.Caching.CacheResultItemsAttribute[],System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Caches each item from the collection returned by target method.
             </summary>
@@ -10677,7 +10714,7 @@
             </summary>
             <param name="ex">The exception to be handled</param>
             <param name="invocation">The <see cref="T:AopAlliance.Intercept.IMethodInvocation"/> that raised this exception.</param>
-            <returns>The output of <see cref="M:Spring.Aspects.IExceptionHandler.HandleException(System.Collections.IDictionary)"/> </returns>
+            <returns>The output of <see cref="M:Spring.Aspects.IExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})"/> </returns>
         </member>
         <member name="M:Spring.Aspects.Exceptions.ExceptionHandlerAdvice.Parse(System.String)">
             <summary>
@@ -10817,7 +10854,7 @@
             </summary>
             <author>Mark Pollack</author>
         </member>
-        <member name="M:Spring.Aspects.IExceptionHandler.CanHandleException(System.Exception,System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.IExceptionHandler.CanHandleException(System.Exception,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Determines whether this instance can handle the exception the specified exception.
             </summary>
@@ -10827,7 +10864,7 @@
             	<c>true</c> if this instance can handle the specified exception; otherwise, <c>false</c>.
             </returns>
         </member>
-        <member name="M:Spring.Aspects.IExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.IExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -10882,7 +10919,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.AbstractExceptionHandler.CanHandleException(System.Exception,System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.AbstractExceptionHandler.CanHandleException(System.Exception,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Determines whether this instance can handle the exception the specified exception.
             </summary>
@@ -10892,7 +10929,7 @@
             	<c>true</c> if this instance can handle the specified exception; otherwise, <c>false</c>.
             </returns>
         </member>
-        <member name="M:Spring.Aspects.AbstractExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.AbstractExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -10939,7 +10976,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.Exceptions.ExecuteSpelExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Exceptions.ExecuteSpelExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -10962,7 +10999,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.Exceptions.LogExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Exceptions.LogExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -11016,7 +11053,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.Exceptions.ReturnValueExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Exceptions.ReturnValueExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Returns the result of evaluating the translation expression.
             </summary>
@@ -11039,7 +11076,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.Exceptions.SwallowExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Exceptions.SwallowExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -11062,7 +11099,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.Exceptions.TranslationExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.Exceptions.TranslationExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
@@ -11711,7 +11748,7 @@
             </summary>
             <param name="exceptionNames">The exception names.</param>
         </member>
-        <member name="M:Spring.Aspects.RetryExceptionHandler.HandleException(System.Collections.IDictionary)">
+        <member name="M:Spring.Aspects.RetryExceptionHandler.HandleException(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Handles the exception.
             </summary>
