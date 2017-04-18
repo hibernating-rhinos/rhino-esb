@@ -1,7 +1,7 @@
 Rhino Service Bus - A developer friendly service bus for .NET
 =====================================================
 
-##DESCRIPTION
+## DESCRIPTION
 
 Rhino Service Bus is a messaging framework that supports transactional, durable, reliable, distributed, asynchronous messaging.
 
